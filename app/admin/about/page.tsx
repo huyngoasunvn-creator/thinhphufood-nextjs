@@ -1,7 +1,15 @@
-'use client';
+'use client'
 
-import AboutConfig from '@/pages/admin/AboutConfig';
+import { useAppState } from '@/hooks/useAppState'
+import AboutConfig from '@/pages/admin/AboutConfig'
 
 export default function AdminAboutPage() {
-  return <AboutConfig />;
+  const { aboutConfig, saveAboutConfig } = useAppState()
+
+  return (
+    <AboutConfig
+      config={aboutConfig}
+      onUpdate={saveAboutConfig}
+    />
+  )
 }
