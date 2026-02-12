@@ -17,7 +17,8 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, cartCount, profileActive, aboutActive, siteConfig }) => {
   const pathname = usePathname();
-  const isAdmin = pathname.startsWith('/admin');
+const isAdmin = pathname?.startsWith('/admin') ?? false;
+
 
   return (
     <div className="flex flex-col min-h-screen">

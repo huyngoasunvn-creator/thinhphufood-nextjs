@@ -1,7 +1,10 @@
 
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Save, Info, Image as ImageIcon, Layout, Type, Link as LinkIcon, BarChart3 } from 'lucide-react';
 import { AboutConfig } from '../../types';
+
+
 
 interface AdminAboutConfigProps {
   config: AboutConfig;
@@ -10,6 +13,10 @@ interface AdminAboutConfigProps {
 
 const AdminAboutConfig: React.FC<AdminAboutConfigProps> = ({ config, onUpdate }) => {
   const [formData, setFormData] = useState<AboutConfig>(config);
+  useEffect(() => {
+  setFormData(config);
+}, [config]);
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

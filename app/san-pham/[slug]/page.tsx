@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -7,14 +6,17 @@ import { useAppState } from '../../../hooks/useAppState';
 import { useParams } from 'next/navigation';
 
 export default function ProductDetailPage() {
-  const { slug } = useParams();
+  const params = useParams();
+  const slug = params?.slug as string;
+
   const { products, siteConfig, addToCart } = useAppState();
 
   return (
     <ProductDetail 
       products={products} 
       siteConfig={siteConfig} 
-      onAddToCart={addToCart} 
+      onAddToCart={addToCart}
+             
     />
   );
 }

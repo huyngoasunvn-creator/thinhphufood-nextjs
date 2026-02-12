@@ -10,6 +10,16 @@ exports.id = "vendor-chunks/next";
 exports.ids = ["vendor-chunks/next"];
 exports.modules = {
 
+/***/ "(rsc)/./node_modules/next/font/google/target.css?{\"path\":\"app\\\\layout.tsx\",\"import\":\"Be_Vietnam_Pro\",\"arguments\":[{\"subsets\":[\"latin\",\"vietnamese\"],\"weight\":[\"400\",\"500\",\"600\",\"700\",\"800\"]}],\"variableName\":\"beVietnam\"}":
+/*!****************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/next/font/google/target.css?{"path":"app\\layout.tsx","import":"Be_Vietnam_Pro","arguments":[{"subsets":["latin","vietnamese"],"weight":["400","500","600","700","800"]}],"variableName":"beVietnam"} ***!
+  \****************************************************************************************************************************************************************************************************************************/
+/***/ ((module) => {
+
+eval("// Exports\nmodule.exports = {\n\t\"style\": {\"fontFamily\":\"'__Be_Vietnam_Pro_383d88', '__Be_Vietnam_Pro_Fallback_383d88'\",\"fontStyle\":\"normal\"},\n\t\"className\": \"__className_383d88\"\n};\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHJzYykvLi9ub2RlX21vZHVsZXMvbmV4dC9mb250L2dvb2dsZS90YXJnZXQuY3NzP3tcInBhdGhcIjpcImFwcFxcXFxsYXlvdXQudHN4XCIsXCJpbXBvcnRcIjpcIkJlX1ZpZXRuYW1fUHJvXCIsXCJhcmd1bWVudHNcIjpbe1wic3Vic2V0c1wiOltcImxhdGluXCIsXCJ2aWV0bmFtZXNlXCJdLFwid2VpZ2h0XCI6W1wiNDAwXCIsXCI1MDBcIixcIjYwMFwiLFwiNzAwXCIsXCI4MDBcIl19XSxcInZhcmlhYmxlTmFtZVwiOlwiYmVWaWV0bmFtXCJ9IiwibWFwcGluZ3MiOiJBQUFBO0FBQ0E7QUFDQSxXQUFXLGtHQUFrRztBQUM3RztBQUNBIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vdGhpbmhwaHVmb29kLWVjb21tZXJjZS8uL25vZGVfbW9kdWxlcy9uZXh0L2ZvbnQvZ29vZ2xlL3RhcmdldC5jc3M/MjYyOCJdLCJzb3VyY2VzQ29udGVudCI6WyIvLyBFeHBvcnRzXG5tb2R1bGUuZXhwb3J0cyA9IHtcblx0XCJzdHlsZVwiOiB7XCJmb250RmFtaWx5XCI6XCInX19CZV9WaWV0bmFtX1Byb18zODNkODgnLCAnX19CZV9WaWV0bmFtX1Byb19GYWxsYmFja18zODNkODgnXCIsXCJmb250U3R5bGVcIjpcIm5vcm1hbFwifSxcblx0XCJjbGFzc05hbWVcIjogXCJfX2NsYXNzTmFtZV8zODNkODhcIlxufTtcbiJdLCJuYW1lcyI6W10sInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///(rsc)/./node_modules/next/font/google/target.css?{\"path\":\"app\\\\layout.tsx\",\"import\":\"Be_Vietnam_Pro\",\"arguments\":[{\"subsets\":[\"latin\",\"vietnamese\"],\"weight\":[\"400\",\"500\",\"600\",\"700\",\"800\"]}],\"variableName\":\"beVietnam\"}\n");
+
+/***/ }),
+
 /***/ "(ssr)/./node_modules/next/dist/api/link.js":
 /*!********************************************!*\
   !*** ./node_modules/next/dist/api/link.js ***!

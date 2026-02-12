@@ -6,12 +6,17 @@ import { ShoppingCart, Menu, X, Search, User, ShieldCheck, LogOut } from 'lucide
 import { useAuth } from '../hooks/useAuth';
 
 interface HeaderProps {
-  cartCount: number;
+  cartCount?: number;
   profileActive?: boolean;
   aboutPageActive?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ cartCount, profileActive = true, aboutPageActive = true }) => {
+const Header: React.FC<HeaderProps> = ({
+  cartCount = 0,
+  profileActive = true,
+  aboutPageActive = true
+}) => {
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');

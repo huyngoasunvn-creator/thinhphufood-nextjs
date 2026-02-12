@@ -1,15 +1,26 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
 import { Save, Phone, Mail, MapPin, Clock, Type, Link as LinkIcon, Info, Eye, EyeOff } from 'lucide-react';
 import { ContactConfig } from '../../types';
 
 interface AdminContactConfigProps {
-  config: ContactConfig;
+  config?: ContactConfig | null;
   onUpdate: (config: ContactConfig) => void;
 }
 
+
 const AdminContactConfig: React.FC<AdminContactConfigProps> = ({ config, onUpdate }) => {
-  const [formData, setFormData] = useState<ContactConfig>(config);
+  const [formData, setFormData] = useState<ContactConfig | null>(config ?? null);
+
+useEffect(() => {
+  if (config) {
+    setFormData(config);
+  }
+}, [config]);
+
+if (!formData) return null;
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

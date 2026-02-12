@@ -8,6 +8,11 @@
     @apply bg-background text-slate-900;
   }
 }
+  body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;

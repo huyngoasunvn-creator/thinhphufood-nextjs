@@ -14,24 +14,31 @@ interface ProductsProps {
 
 const Products: React.FC<ProductsProps> = ({ products, categories, onAddToCart }) => {
   const searchParams = useSearchParams();
+  const safeSearchParams = searchParams ?? new URLSearchParams();
+
   const router = useRouter();
   const pathname = usePathname();
   const [activeCategory, setActiveCategory] = useState('Tất cả');
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const [searchQuery, setSearchQuery] = useState(
+  safeSearchParams.get('q') ?? ''
+);
+
+
   const [sortBy, setSortBy] = useState('newest');
 
   // Đồng bộ hóa khi tham số URL thay đổi (từ Header)
   useEffect(() => {
-    const q = searchParams.get('q');
-    if (q !== null) {
-      setSearchQuery(q);
-    }
-  }, [searchParams]);
+  const q = safeSearchParams.get('q');
+  if (q) setSearchQuery(q);
+}, [safeSearchParams]);
+
+
 
   // Cập nhật URL khi người dùng nhập vào ô tìm kiếm tại trang này
   const handleSearchChange = (val: string) => {
     setSearchQuery(val);
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(safeSearchParams.toString());
+
     if (val) {
       params.set('q', val);
     } else {

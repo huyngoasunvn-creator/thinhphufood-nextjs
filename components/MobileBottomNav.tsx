@@ -6,16 +6,21 @@ import { usePathname } from 'next/navigation';
 import { Home, ShoppingBag, Newspaper, ShoppingCart, User } from 'lucide-react';
 
 interface MobileBottomNavProps {
-  cartCount: number;
+  cartCount?: number;
   profileActive?: boolean;
 }
 
-const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ cartCount, profileActive = true }) => {
+const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
+  cartCount = 0,
+  profileActive = true
+}) => {
+
   const pathname = usePathname();
   const isActive = (path: string) => pathname === path;
 
   // Không hiển thị trong trang quản trị
-  if (pathname.startsWith('/admin')) return null;
+  if (pathname?.startsWith('/admin')) return null;
+
 
   const navs = [
     { label: 'Trang chủ', icon: Home, path: '/' },
