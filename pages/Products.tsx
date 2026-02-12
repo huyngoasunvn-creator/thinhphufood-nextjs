@@ -1,3 +1,4 @@
+'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
 // Use next/navigation instead of react-router-dom
