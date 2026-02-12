@@ -1,0 +1,33 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #15803d;
+  --secondary: #16a34a;
+  --accent: #facc15;
+  --background: #f8fafc;
+}
+
+body {
+  font-family: 'Be Vietnam Pro', sans-serif;
+  background-color: var(--background);
+  color: #0f172a;
+}
+
+.scroll-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom Typography for Content Detail */
+.prose {
+  max-width: 100% !important;
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+}

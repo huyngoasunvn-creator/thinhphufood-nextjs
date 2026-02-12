@@ -1,0 +1,12 @@
+
+{
+  "name": "ThinhPhuFood - Ecommerce Gạo & Nông Sản",
+  "description": "Website thương mại điện tử chuyên về gạo sạch và nông sản hữu cơ",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "deployment": {
+    "platform": "vercel",
+    "framework": "nextjs"
+  }
+}
