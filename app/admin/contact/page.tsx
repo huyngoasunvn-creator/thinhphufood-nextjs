@@ -1,7 +1,15 @@
-'use client';
+'use client'
 
-import AdminContactConfig from '@/pages/admin/AdminContactConfig';
+import { useAppState } from '@/hooks/useAppState'
+import AdminContactConfig from '@/pages/admin/AdminContactConfig'
 
 export default function AdminContactPage() {
-  return <AdminContactConfig />;
+  const { contact, saveContact } = useAppState()
+
+  return (
+    <AdminContactConfig
+      config={contact}
+      onUpdate={saveContact}
+    />
+  )
 }
