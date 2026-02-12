@@ -1,7 +1,15 @@
-'use client';
+'use client'
 
-import AboutPageConfig from '@/pages/admin/AboutPageConfig';
+import { useAppState } from '@/hooks/useAppState'
+import AboutPageConfig from '@/pages/admin/AboutPageConfig'
 
 export default function AdminAboutPageEmbed() {
-  return <AboutPageConfig />;
+  const { aboutPage, saveAboutPage } = useAppState()
+
+  return (
+    <AboutPageConfig 
+      config={aboutPage}
+      onUpdate={saveAboutPage}
+    />
+  )
 }
