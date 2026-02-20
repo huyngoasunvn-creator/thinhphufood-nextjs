@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import AboutUs from '../../pages/AboutUs';
+import AboutUs from '../../components/AboutUs';
 import { useAppState } from '../../hooks/useAppState';
 
 export default function AboutUsPage() {

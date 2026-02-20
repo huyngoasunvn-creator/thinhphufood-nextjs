@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import Products from '../../pages/Products';
+import Products from '../../components/Products';
 import { useAppState } from '../../hooks/useAppState';
 
 export default function ProductsPage() {

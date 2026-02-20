@@ -1,6 +1,6 @@
 
 import React from 'react';
-import SEOManager from '../components/common/SEO';
+import SEOManager from './common/SEO';
 import { AboutPageConfig } from '../types';
 import { HelpCircle } from 'lucide-react';
 

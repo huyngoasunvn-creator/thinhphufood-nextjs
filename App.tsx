@@ -16,13 +16,13 @@ const Route = ({ element, children }: { element: React.ReactNode, children?: Rea
 
 import Layout from './components/Layout';
 import Home from './pages/Home';
-import Products from './pages/Products';
+import Products from './components/Products';
 import Cart from './pages/Cart';
-import ProductDetail from './pages/ProductDetail';
+import ProductDetail from './components/ProductDetail';
 import News from './pages/News';
 import NewsDetail from './pages/NewsDetail';
 import Profile from './pages/Profile';
-import AboutUs from './pages/AboutUs';
+import AboutUs from './components/AboutUs';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Popup from './components/common/Popup';

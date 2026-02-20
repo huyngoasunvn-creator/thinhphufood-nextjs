@@ -5,11 +5,11 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, BookOpen } from 'lucide-react';
 import { Product, SiteConfig } from '../types';
-import SEOManager from '../components/common/SEO';
-import ProductGallery from '../components/product/ProductGallery';
-import ProductInfo from '../components/product/ProductInfo';
-import ProductTrustBadges from '../components/product/ProductTrustBadges';
-import ProductActionPanel from '../components/product/ProductActionPanel';
+import SEOManager from './common/SEO';
+import ProductGallery from './product/ProductGallery';
+import ProductInfo from './product/ProductInfo';
+import ProductTrustBadges from './product/ProductTrustBadges';
+import ProductActionPanel from './product/ProductActionPanel';
 
 interface ProductDetailProps {
   products: Product[];
