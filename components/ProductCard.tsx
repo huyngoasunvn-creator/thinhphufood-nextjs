@@ -1,3 +1,4 @@
+'use client';
 
 import React from 'react';
 // Use next/link instead of react-router-dom
@@ -5,12 +6,9 @@ import Link from 'next/link';
 import { ShoppingCart, Star, Heart } from 'lucide-react';
 import { Product } from '../types';
 
-interface ProductCardProps {
-  product: Product;
-  onAddToCart: (product: Product) => void;
-}
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+
   return (
     <div className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl transition-all duration-300">
       <div className="relative aspect-square overflow-hidden">
@@ -31,7 +29,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
         </Link>
         <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
           <button
-            onClick={() => onAddToCart(product)}
+            onClick={() => addToCart(product)}
             className="w-full bg-green-600 text-white py-2.5 rounded-xl font-medium flex items-center justify-center space-x-2 hover:bg-green-700 active:scale-95 transition-all shadow-lg shadow-green-600/20"
           >
             <ShoppingCart className="h-4 w-4" />

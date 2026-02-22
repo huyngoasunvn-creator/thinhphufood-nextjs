@@ -1,21 +1,16 @@
-'use client';
-export const dynamic = "force-dynamic";
+import HomePage from "@/components/home/HomePage";
+import { getHomeData } from "@/lib/home-server";
 
-import React from 'react';
-import Home from '../pages/Home';
-import { useAppState } from '../hooks/useAppState';
-
-export default function Page() {
-  const state = useAppState();
+export default async function Page() {
+  const data = await getHomeData();
 
   return (
-    <Home 
-      products={state.products} 
-      banners={state.banners} 
-      news={state.news} 
-      commitments={state.commitments} 
-      aboutConfig={state.aboutConfig} 
-      onAddToCart={state.addToCart} 
+    <HomePage
+      products={data.products}
+      banners={data.banners}
+      news={data.news}
+      commitments={data.commitments}
+      aboutConfig={data.aboutConfig}
     />
   );
 }

@@ -15,9 +15,10 @@ import {
   CheckCircle
 } from 'lucide-react';
 
-import ProductCard from '../components/ProductCard';
-import Hero from '../components/home/Hero';
-import SEOManager from '../components/common/SEO';
+import ProductCard from '@/components/ProductCard';
+import Hero from '@/components/home/Hero';
+import SEOManager from '@/components/common/SEO';
+
 import { Product, Banner, NewsPost, Commitment, AboutConfig } from '../types';
 
 const ICON_MAP: Record<string, any> = {
@@ -37,7 +38,8 @@ interface HomeProps {
   news?: NewsPost[];
   commitments?: Commitment[];
   aboutConfig?: AboutConfig;
-  }
+  onAddToCart?: (product: Product) => void;
+}
 
 const Home: React.FC<HomeProps> = ({
   products = [],
@@ -223,6 +225,7 @@ const Home: React.FC<HomeProps> = ({
               <ProductCard
                 key={product?.id}
                 product={product}
+                onAddToCart={onAddToCart}
               />
             ))}
           </div>
