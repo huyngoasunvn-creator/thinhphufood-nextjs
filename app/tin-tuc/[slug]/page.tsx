@@ -1,7 +1,10 @@
-import { notFound } from 'next/navigation';
-import { getNewsServer } from '@/lib/server/news-server';
-import NewsDetail from '@/components/news/NewsDetail';
-import type { Metadata } from 'next';
+export const dynamic = "force-dynamic";
+
+import Script from "next/script";
+import { getNewsServer } from "@/lib/server/news-server";
+import NewsDetail from "@/components/news/NewsDetail";
+import type { Metadata } from "next";
+
 
 export async function generateStaticParams() {
   const news = await getNewsServer();
