@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Eye, Printer, Search, Filter } from 'lucide-react';
-import { Order } from '../../types';
+import { Order } from '@/types';
 import OrderStats from '../../components/admin/orders/OrderStats';
 import OrderDetailModal from '../../components/admin/orders/OrderDetailModal';
 

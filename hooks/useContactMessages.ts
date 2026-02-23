@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { ContactMessage } from '../types';
+import { ContactMessage } from '@/types';
 
 export const useContactMessages = () => {
   const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);

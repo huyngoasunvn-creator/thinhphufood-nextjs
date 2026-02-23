@@ -1,3 +1,4 @@
+'use client';
 
 import React from 'react';
 import { ADMIN_MENU_ITEMS } from './AdminSidebar';

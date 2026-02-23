@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { Save, Phone, Mail, MapPin, Clock, Type, Link as LinkIcon, Info, Eye, EyeOff } from 'lucide-react';
-import { ContactConfig } from '../../types';
+import { ContactConfig } from '@/types';
 
 interface AdminContactConfigProps {
   config?: ContactConfig | null;

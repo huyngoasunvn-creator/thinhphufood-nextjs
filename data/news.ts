@@ -1,5 +1,5 @@
 
-import { NewsPost } from '../types';
+import { NewsPost } from '@/types';
 
 export const SAMPLE_NEWS: NewsPost[] = [
   {

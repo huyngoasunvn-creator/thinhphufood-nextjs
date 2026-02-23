@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Calendar, User, ArrowLeft, Newspaper, Sparkles } from 'lucide-react';
-import { NewsPost } from '../types';
+import { NewsPost } from '@/types';
 import SEOManager from '../components/common/SEO';
 import NewsCard from '../components/news/NewsCard';
 

@@ -2,15 +2,28 @@
 import React, { useState } from 'react';
 import { Image as ImageIcon, Upload, Loader2, Link as LinkIcon } from 'lucide-react';
 import { uploadImage } from '../../../services/storage';
+import { Product } from '@/types';
+
+
 
 interface ProductFormMediaProps {
-  image: string;
-  onChange: (url: string) => void;
+  initialData?: Product | null;
+  categories: string[];
+  onSave: (product: Product) => void;
+  onClose: () => void;
 }
 
-const ProductFormMedia: React.FC<ProductFormMediaProps> = ({ image, onChange }) => {
+
+const ProductFormMedia: React.FC<ProductFormMediaProps> = ({
+  initialData,
+  categories,
+  onSave,
+  onClose,
+}) => {
+
   const [uploading, setUploading] = useState(false);
   const [mode, setMode] = useState<'upload' | 'url'>('upload');
+  const [image, setImage] = useState<string>(initialData?.image || '');
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -19,7 +32,7 @@ const ProductFormMedia: React.FC<ProductFormMediaProps> = ({ image, onChange }) 
     try {
       setUploading(true);
       const url = await uploadImage(file, 'products');
-      onChange(url);
+      setImage(url);
     } catch (error) {
       console.error("Upload error:", error);
       alert("Lỗi khi tải ảnh lên!");
@@ -27,6 +40,7 @@ const ProductFormMedia: React.FC<ProductFormMediaProps> = ({ image, onChange }) 
       setUploading(false);
     }
   };
+
 
   return (
     <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200">
@@ -81,7 +95,8 @@ const ProductFormMedia: React.FC<ProductFormMediaProps> = ({ image, onChange }) 
               placeholder="Dán URL hình ảnh..." 
               className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-2xl outline-none text-xs font-mono" 
               value={image} 
-              onChange={(e) => onChange(e.target.value)} 
+              onChange={(e) => setImage(e.target.value)}
+ 
             />
           </div>
         )}

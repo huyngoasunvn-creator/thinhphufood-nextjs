@@ -1,8 +1,10 @@
+'use client';
 
 import React, { useState, useMemo } from 'react';
 import { Plus, Search, Edit2, Trash2, Copy } from 'lucide-react';
-import { Product } from '../../types';
-import ProductForm from './ProductForm';
+import { Product } from '@/types';
+import ProductFormMedia from './ProductFormMedia'
+
 
 interface AdminProductsProps {
   products: Product[];
@@ -153,7 +155,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, categories, onA
       </div>
 
       {isModalOpen && (
-        <ProductForm 
+        <ProductFormMedia 
           initialData={editingProduct} 
           categories={categories}
           onSave={handleSave} 

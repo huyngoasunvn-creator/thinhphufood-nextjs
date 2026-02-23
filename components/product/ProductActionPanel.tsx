@@ -1,7 +1,8 @@
+'use client'
 
 import React, { useState } from 'react';
 import { ShoppingCart, Plus, Minus } from 'lucide-react';
-import { Product } from '../../types';
+import { Product } from '@/types';
 
 interface ProductActionPanelProps {
   product: Product;

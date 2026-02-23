@@ -1,7 +1,8 @@
+'use client'
 
 import React, { useState, useMemo } from 'react';
 import { PlayCircle } from 'lucide-react';
-import { Product } from '../../types';
+import { Product } from '@/types';
 
 interface ProductGalleryProps {
   product: Product;

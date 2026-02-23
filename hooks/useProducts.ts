@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore"; // ✅ sửa ở đây
-import { Product } from "../types";
+import { Product } from "@/types";
 import { db } from "../services/firebase";
 import {
   PRODUCTS as INITIAL_PRODUCTS,

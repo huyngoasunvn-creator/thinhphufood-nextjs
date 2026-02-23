@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Mail, Trash2, Eye, MessageSquare, Clock, User, Phone, CheckCircle, Search, Filter } from 'lucide-react';
-import { ContactMessage } from '../../types';
+import { ContactMessage } from '@/types';
 
 interface AdminMessagesProps {
   messages: ContactMessage[];

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Save, UserCircle, Link as LinkIcon, Eye, Info, Type, Settings } from 'lucide-react';
-import { ProfileConfig } from '../../types';
+import { ProfileConfig } from '@/types';
 
 interface AdminProfileConfigProps {
   config: ProfileConfig;

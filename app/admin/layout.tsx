@@ -1,32 +1,25 @@
 
-'use client';
-
 import React from 'react';
-import AdminLayout from '../../pages/admin/AdminLayout';
-import { useAuth } from '../../hooks/useAuth';
-import { useRouter } from 'next/navigation';
+import AdminSidebar from '@/components/admin/layout/AdminSidebar';
+import AdminHeader from '@/components/admin/layout/AdminHeader';
 
-export default function AdminRootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const { user, loading, isAdmin } = useAuth();
-  const router = useRouter();
 
-  // Bảo mật: Nếu không phải admin thì đẩy về trang chủ
-  React.useEffect(() => {
-    if (!loading && (!user || !isAdmin)) {
-      router.push('/login');
-    }
-  }, [user, loading, isAdmin, router]);
-
-  if (loading) return <div className="min-h-screen flex items-center justify-center font-bold">Đang xác thực quyền Admin...</div>;
-  if (!user || !isAdmin) return null;
-
+// Next.js layout style components use children instead of react-router-dom Outlet
+const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   return (
-    <AdminLayout>
-      {children}
-    </AdminLayout>
+    <div className="flex min-h-screen bg-slate-100">
+      <AdminSidebar />
+      <main className="flex-1 ml-64 min-h-screen relative">
+        <AdminHeader />
+        <div className="p-8 pb-20">
+          {children}
+        </div>
+        <footer className="absolute bottom-0 left-0 right-0 p-4 text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest border-t border-slate-200 bg-white/50 backdrop-blur-sm">
+          ThinhPhuFood CMS v2.5 • SEO Optimized Engine
+        </footer>
+      </main>
+    </div>
   );
-}
+};
+
+export default AdminLayout;

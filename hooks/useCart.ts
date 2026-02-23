@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { doc, getDoc, setDoc } from "firebase/firestore"; // ✅ sửa ở đây
-import { Product, CartItem } from "../types";
+import { Product, CartItem } from "@/types";
 import { db } from "../services/firebase";
 import { useAuth } from "./useAuth";
 

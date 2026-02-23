@@ -1,3 +1,4 @@
+'use client';
 
 import React from 'react';
 // Use next/link and next/navigation instead of react-router-dom
@@ -33,7 +34,8 @@ export const ADMIN_MENU_ITEMS: MenuItem[] = [
 ];
 
 const AdminSidebar: React.FC = () => {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? '';
+
 
   return (
     <aside className="w-64 bg-slate-900 text-slate-400 flex flex-col fixed h-full z-20 shadow-2xl">
@@ -44,7 +46,14 @@ const AdminSidebar: React.FC = () => {
       
       <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto scroll-hide">
         {ADMIN_MENU_ITEMS.map((item) => {
-          const isActive = pathname === item.path;
+          const isActive =
+  item.path === '/admin'
+    ? pathname === '/admin'
+    : pathname === item.path ||
+      pathname.startsWith(item.path + '/');
+
+
+
           return (
             <Link
               key={item.path}

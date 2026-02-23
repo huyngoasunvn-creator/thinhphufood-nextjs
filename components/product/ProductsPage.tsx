@@ -5,7 +5,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Search, SlidersHorizontal, ChevronRight } from 'lucide-react';
 import ProductCard from './ProductCard';
-import { Product } from '../types';
+import { Product } from '@/types';
 
 interface ProductsProps {
   products: Product[];
@@ -13,7 +13,7 @@ interface ProductsProps {
   onAddToCart: (product: Product) => void;
 }
 
-const Products: React.FC<ProductsProps> = ({ products, categories, onAddToCart }) => {
+const ProductsPage: React.FC<ProductsProps> = ({ products, categories, onAddToCart }) => {
   const searchParams = useSearchParams();
   const safeSearchParams = searchParams ?? new URLSearchParams();
 
@@ -196,4 +196,4 @@ const Products: React.FC<ProductsProps> = ({ products, categories, onAddToCart }
   );
 };
 
-export default Products;
+export default ProductsPage;

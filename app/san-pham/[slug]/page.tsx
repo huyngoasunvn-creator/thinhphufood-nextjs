@@ -1,22 +1,19 @@
-'use client';
+import ProductDetail from '@/components/product/ProductDetail';
+import { getProductBySlug } from '@/lib/server/product-server';
+import { notFound } from 'next/navigation';
 
-import React from 'react';
-import ProductDetail from '../../../components/ProductDetail';
-import { useAppState } from '../../../hooks/useAppState';
-import { useParams } from 'next/navigation';
+interface PageProps {
+  params: {
+    slug: string;
+  };
+}
 
-export default function ProductDetailPage() {
-  const params = useParams();
-  const slug = params?.slug as string;
+export default async function Page({ params }: PageProps) {
+  const product = await getProductBySlug(params.slug);
 
-  const { products, siteConfig, addToCart } = useAppState();
+  if (!product) {
+    notFound();
+  }
 
-  return (
-    <ProductDetail 
-      products={products} 
-      siteConfig={siteConfig} 
-      onAddToCart={addToCart}
-             
-    />
-  );
+  return <ProductDetail product={product} />;
 }

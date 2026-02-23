@@ -1,8 +1,10 @@
+'use client'
+
 
 import React, { useEffect } from 'react';
 // Use next/navigation instead of react-router-dom
 import { usePathname } from 'next/navigation';
-import { Product, NewsPost } from '../../types';
+import { Product, NewsPost } from '@/types';
 import { generateWebsiteSchema, generateProductSchema, generateArticleSchema } from '../../helpers/seo';
 
 interface SEOProps {

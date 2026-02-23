@@ -3,7 +3,7 @@ import React from 'react';
 import { Mail, Phone, MapPin, Facebook, Instagram, Youtube, Lock } from 'lucide-react';
 // Use next/link instead of react-router-dom
 import Link from 'next/link';
-import { SiteConfig } from '../types';
+import { SiteConfig } from '@/types';
 
 interface FooterProps {
   config: SiteConfig;

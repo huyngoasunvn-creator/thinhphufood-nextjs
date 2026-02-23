@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { X, ArrowRight } from 'lucide-react';
 // Use next/link instead of react-router-dom
 import Link from 'next/link';
-import { PopupConfig } from '../../types';
+import { PopupConfig } from '@/types';
 
 interface PopupProps {
   config: PopupConfig;

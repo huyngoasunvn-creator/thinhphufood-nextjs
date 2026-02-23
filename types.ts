@@ -139,4 +139,5 @@ export interface SiteConfig {
   certValue: string;
   shippingLabel: string;
   shippingValue: string;
+  
 }

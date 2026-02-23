@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 // Use next/link instead of react-router-dom
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { Banner } from '../../types';
+import { Banner } from '@/types';
 
 interface HeroProps {
   banners: Banner[];

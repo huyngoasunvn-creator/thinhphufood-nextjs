@@ -1,18 +1,8 @@
+import ProductsList from "@/components/product/ProductsList";
+import { getProducts } from "@/lib/server/product-server";
 
-'use client';
+export default async function Page() {
+  const products = await getProducts();
 
-import React from 'react';
-import Products from '../../components/Products';
-import { useAppState } from '../../hooks/useAppState';
-
-export default function ProductsPage() {
-  const { products, categories, addToCart } = useAppState();
-
-  return (
-    <Products 
-      products={products} 
-      categories={categories} 
-      onAddToCart={addToCart} 
-    />
-  );
+  return <ProductsList products={products} />;
 }

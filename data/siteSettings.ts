@@ -1,5 +1,5 @@
 
-import { Banner, Commitment, AboutConfig, AboutPageConfig, ProfileConfig, PopupConfig, ContactConfig, SiteConfig } from '../types';
+import { Banner, Commitment, AboutConfig, AboutPageConfig, ProfileConfig, PopupConfig, ContactConfig, SiteConfig } from '@/types';
 
 export const INITIAL_SITE_CONFIG: SiteConfig = {
   siteName: 'ThinhPhuFood',

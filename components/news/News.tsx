@@ -1,9 +1,11 @@
+'use client';
 
 import React, { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
-import SEOManager from '../components/common/SEO';
-import NewsCard from '../components/news/NewsCard';
-import { NewsPost, Banner } from '../types';
+import SEOManager from '@/components/common/SEO';
+import NewsCard from '@/components/news/NewsCard';
+
+import { NewsPost, Banner } from '@/types';
 
 interface NewsProps {
   banners: Banner[];

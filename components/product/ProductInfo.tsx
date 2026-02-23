@@ -1,12 +1,13 @@
 
 import React from 'react';
 import { Star, Info } from 'lucide-react';
-import { Product, SiteConfig } from '../../types';
+import { Product, SiteConfig } from '@/types';
 
 interface ProductInfoProps {
   product: Product;
-  siteConfig: SiteConfig;
+  siteConfig?: SiteConfig;
 }
+
 
 const ProductInfo: React.FC<ProductInfoProps> = ({ product, siteConfig }) => (
   <div className="space-y-8">
@@ -24,7 +25,8 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, siteConfig }) => (
           ))}
           <span className="ml-2 font-bold text-slate-700">{product.rating}</span>
         </div>
-        {siteConfig.showStock && (
+        {siteConfig?.showStock && (
+
           <>
             <div className="h-4 w-px bg-slate-200"></div>
             <span className={`text-sm font-bold ${product.stock > 0 ? 'text-green-600' : 'text-red-500'}`}>

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import SEOManager from './common/SEO';
-import { AboutPageConfig } from '../types';
+import { AboutPageConfig } from '@/types';
 import { HelpCircle } from 'lucide-react';
 
 interface AboutUsProps {

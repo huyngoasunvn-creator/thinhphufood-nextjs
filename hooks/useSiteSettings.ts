@@ -21,7 +21,7 @@ import {
   ContactConfig,
   SiteConfig,
   NewsPost,
-} from "../types";
+} from "@/types";
 
 import {
   INITIAL_SITE_CONFIG,

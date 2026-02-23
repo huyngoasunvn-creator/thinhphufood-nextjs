@@ -1,5 +1,5 @@
 
-import { Product, NewsPost } from '../types';
+import { Product, NewsPost } from '@/types';
 
 export const generateWebsiteSchema = (siteName: string, description: string) => ({
   "@context": "https://schema.org",

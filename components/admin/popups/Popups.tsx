@@ -1,7 +1,8 @@
+'use client';
 
 import React, { useState } from 'react';
 import { MonitorPlay, Save, Image as ImageIcon, Type, Link as LinkIcon, Clock, MessageSquare, Eye, EyeOff } from 'lucide-react';
-import { PopupConfig } from '../../types';
+import { PopupConfig } from '@/types';
 
 interface AdminPopupsProps {
   config: PopupConfig;

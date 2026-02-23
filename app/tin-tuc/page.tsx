@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import News from '../../pages/News';
+import News from '@/components/news/News';
 import { useAppState } from '../../hooks/useAppState';
 
 export default function NewsPage() {

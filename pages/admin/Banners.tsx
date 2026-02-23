@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Plus, Image as ImageIcon, Trash2, Edit2, Eye, EyeOff, Layout, Link as LinkIcon, Palette } from 'lucide-react';
-import { Banner } from '../../types';
+import { Banner } from '@/types';
 import BannerForm from './BannerForm';
 
 interface AdminBannersProps {

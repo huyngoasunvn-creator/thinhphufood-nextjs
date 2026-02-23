@@ -1,18 +1,15 @@
-import { adminDb } from "@/lib/firebase-admin";
+import { adminDb } from "../firebase-admin";
+import { AboutConfig, SiteConfig } from "@/types";
 
-export async function getSettingsServer() {
-  try {
-    const docRef = adminDb.collection("settings").doc("global");
-    const snapshot = await docRef.get();
+interface GlobalSettings {
+  aboutConfig?: AboutConfig;
+  siteConfig?: SiteConfig;
+}
 
-    if (!snapshot.exists) return null;
+export async function getSettingsServer(): Promise<GlobalSettings | null> {
+  const doc = await adminDb.collection("settings").doc("global").get();
 
-    return {
-      id: snapshot.id,
-      ...snapshot.data(),
-    };
-  } catch (error) {
-    console.error("getSettingsServer error:", error);
-    return null;
-  }
+  if (!doc.exists) return null;
+
+  return doc.data() as GlobalSettings;
 }

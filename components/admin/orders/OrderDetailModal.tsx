@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { X, Printer, Package, User, MapPin, Phone, MessageSquare, CreditCard } from 'lucide-react';
-import { Order } from '../../../types';
+import { Order } from '@/types';
 
 interface OrderDetailModalProps {
   order: Order;

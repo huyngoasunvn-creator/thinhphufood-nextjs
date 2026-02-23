@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ShoppingBag, Truck, CheckCircle, XCircle } from 'lucide-react';
-import { Order } from '../../../types';
+import { Order } from '@/types';
 
 interface OrderStatsProps {
   orders: Order[];

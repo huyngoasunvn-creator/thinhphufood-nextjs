@@ -1,7 +1,9 @@
+'use client'
 
 import React, { useState } from 'react';
 import { Save, Info, Link as LinkIcon, Eye, Type, Settings, Layout } from 'lucide-react';
-import { AboutPageConfig } from '../../types';
+import { AboutPageConfig } from '@/types';
+
 
 interface AdminAboutPageConfigProps {
   config: AboutPageConfig;

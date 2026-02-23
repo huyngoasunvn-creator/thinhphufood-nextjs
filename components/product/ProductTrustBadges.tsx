@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ShieldCheck, Truck } from 'lucide-react';
-import { SiteConfig } from '../../types';
+import { SiteConfig } from '@/types';
 
 interface ProductTrustBadgesProps {
   config: SiteConfig;

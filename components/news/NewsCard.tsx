@@ -3,7 +3,7 @@ import React from 'react';
 // Use next/link instead of react-router-dom
 import Link from 'next/link';
 import { Calendar, User, ArrowRight } from 'lucide-react';
-import { NewsPost } from '../../types';
+import { NewsPost } from '@/types';
 
 interface NewsCardProps {
   post: NewsPost;

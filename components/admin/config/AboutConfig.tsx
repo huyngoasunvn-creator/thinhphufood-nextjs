@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Save, Info, Image as ImageIcon, Layout, Type, Link as LinkIcon, BarChart3 } from 'lucide-react';
-import { AboutConfig } from '../../types';
-
+import { AboutConfig } from '@/types';
 
 
 interface AdminAboutConfigProps {

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { X, Save, Image as ImageIcon, FileText, Calendar, Upload, Loader2, Link as LinkIcon } from 'lucide-react';
-import { NewsPost } from '../../types';
+import { NewsPost } from '@/types';
 import RichTextEditor from '../../components/admin/RichTextEditor';
 import { uploadImage } from '../../services/storage';
 

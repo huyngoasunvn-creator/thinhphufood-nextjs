@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Trash2, Plus, Minus } from 'lucide-react';
-import { CartItem } from '../../types';
+import { CartItem } from '@/types';
 
 interface CartItemRowProps {
   item: CartItem;

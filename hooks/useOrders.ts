@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Order } from '../types';
+import { Order } from '@/types';
 import { PRODUCTS as INITIAL_PRODUCTS } from '../data/products';
 
 const INITIAL_ORDERS_MOCK: Order[] = [

@@ -15,11 +15,11 @@ import {
   CheckCircle
 } from 'lucide-react';
 
-import ProductCard from '@/components/ProductCard';
+import ProductCard from '@/components/product/ProductCard';
 import Hero from '@/components/home/Hero';
 import SEOManager from '@/components/common/SEO';
 
-import { Product, Banner, NewsPost, Commitment, AboutConfig } from '../types';
+import { Product, Banner, NewsPost, Commitment, AboutConfig } from '@/types';
 
 const ICON_MAP: Record<string, any> = {
   Leaf,

@@ -1,7 +1,7 @@
 'use client'
 
 import { useAppState } from '@/hooks/useAppState'
-import ProfileConfig from '@/pages/admin/ProfileConfig'
+import ProfileConfig from '@/components/admin/config/ProfileConfig'
 
 export default function AdminProfilePage() {
   const { profile, saveProfile } = useAppState()
