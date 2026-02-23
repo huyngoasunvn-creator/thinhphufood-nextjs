@@ -3,6 +3,7 @@
 import React from 'react';
 import Popups from '@/components/admin/popups/Popups';
 import { useAppState } from '@/hooks/useAppState';
+export const dynamic = "force-dynamic";
 
 export default function AdminPopupsPage() {
   const { popupConfig, savePopups } = useAppState();

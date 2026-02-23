@@ -4,6 +4,7 @@
 import React from 'react';
 import Products from '@/components/admin/products/Products';
 import { useAppState } from '@/hooks/useAppState';
+export const dynamic = "force-dynamic";
 
 export default function AdminProductsPage() {
   const { products, categories, saveProducts } = useAppState();

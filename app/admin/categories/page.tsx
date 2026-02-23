@@ -2,8 +2,9 @@
 'use client';
 
 import React from 'react';
-import AdminCategories from '../../../pages/admin/Categories';
+import AdminCategories from '@/components/admin/Categories';
 import { useAppState } from '../../../hooks/useAppState';
+export const dynamic = "force-dynamic";
 
 export default function AdminCategoriesPage() {
   const { categories, saveCategories } = useAppState();

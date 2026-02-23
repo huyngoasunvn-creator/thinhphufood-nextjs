@@ -1,8 +1,9 @@
-
+'use client';
 import React from 'react';
 import AdminSidebar from '@/components/admin/layout/AdminSidebar';
 import AdminHeader from '@/components/admin/layout/AdminHeader';
 
+export const dynamic = "force-dynamic";
 
 // Next.js layout style components use children instead of react-router-dom Outlet
 const AdminLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {

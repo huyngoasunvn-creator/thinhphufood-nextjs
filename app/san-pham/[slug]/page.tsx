@@ -7,6 +7,7 @@ interface PageProps {
     slug: string;
   };
 }
+export const dynamic = "force-dynamic";
 
 export default async function Page({ params }: PageProps) {
   const product = await getProductBySlug(params.slug);

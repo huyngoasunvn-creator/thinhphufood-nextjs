@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { X, Save, Image as ImageIcon, Layout, Link as LinkIcon, Type, Eye } from 'lucide-react';
-import { Banner } from '@/types';
+import { Banner } from '../../types';
 
 interface BannerFormProps {
   initialData?: Banner | null;

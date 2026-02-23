@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Search, Eye, Share2, Globe, CheckCircle, AlertCircle, Info } from 'lucide-react';
-import { SiteConfig } from '@/types';
+import { SiteConfig } from '../../types';
 
 interface SEOConfigProps {
   config: SiteConfig;

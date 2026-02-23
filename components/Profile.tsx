@@ -1,7 +1,7 @@
 
 import React from 'react';
 import SEOManager from '../components/common/SEO';
-import { ProfileConfig } from '@/types';
+import { ProfileConfig } from '../types';
 import { ShieldCheck } from 'lucide-react';
 
 interface ProfileProps {

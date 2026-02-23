@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, ShoppingBag } from 'lucide-react';
-import { CartItem, Order } from '@/types';
+import { CartItem, Order } from '../types';
 import CartEmpty from '../components/cart/CartEmpty';
 import CartItemRow from '../components/cart/CartItemRow';
 import CheckoutForm from '../components/cart/CheckoutForm';

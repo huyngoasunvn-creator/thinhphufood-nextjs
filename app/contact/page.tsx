@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import Contact from '../../pages/Contact';
+import Contact from '@/components/Contact';
 import { useAppState } from '../../hooks/useAppState';
 
 export default function ContactPage() {

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { X, Save, Info } from 'lucide-react';
-import { Product } from '@/types';
+import { Product } from '../../types';
 import RichTextEditor from '../../components/admin/RichTextEditor';
 import ProductMultiMedia from '../../components/admin/products/ProductMultiMedia';
 

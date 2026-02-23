@@ -2,8 +2,9 @@
 'use client';
 
 import React from 'react';
-import AdminMessages from '../../../pages/admin/ContactMessages';
+import AdminMessages from '@/components/admin/ContactMessages';
 import { useAppState } from '../../../hooks/useAppState';
+export const dynamic = "force-dynamic";
 
 export default function AdminMessagesPage() {
   const { contactMessages, deleteMessage, markAsRead } = useAppState();

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Plus, Edit2, Trash2, Search, Calendar, User } from 'lucide-react';
-import { NewsPost } from '@/types';
+import { NewsPost } from '../../types';
 import AdminNewsForm from './AdminNewsForm';
 
 interface AdminNewsProps {

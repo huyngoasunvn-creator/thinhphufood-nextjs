@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import SEOManager from '../components/common/SEO';
-import { ContactConfig } from '@/types';
+import { ContactConfig } from '../types';
 import { Phone, Mail, MapPin, Clock, Send } from 'lucide-react';
 
 interface ContactProps {

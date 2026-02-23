@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Plus, Trash2, Edit2, Save, X, Leaf, ShieldCheck, Truck, RotateCcw, Award, Star, Heart, CheckCircle } from 'lucide-react';
-import { Commitment } from '@/types';
+import { Commitment } from '../../types';
 
 const ICON_MAP: Record<string, any> = {
   Leaf, ShieldCheck, Truck, RotateCcw, Award, Star, Heart, CheckCircle
