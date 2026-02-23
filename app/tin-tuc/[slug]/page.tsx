@@ -7,15 +7,6 @@ import NewsDetail from "@/components/news/NewsDetail";
 import type { Metadata } from "next";
 
 
-
-export async function generateStaticParams() {
-  const news = await getNewsServer();
-
-  return news.map((item) => ({
-    slug: item.slug,
-  }));
-}
-
 export async function generateMetadata(
   { params }: { params: { slug: string } }
 ): Promise<Metadata> {
