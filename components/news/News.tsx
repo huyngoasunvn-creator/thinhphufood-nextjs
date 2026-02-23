@@ -36,8 +36,15 @@ const News: React.FC<NewsProps> = ({ news, banners = [] }) => {
   }, [news, activeCategory, searchTerm]);
 
   return (
-    <div>
-      {/* JSX của bạn ở đây */}
+    <div style={{ padding: 40 }}>
+      <h1>Tin tức</h1>
+
+      {filtered.map((post) => (
+        <div key={post.id}>
+          <h2>{post.title}</h2>
+          <p>{post.summary}</p>
+        </div>
+      ))}
     </div>
   );
 };
