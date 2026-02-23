@@ -1,7 +1,7 @@
 
 import React, { useMemo } from 'react';
 // Use next/navigation and next/link instead of react-router-dom
-import { useParams } from 'next/navigation';
+
 import Link from 'next/link';
 import { Calendar, User, ArrowLeft, Newspaper, Sparkles } from 'lucide-react';
 import { NewsPost } from '@/types';
@@ -11,10 +11,13 @@ import NewsCard from '@/components/news/NewsCard';
 
 interface NewsDetailProps {
   news: NewsPost[];
+  slug: string;
 }
 
-const NewsDetail: React.FC<NewsDetailProps> = ({ news }) => {
-  const { slug } = useParams() as { slug: string };
+
+const NewsDetail: React.FC<NewsDetailProps> = ({ news, slug }) => {
+
+  
   
   const post = useMemo(() => news.find(n => n.slug === slug), [news, slug]);
   

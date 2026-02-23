@@ -1,5 +1,5 @@
 import { getProductBySlug } from "@/lib/server/product-server";
-import ProductDetail from "@/components/products/ProductDetail";
+import ProductDetail from "@/components/product/ProductDetail";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic"; // 🔥 QUAN TRỌNG
