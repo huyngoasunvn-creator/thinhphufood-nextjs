@@ -7,6 +7,9 @@ const serviceAccount = {
   privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
 };
 
+console.log("PROJECT ID:", process.env.FIREBASE_PROJECT_ID);
+console.log("HAS PRIVATE KEY:", !!process.env.FIREBASE_PRIVATE_KEY);
+
 if (!getApps().length) {
   initializeApp({
     credential: cert(serviceAccount as any),
