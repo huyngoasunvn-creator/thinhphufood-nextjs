@@ -11,5 +11,10 @@ export async function getSettingsServer(): Promise<GlobalSettings | null> {
 
   if (!doc.exists) return null;
 
-  return doc.data() as GlobalSettings;
+  const data: GlobalSettings = {
+    ...doc.data(),
+  };
+
+  return JSON.parse(JSON.stringify(data));
 }
+

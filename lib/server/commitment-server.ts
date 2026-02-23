@@ -4,9 +4,12 @@ import { Commitment } from "@/types";
 export async function getCommitmentsServer(): Promise<Commitment[]> {
   const snapshot = await adminDb.collection("commitments").get();
 
-  return snapshot.docs.map((doc) => ({
+  const data = snapshot.docs.map((doc) => ({
     id: doc.id,
-    ...(doc.data() as Omit<Commitment, "id">),
+    ...doc.data(),
   }));
+
+  return JSON.parse(JSON.stringify(data));
 }
+
 

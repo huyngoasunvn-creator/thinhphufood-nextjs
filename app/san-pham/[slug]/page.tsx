@@ -1,19 +1,20 @@
-import ProductDetail from '@/components/product/ProductDetail';
-import { getProductBySlug } from '@/lib/server/product-server';
-import { notFound } from 'next/navigation';
+import { getProductBySlug } from "@/lib/server/product-server";
+import ProductDetail from "@/components/products/ProductDetail";
+import { notFound } from "next/navigation";
 
-interface PageProps {
+export const dynamic = "force-dynamic"; // 🔥 QUAN TRỌNG
+
+interface Props {
   params: {
     slug: string;
   };
 }
-export const dynamic = "force-dynamic";
 
-export default async function Page({ params }: PageProps) {
+export default async function Page({ params }: Props) {
   const product = await getProductBySlug(params.slug);
 
   if (!product) {
-    notFound();
+    return notFound();
   }
 
   return <ProductDetail product={product} />;

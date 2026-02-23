@@ -4,13 +4,17 @@ import { Product } from "@/types";
 export async function getProducts(): Promise<Product[]> {
   const snapshot = await adminDb.collection("products").get();
 
-  return snapshot.docs.map(doc => ({
+  const data = snapshot.docs.map((doc) => ({
     id: doc.id,
-    ...(doc.data() as Omit<Product, "id">),
+    ...doc.data(),
   }));
+
+  return JSON.parse(JSON.stringify(data));
 }
 
-export async function getProductBySlug(slug: string): Promise<Product | null> {
+export async function getProductBySlug(
+  slug: string
+): Promise<Product | null> {
   const snapshot = await adminDb
     .collection("products")
     .where("slug", "==", slug)
@@ -21,8 +25,10 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 
   const doc = snapshot.docs[0];
 
-  return {
+  const data = {
     id: doc.id,
-    ...(doc.data() as Omit<Product, "id">),
+    ...doc.data(),
   };
+
+  return JSON.parse(JSON.stringify(data));
 }
