@@ -1,4 +1,4 @@
-import Script from 'next/script'
+import { notFound } from 'next/navigation';
 import { getNewsServer } from '@/lib/server/news-server';
 import NewsDetail from '@/components/news/NewsDetail';
 import type { Metadata } from 'next';
@@ -50,7 +50,7 @@ export default async function Page({
   const news = await getNewsServer();
   const post = news.find((n) => n.slug === params.slug);
 
-  if (!post) return null;
+  if (!post) return notFound();
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -66,9 +66,7 @@ export default async function Page({
 
   return (
     <>
-      {/* ✅ JSON-LD đặt ngay trước component */}
-      <Script
-        id="article-schema"
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(articleSchema),
@@ -79,4 +77,3 @@ export default async function Page({
     </>
   );
 }
-
