@@ -1,30 +1,35 @@
 import { adminDb } from "../firebase-admin";
 import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
+import { NewsPost } from "@/types";
 
-export async function getNewsServer() {
+export async function getNewsServer(): Promise<NewsPost[]> {
   const snapshot = await adminDb.collection("news").get();
   console.log("NEWS COUNT:", snapshot.size);
 
-  return snapshot.docs.map(
+  const data: NewsPost[] = snapshot.docs.map(
     (doc: QueryDocumentSnapshot<DocumentData>) => {
-      const data = doc.data();
+      const raw = doc.data();
 
       return {
         id: doc.id,
-        title: data.title || "",
-        slug: data.slug || "",
-        summary: data.summary || "",
-        content: data.content || "",
-        image: data.image || "",
-        category: data.category || "",
-        author: data.author || "",
-        date: data.date || "",
+        title: raw.title || "",
+        slug: raw.slug || "",
+        summary: raw.summary || "",
+        content: raw.content || "",
+        image: raw.image || "",
+        category: raw.category || "",
+        author: raw.author || "",
+        date: raw.date || "",
       };
     }
   );
+
+  return JSON.parse(JSON.stringify(data));
 }
 
-export async function getNewsBySlug(slug: string) {
+export async function getNewsBySlug(
+  slug: string
+): Promise<NewsPost | null> {
   const snapshot = await adminDb
     .collection("news")
     .where("slug", "==", slug)
@@ -34,17 +39,19 @@ export async function getNewsBySlug(slug: string) {
   if (snapshot.empty) return null;
 
   const doc = snapshot.docs[0];
-  const data = doc.data();
+  const raw = doc.data();
 
-  return {
-    id: doc.id,
-    title: data.title || "",
-    slug: data.slug || "",
-    summary: data.summary || "",
-    content: data.content || "",
-    image: data.image || "",
-    category: data.category || "",
-    author: data.author || "",
-    date: data.date || "",
-  };
+  return JSON.parse(
+    JSON.stringify({
+      id: doc.id,
+      title: raw.title || "",
+      slug: raw.slug || "",
+      summary: raw.summary || "",
+      content: raw.content || "",
+      image: raw.image || "",
+      category: raw.category || "",
+      author: raw.author || "",
+      date: raw.date || "",
+    })
+  );
 }
