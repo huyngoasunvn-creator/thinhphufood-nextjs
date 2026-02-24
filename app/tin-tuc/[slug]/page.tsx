@@ -1,50 +1,69 @@
-export const dynamic = "force-dynamic";
-
-import { adminDb } from "@/lib/firebase-admin";
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { decode } from "html-entities";
+import { db } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
-async function getNewsBySlug(slug: string) {
-  const snapshot = await adminDb
-    .collection("news")
-    .where("slug", "==", slug)
-    .limit(1)
-    .get();
+interface PageProps {
+  params: { slug: string };
+}
 
-  if (snapshot.empty) return null;
+async function getPost(slug: string) {
+  const snap = await getDoc(doc(db, "posts", slug));
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() };
+}
 
-  const doc = snapshot.docs[0];
+export async function generateMetadata(
+  { params }: PageProps
+): Promise<Metadata> {
+  const post: any = await getPost(params.slug);
+  if (!post) return {};
 
   return {
-    id: doc.id,
-    ...doc.data(),
+    title: post.seoTitle || post.title,
+    description: post.seoDescription || post.excerpt,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      images: [post.thumbnail],
+      type: "article",
+    },
   };
 }
 
-export default async function Page({
-  params,
-}: {
-  params: { slug: string };
-}) {
-  const post: any = await getNewsBySlug(params.slug);
-
+export default async function PostPage({ params }: PageProps) {
+  const post: any = await getPost(params.slug);
   if (!post) return notFound();
 
-  // 🔥 Decode HTML nếu bị escape
-  const decodedContent = decode(post.content || "");
-
   return (
-    <div className="max-w-4xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold mb-6 text-primary">
-        {post.title}
-      </h1>
+    <article className="bg-background min-h-screen py-12">
+      <div className="max-w-4xl mx-auto px-4">
 
-      <div
-        className="prose prose-lg max-w-none"
-        dangerouslySetInnerHTML={{
-          __html: decodedContent,
-        }}
-      />
-    </div>
+        {/* Title */}
+        <h1 className="text-4xl font-bold mb-4 text-primary leading-tight">
+          {post.title}
+        </h1>
+
+        {/* Meta */}
+        <div className="text-sm text-gray-500 mb-6">
+          {new Date(post.createdAt?.seconds * 1000).toLocaleDateString("vi-VN")}
+        </div>
+
+        {/* Thumbnail */}
+        {post.thumbnail && (
+          <img
+            src={post.thumbnail}
+            alt={post.title}
+            className="rounded-xl mb-8 w-full object-cover"
+          />
+        )}
+
+        {/* Content */}
+        <div
+          className="prose prose-lg max-w-none prose-headings:text-primary"
+          dangerouslySetInnerHTML={{ __html: post.content }}
+        />
+      </div>
+    </article>
   );
 }
