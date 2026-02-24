@@ -1,12 +1,7 @@
-import { adminDb } from "@/lib/firebase-admin";
+import { adminDb } from "../firebase-admin";
 import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 
-export async function getBanners() {
-  if (!adminDb) {
-    console.error("adminDb not initialized");
-    return [];
-  }
-
+export async function getBannersServer() {
   const snapshot = await adminDb.collection("banners").get();
 
   return snapshot.docs.map(
