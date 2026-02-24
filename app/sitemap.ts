@@ -1,22 +1,29 @@
-import { MetadataRoute } from "next";
-import { adminDb } from "@/lib/firebase-admin";
+import { MetadataRoute } from "next"
+import { adminDb } from "@/lib/firebase-admin"
+import type { QueryDocumentSnapshot } from "firebase-admin/firestore"
+
+interface News {
+  slug: string
+  updatedAt?: FirebaseFirestore.Timestamp
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://thinhphufood.vn";
+  const baseUrl = "https://thinhphufood.vn"
 
-  // 🔥 Lấy toàn bộ bài viết
-  const snapshot = await adminDb.collection("news").get();
+  const snapshot = await adminDb.collection("news").get()
 
-  const newsUrls = snapshot.docs.map((doc) => {
-    const data = doc.data();
+  const newsUrls = snapshot.docs.map(
+    (doc: QueryDocumentSnapshot<News>) => {
+      const data = doc.data()
 
-    return {
-      url: `${baseUrl}/tin-tuc/${data.slug}`,
-      lastModified: data.updatedAt?.toDate?.() || new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    };
-  });
+      return {
+        url: `${baseUrl}/tin-tuc/${data.slug}`,
+        lastModified: data.updatedAt?.toDate() ?? new Date(),
+        changeFrequency: "weekly" as const,
+        priority: 0.8,
+      }
+    }
+  )
 
   return [
     {
@@ -43,7 +50,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "yearly",
       priority: 0.6,
     },
-
     ...newsUrls,
-  ];
+  ]
 }
