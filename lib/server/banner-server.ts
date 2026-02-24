@@ -1,7 +1,7 @@
 import { adminDb } from "../firebase-admin";
 import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 
-export async function getBannersServer() {
+export async function getBanners() {
   const snapshot = await adminDb.collection("banners").get();
 
   return snapshot.docs.map(
