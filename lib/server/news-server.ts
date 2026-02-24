@@ -1,24 +1,27 @@
 import { adminDb } from "../firebase-admin";
+import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 
 export async function getNewsServer() {
   const snapshot = await adminDb.collection("news").get();
   console.log("NEWS COUNT:", snapshot.size);
 
-  return snapshot.docs.map((doc) => {
-    const data = doc.data();
+  return snapshot.docs.map(
+    (doc: QueryDocumentSnapshot<DocumentData>) => {
+      const data = doc.data();
 
-    return {
-      id: doc.id,
-      title: data.title || "",
-      slug: data.slug || "",
-      summary: data.summary || "",
-      content: data.content || "",
-      image: data.image || "",
-      category: data.category || "",
-      author: data.author || "",
-      date: data.date || "",
-    };
-  });
+      return {
+        id: doc.id,
+        title: data.title || "",
+        slug: data.slug || "",
+        summary: data.summary || "",
+        content: data.content || "",
+        image: data.image || "",
+        category: data.category || "",
+        author: data.author || "",
+        date: data.date || "",
+      };
+    }
+  );
 }
 
 export async function getNewsBySlug(slug: string) {
