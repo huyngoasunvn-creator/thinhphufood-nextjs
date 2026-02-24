@@ -1,7 +1,5 @@
-export default function Page({
-  params,
-}: {
-  params: { slug: string };
-}) {
-  return <div>Slug: {params.slug}</div>;
+export const dynamic = "force-dynamic";
+
+export default function Page({ params }: any) {
+  return <div>Slug prod: {params.slug}</div>;
 }
