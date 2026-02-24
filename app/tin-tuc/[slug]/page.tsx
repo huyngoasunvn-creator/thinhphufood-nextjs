@@ -1,5 +1,18 @@
 export const dynamic = "force-dynamic";
 
-export default function Page() {
-  return <div style={{ fontSize: 40 }}>TIN TUC WORKING</div>;
+import { getNewsBySlug } from "@/server/news-server";
+
+export default async function Page({ params }: any) {
+  const post = await getNewsBySlug(params.slug);
+
+  if (!post) {
+    return <div>Không tìm thấy bài viết</div>;
+  }
+
+  return (
+    <div>
+      <h1>{post.title}</h1>
+      <div>{post.content}</div>
+    </div>
+  );
 }
