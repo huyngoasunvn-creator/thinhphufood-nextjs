@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { db } from "@/lib/firebase";
+import { db } from "@/services/firebase";
 import { doc, getDoc } from "firebase/firestore";
 
 interface PageProps {
