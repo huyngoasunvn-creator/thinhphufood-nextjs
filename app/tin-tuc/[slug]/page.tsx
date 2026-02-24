@@ -1,16 +1,27 @@
 export const dynamic = "force-dynamic";
-
+import type { QueryDocumentSnapshot, Timestamp } from "firebase-admin/firestore"
+interface News {
+  title: string
+  slug: string
+  content: string
+  image?: string
+  createdAt?: Timestamp
+  updatedAt?: Timestamp
+}
 import { adminDb } from "@/lib/firebase-admin";
 import { notFound } from "next/navigation";
 import { decode } from "html-entities";
 import Link from "next/link";
 import { Metadata } from "next";
 
+
+
 const baseUrl = "https://thinhphufood.vn";
 
 interface Props {
   params: { slug: string };
 }
+
 
 /* ================= FETCH ================= */
 
@@ -37,11 +48,12 @@ async function getRelatedPosts(category: string, currentSlug: string) {
     .where("category", "==", category)
     .limit(3)
     .get();
+    
 
-  return snapshot.docs
-    .map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
+  return snapshot.docs.map(
+  (doc: QueryDocumentSnapshot<News>) => ({
+    id: doc.id,
+    ...doc.data(),
     }))
     .filter((item: any) => item.slug !== currentSlug);
 }

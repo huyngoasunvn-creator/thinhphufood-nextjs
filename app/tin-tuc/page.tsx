@@ -1,3 +1,13 @@
+import type { QueryDocumentSnapshot, Timestamp } from "firebase-admin/firestore"
+interface News {
+  title: string
+  slug: string
+  content: string
+  image?: string
+  createdAt?: Timestamp
+  updatedAt?: Timestamp
+}
+
 import { adminDb } from "@/lib/firebase-admin";
 import Link from "next/link";
 import { Metadata } from "next";
@@ -44,7 +54,8 @@ export const metadata: Metadata = {
 async function getNews() {
   const snapshot = await adminDb.collection("news").get();
 
-  return snapshot.docs.map((doc) => ({
+  return snapshot.docs.map(
+  (doc: QueryDocumentSnapshot<News>) => ({
     id: doc.id,
     ...doc.data(),
   })) as any[];
