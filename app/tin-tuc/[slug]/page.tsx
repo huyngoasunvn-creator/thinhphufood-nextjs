@@ -3,14 +3,7 @@ export const dynamic = "force-dynamic";
 import { adminDb } from "@/lib/firebase-admin";
 import { notFound } from "next/navigation";
 
-interface NewsPost {
-  id: string;
-  title: string;
-  content: string;
-  slug: string;
-}
-
-async function getNewsBySlug(slug: string): Promise<NewsPost | null> {
+async function getNewsBySlug(slug: string) {
   const snapshot = await adminDb
     .collection("news")
     .where("slug", "==", slug)
@@ -23,8 +16,19 @@ async function getNewsBySlug(slug: string): Promise<NewsPost | null> {
 
   return {
     id: doc.id,
-    ...(doc.data() as Omit<NewsPost, "id">),
+    ...doc.data(),
   };
+}
+
+// 🔥 Hàm làm sạch HTML từ Word
+function cleanHtml(html: string) {
+  if (!html) return "";
+
+  return html
+    .replace(/class="MsoNormal"/g, "")
+    .replace(/<o:p>.*?<\/o:p>/g, "")
+    .replace(/style="[^"]*"/g, "")
+    .replace(/&nbsp;/g, " ");
 }
 
 export default async function Page({
@@ -32,9 +36,11 @@ export default async function Page({
 }: {
   params: { slug: string };
 }) {
-  const post = await getNewsBySlug(params.slug);
+  const post: any = await getNewsBySlug(params.slug);
 
   if (!post) return notFound();
+
+  const cleanedContent = cleanHtml(post.content);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
@@ -44,7 +50,9 @@ export default async function Page({
 
       <div
         className="prose prose-lg max-w-none"
-        dangerouslySetInnerHTML={{ __html: post.content }}
+        dangerouslySetInnerHTML={{
+          __html: cleanedContent,
+        }}
       />
     </div>
   );
