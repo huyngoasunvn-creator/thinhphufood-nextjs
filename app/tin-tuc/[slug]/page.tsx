@@ -1,5 +1,5 @@
 export const dynamic = "force-dynamic";
 
-export default function Page({ params }: any) {
-  return <div>Slug prod: {params.slug}</div>;
+export default function Page() {
+  return <div style={{ fontSize: 40 }}>TIN TUC WORKING</div>;
 }
