@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { db } from "@/lib/firebase-admin";
+import { adminDb } from "@/lib/firebase-admin";
 
 async function getPosts() {
-  const snapshot = await db.collection("posts").get();
+  const snapshot = await adminDb.collection("posts").get();
 
   return snapshot.docs.map((doc) => ({
     id: doc.id,
@@ -22,18 +22,24 @@ export default async function NewsPage() {
             href={`/tin-tuc/${post.id}`}
             className="bg-white rounded-2xl shadow hover:shadow-xl transition"
           >
-            <img
-              src={post.thumbnail}
-              alt={post.title}
-              className="h-56 w-full object-cover rounded-t-2xl"
-            />
+            {post.thumbnail && (
+              <img
+                src={post.thumbnail}
+                alt={post.title}
+                className="h-56 w-full object-cover rounded-t-2xl"
+              />
+            )}
+
             <div className="p-5">
               <h3 className="font-semibold text-lg mb-2">
                 {post.title}
               </h3>
-              <p className="text-sm text-gray-500 line-clamp-3">
-                {post.excerpt}
-              </p>
+
+              {post.excerpt && (
+                <p className="text-sm text-gray-500 line-clamp-3">
+                  {post.excerpt}
+                </p>
+              )}
             </div>
           </Link>
         ))}

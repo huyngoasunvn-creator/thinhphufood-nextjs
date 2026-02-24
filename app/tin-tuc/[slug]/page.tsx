@@ -1,37 +1,50 @@
+export const dynamic = "force-dynamic";
+
+import { adminDb } from "@/lib/firebase-admin";
 import { notFound } from "next/navigation";
-import { db } from "@/lib/firebase-admin";
+import { decode } from "html-entities";
 
-async function getPost(slug: string) {
-  const doc = await db.collection("posts").doc(slug).get();
-  if (!doc.exists) return null;
+async function getNewsBySlug(slug: string) {
+  const snapshot = await adminDb
+    .collection("news")
+    .where("slug", "==", slug)
+    .limit(1)
+    .get();
 
-  return { id: doc.id, ...doc.data() };
+  if (snapshot.empty) return null;
+
+  const doc = snapshot.docs[0];
+
+  return {
+    id: doc.id,
+    ...doc.data(),
+  };
 }
 
-export default async function PostPage({
+export default async function Page({
   params,
 }: {
   params: { slug: string };
 }) {
-  const post: any = await getPost(params.slug);
+  const post: any = await getNewsBySlug(params.slug);
+
   if (!post) return notFound();
 
+  // 🔥 Decode HTML nếu bị escape
+  const decodedContent = decode(post.content || "");
+
   return (
-    <article className="max-w-4xl mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-6 text-primary">
+    <div className="max-w-4xl mx-auto px-4 py-10">
+      <h1 className="text-3xl font-bold mb-6 text-primary">
         {post.title}
       </h1>
 
-      <img
-        src={post.thumbnail}
-        alt={post.title}
-        className="rounded-xl mb-8"
-      />
-
       <div
         className="prose prose-lg max-w-none"
-        dangerouslySetInnerHTML={{ __html: post.content }}
+        dangerouslySetInnerHTML={{
+          __html: decodedContent,
+        }}
       />
-    </article>
+    </div>
   );
 }
