@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { getNewsBySlug } from "@/lib/server/firebase-admin";
+import { getNewsBySlug } from "@/lib/server/news-server";
 
 export default async function Page({ params }: any) {
   const post = await getNewsBySlug(params.slug);
