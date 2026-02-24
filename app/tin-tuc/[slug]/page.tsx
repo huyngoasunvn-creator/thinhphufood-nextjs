@@ -3,7 +3,14 @@ export const dynamic = "force-dynamic";
 import { adminDb } from "@/lib/firebase-admin";
 import { notFound } from "next/navigation";
 
-async function getNewsBySlug(slug: string) {
+interface NewsPost {
+  id: string;
+  title: string;
+  content: string;
+  slug: string;
+}
+
+async function getNewsBySlug(slug: string): Promise<NewsPost | null> {
   const snapshot = await adminDb
     .collection("news")
     .where("slug", "==", slug)
@@ -12,13 +19,19 @@ async function getNewsBySlug(slug: string) {
 
   if (snapshot.empty) return null;
 
+  const doc = snapshot.docs[0];
+
   return {
-    id: snapshot.docs[0].id,
-    ...snapshot.docs[0].data(),
+    id: doc.id,
+    ...(doc.data() as Omit<NewsPost, "id">),
   };
 }
 
-export default async function Page({ params }: { params: { slug: string } }) {
+export default async function Page({
+  params,
+}: {
+  params: { slug: string };
+}) {
   const post = await getNewsBySlug(params.slug);
 
   if (!post) return notFound();
@@ -29,7 +42,6 @@ export default async function Page({ params }: { params: { slug: string } }) {
         {post.title}
       </h1>
 
-      {/* Quan trọng: dùng prose */}
       <div
         className="prose prose-lg max-w-none"
         dangerouslySetInnerHTML={{ __html: post.content }}
