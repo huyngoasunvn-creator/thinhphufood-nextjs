@@ -2,6 +2,11 @@ import Link from "next/link";
 import { adminDb } from "@/lib/firebase-admin";
 
 async function getPosts() {
+  if (!adminDb) {
+    console.error("adminDb not initialized");
+    return [];
+  }
+
   try {
     const snapshot = await adminDb.collection("posts").get();
 

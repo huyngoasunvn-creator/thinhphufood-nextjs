@@ -1,19 +1,39 @@
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
-const serviceAccount = {
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-  privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-};
+let adminDb: any = null;
 
-console.log("PROJECT ID:", process.env.FIREBASE_PROJECT_ID);
-console.log("HAS PRIVATE KEY:", !!process.env.FIREBASE_PRIVATE_KEY);
+function initFirebase() {
+  if (getApps().length) {
+    return getFirestore();
+  }
 
-if (!getApps().length) {
-  initializeApp({
-    credential: cert(serviceAccount as any),
-  });
+  const projectId = process.env.FIREBASE_PROJECT_ID;
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+
+  // Nếu thiếu ENV → không crash app
+  if (!projectId || !clientEmail || !privateKey) {
+    console.error("❌ Missing Firebase Admin ENV variables");
+    return null;
+  }
+
+  try {
+    initializeApp({
+      credential: cert({
+        projectId,
+        clientEmail,
+        privateKey,
+      }),
+    });
+
+    return getFirestore();
+  } catch (error) {
+    console.error("❌ Firebase Admin init error:", error);
+    return null;
+  }
 }
 
-export const adminDb = getFirestore();
+adminDb = initFirebase();
+
+export { adminDb };
