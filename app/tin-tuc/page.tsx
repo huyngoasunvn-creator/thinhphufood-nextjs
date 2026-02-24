@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { adminDb } from "@/lib/firebase-admin";
+import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 
 async function getPosts() {
   if (!adminDb) {
@@ -14,10 +15,12 @@ async function getPosts() {
       return [];
     }
 
-    return snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    return snapshot.docs.map(
+      (doc: QueryDocumentSnapshot<DocumentData>) => ({
+        id: doc.id,
+        ...doc.data(),
+      })
+    );
   } catch (error) {
     console.error("Firestore error:", error);
     return [];
@@ -25,12 +28,11 @@ async function getPosts() {
 }
 
 export default async function NewsPage() {
-  const posts: any[] = await getPosts();
+  const posts = await getPosts();
 
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-6xl mx-auto px-4 py-16">
-
         {posts.length === 0 && (
           <div className="text-center text-gray-500 text-lg">
             Chưa có bài viết nào.
@@ -38,7 +40,7 @@ export default async function NewsPage() {
         )}
 
         <div className="grid md:grid-cols-3 gap-8">
-          {posts.map((post) => (
+          {posts.map((post: any) => (
             <Link
               key={post.id}
               href={`/tin-tuc/${post.id}`}
