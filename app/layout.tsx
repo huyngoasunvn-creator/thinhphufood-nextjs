@@ -8,6 +8,14 @@ const beVietnam = Be_Vietnam_Pro({
   weight: ['400', '500', '600', '700', '800'],
 });
 
+export const metadata = {
+  metadataBase: new URL("https://thinhphufood.vercel.app"),
+  title: {
+    default: "Thịnh Phú Food",
+    template: "%s | Thịnh Phú Food",
+  },
+  description: "Thực phẩm nông sản chất lượng cao",
+};
 export default function RootLayout({
   children,
 }: {
