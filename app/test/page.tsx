@@ -1,3 +1,3 @@
-export default function Page() {
-  return <div>TEST STATIC PAGE</div>;
+export default async function TinTucPage() {
+  return <div>OK</div>;
 }
