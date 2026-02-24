@@ -10,7 +10,11 @@ export default async function Page({
 }) {
   const news = await getNewsServer();
 
-  const post = news.find((n) => n.slug === params.slug);
+  const post = news.find(
+  (n) => n.slug?.toLowerCase() === params.slug.toLowerCase()
+);
+  console.log("ALL NEWS:", news);
+
 
   if (!post) {
     console.log("NOT FOUND SLUG:", params.slug);
