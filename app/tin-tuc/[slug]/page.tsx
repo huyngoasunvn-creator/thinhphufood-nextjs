@@ -2,16 +2,22 @@ import { getNewsBySlug } from "@/lib/server/news-server";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 
+export const dynamic = "force-dynamic";
+
 export default async function Page({
   params,
 }: {
   params: { slug: string };
 }) {
-  const data = await getNewsBySlug(params.slug);
+  const { slug } = params;
+
+  console.log("SLUG:", slug);
+
+  const data = await getNewsBySlug(slug);
 
   if (!data) {
-  return <div>KHÔNG TÌM THẤY DATA</div>;
-}
+    return <div>KHÔNG TÌM THẤY DATA</div>;
+  }
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
@@ -40,19 +46,4 @@ export default async function Page({
       />
     </div>
   );
-}
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const news = await getNewsBySlug(params.slug);
-
-  if (!news) return {};
-
-  return {
-    title: news.title,
-    description: news.summary,
-    openGraph: {
-      title: news.title,
-      description: news.summary,
-      images: [news.image],
-    },
-  };
 }
