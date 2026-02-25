@@ -27,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({
 
   const navLinks = [
     { name: 'Trang chủ', path: '/' },
-    { name: 'Sản phẩm', path: '/products' },
+    { name: 'Sản phẩm', path: '/san-pham' },
     { name: 'Tin tức', path: '/tin-tuc' },
     ...(profileActive ? [{ name: 'Trang cá nhân', path: '/profile' }] : []),
     ...(aboutPageActive ? [{ name: 'Về chúng tôi', path: '/about-us' }] : []),
@@ -39,7 +39,7 @@ const Header: React.FC<HeaderProps> = ({
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchKeyword.trim()) {
-      router.push(`/products?q=${encodeURIComponent(searchKeyword.trim())}`);
+      router.push(`/san-pham?q=${encodeURIComponent(searchKeyword.trim())}`);
       setSearchKeyword('');
       setIsMenuOpen(false);
     }

@@ -13,7 +13,11 @@ interface CartItemRowProps {
 const CartItemRow: React.FC<CartItemRowProps> = ({ item, onUpdateQuantity, onSetQuantity, onRemoveItem }) => (
   <div className="py-6 flex items-center space-x-4">
     <div className="w-20 h-20 flex-shrink-0 bg-slate-100 rounded-2xl overflow-hidden border border-slate-200">
-      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+      <img
+  src={item.images?.[0] || "/placeholder.jpg"}
+  alt={item.name}
+  className="w-full h-full object-cover"
+/>
     </div>
     <div className="flex-1 min-w-0">
       <div className="flex justify-between items-start">

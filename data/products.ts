@@ -9,12 +9,15 @@ export const PRODUCTS: Product[] = [
     category: 'Gạo trắng',
     price: 38000,
     unit: 'kg',
-    image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80&w=800',
+    images: [
+      'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80&w=800'
+    ],
     shortDescription: 'Gạo ngon nhất thế giới, hạt dài, cơm dẻo, thơm mùi lá dứa.',
     description: '<p>Gạo ST25 được sản xuất từ giống lúa thơm đặc sản của vùng đất Sóc Trăng.</p>',
     rating: 5,
     isBestseller: true,
-    stock: 500
+    stock: 500,
+    isActive: true
   },
   {
     id: 'brown-rice',
@@ -23,11 +26,14 @@ export const PRODUCTS: Product[] = [
     category: 'Gạo lứt',
     price: 55000,
     unit: 'kg',
-    image: 'https://images.unsplash.com/photo-1590424600806-2580a3203875?auto=format&fit=crop&q=80&w=800',
+    images: [
+      'https://images.unsplash.com/photo-1590424600806-2580a3203875?auto=format&fit=crop&q=80&w=800'
+    ],
     shortDescription: 'Tốt cho người tiểu đường, tim mạch và hỗ trợ giảm cân.',
     description: '<p>Gạo lứt tím than giàu Anthocyanin chống oxy hóa.</p>',
     rating: 4.8,
-    stock: 200
+    stock: 200,
+    isActive: true
   }
 ];
 

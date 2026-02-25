@@ -11,11 +11,11 @@ interface ProductGalleryProps {
 const ProductGallery: React.FC<ProductGalleryProps> = ({ product }) => {
   const [activeImg, setActiveImg] = useState<string | null>(null);
 
-  const allImages = useMemo(() => {
-    return [product.image, ...(product.images || [])];
-  }, [product]);
+    const allImages = useMemo(() => {
+  return product.images ?? [];
+}, [product]);
 
-  const currentShowImage = activeImg || product.image;
+const currentShowImage = activeImg || product.images?.[0];
 
   return (
     <div className="p-8 lg:p-12 bg-slate-50/50 border-r border-slate-100">

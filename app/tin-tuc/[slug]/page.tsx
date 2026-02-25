@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 import type { QueryDocumentSnapshot, Timestamp } from "firebase-admin/firestore"
 interface News {
   title: string
@@ -42,18 +41,19 @@ async function getNewsBySlug(slug: string) {
   };
 }
 
-async function getRelatedPosts(category: string, currentSlug: string) {
+async function getRelatedPosts(category?: string, currentSlug?: string) {
+  if (!category) return []; // tránh undefined
+
   const snapshot = await adminDb
     .collection("news")
     .where("category", "==", category)
     .limit(3)
     .get();
-    
 
-  return snapshot.docs.map(
-  (doc: QueryDocumentSnapshot<News>) => ({
-    id: doc.id,
-    ...doc.data(),
+  return snapshot.docs
+    .map((doc: QueryDocumentSnapshot<News>) => ({
+      id: doc.id,
+      ...doc.data(),
     }))
     .filter((item: any) => item.slug !== currentSlug);
 }

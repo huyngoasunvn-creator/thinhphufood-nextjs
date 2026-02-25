@@ -21,9 +21,16 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product, siteConfig }) => (
       <div className="flex items-center space-x-6 mt-6">
         <div className="flex items-center text-yellow-400">
           {[...Array(5)].map((_, i) => (
-            <Star key={i} className={`h-4 w-4 ${i < Math.floor(product.rating) ? 'fill-current' : ''}`} />
+            <Star
+  key={i}
+  className={`h-4 w-4 ${
+    i < Math.floor(product.rating ?? 0) ? 'fill-current' : ''
+  }`}
+/>
           ))}
-          <span className="ml-2 font-bold text-slate-700">{product.rating}</span>
+          <span className="ml-2 font-bold text-slate-700">
+  {product.rating ?? 0}
+</span>
         </div>
         {siteConfig?.showStock && (
 

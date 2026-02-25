@@ -28,7 +28,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
 
         <Link href={`/san-pham/${product.slug}`}>
           <img
-            src={product.image}
+            src={product.images?.[0] || "/placeholder.jpg"}
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />

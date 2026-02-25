@@ -10,7 +10,7 @@ import { Product } from '@/types';
 interface ProductsProps {
   products: Product[];
   categories: string[];
-  onAddToCart: (product: Product) => void;
+  onAddToCart?: (product: Product) => void;
 }
 
 const ProductsPage: React.FC<ProductsProps> = ({ products, categories, onAddToCart }) => {

@@ -20,10 +20,10 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, categories, onA
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const filteredProducts = useMemo(() => {
-    return products.filter(p => 
-      p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      p.category.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    return products.filter(p =>
+  p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  (p.category || '').toLowerCase().includes(searchTerm.toLowerCase())
+);
   }, [products, searchTerm]);
 
   const handleOpenAddModal = () => {
@@ -95,7 +95,11 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, categories, onA
                   <td className="px-8 py-5">
                     <div className="flex items-center space-x-4">
                       <div className="h-14 w-14 rounded-2xl overflow-hidden bg-slate-100 flex-shrink-0 shadow-sm border border-slate-200">
-                        <img src={p.image} className="h-full w-full object-cover" alt="" />
+                        <img
+  src={p.images?.[0] || "/placeholder.jpg"}
+  className="h-full w-full object-cover"
+  alt=""
+/>
                       </div>
                       <div className="max-w-[240px]">
                         <p className="text-sm font-bold text-slate-900 truncate">{p.name}</p>

@@ -66,7 +66,11 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClose, onU
                   {order.items?.map((item) => (
                     <div key={item.id} className="flex items-center space-x-4 bg-white p-3 rounded-2xl border border-slate-100 hover:shadow-sm transition-all">
                       <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
-                        <img src={item.image} className="w-full h-full object-cover" alt={item.name} />
+                        <img
+  src={item.images?.[0] || "/placeholder.jpg"}
+  className="w-full h-full object-cover"
+  alt={item.name}
+/>
                       </div>
                       <div className="flex-1 min-w-0">
                         <h5 className="text-xs font-bold text-slate-900 truncate">{item.name}</h5>

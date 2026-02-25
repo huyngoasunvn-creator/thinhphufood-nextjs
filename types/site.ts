@@ -1,20 +1,4 @@
-
-export interface Product {
-  id: string;
-  name: string;
-  slug: string; // Đường dẫn thân thiện SEO
-  category: string;
-  price: number;
-  unit: string;
-  image: string;
-  images?: string[];
-  videoUrl?: string;
-  shortDescription?: string;
-  description: string;
-  rating: number;
-  isBestseller?: boolean;
-  stock: number;
-}
+import { Product } from "./product";
 
 export interface CartItem extends Product {
   quantity: number;

@@ -1,8 +1,11 @@
 import { getProductBySlug } from "@/lib/server/product-server";
 import ProductDetail from "@/components/product/ProductDetail";
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
+import Script from "next/script";
+import { INITIAL_SITE_CONFIG } from "@/data/siteSettings";
 
-export const dynamic = "force-dynamic"; // 🔥 QUAN TRỌNG
+
 
 interface Props {
   params: {
@@ -10,12 +13,102 @@ interface Props {
   };
 }
 
-export default async function Page({ params }: Props) {
+// ==================
+// 🔥 METADATA SEO
+// ==================
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = await getProductBySlug(params.slug);
 
   if (!product) {
-    return notFound();
+    return {
+      title: "Không tìm thấy sản phẩm | Thịnh Phú Food",
+    };
   }
 
-  return <ProductDetail product={product} />;
+  const url = `https://thinhphufood.vn/san-pham/${product.slug}`;
+  const image = product.images?.[0] || "/placeholder.jpg";
+  
+  return {
+    title: `${product.name} Chính Hãng, Giá Tốt | Thịnh Phú Food`,
+    description:
+      product.shortDescription ||
+      `Mua ${product.name} chất lượng cao tại Thịnh Phú Food.`,
+    alternates: {
+      canonical: url,
+    },
+    openGraph: {
+      title: product.name,
+      description: product.shortDescription,
+      url: url,
+      siteName: "Thịnh Phú Food",
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: product.name,
+        },
+      ],
+      locale: "vi_VN",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description: product.shortDescription,
+      images: [image],
+    },
+  };
+}
+
+// ==================
+// 🔥 PAGE
+// ==================
+export default async function Page({ params }: Props) {
+  const product = await getProductBySlug(params.slug);
+    
+  if (!product) {
+    return notFound();
+  }
+  const config = INITIAL_SITE_CONFIG;
+  const image = product.images?.[0] || "/placeholder.jpg";
+
+  // 🔥 PRODUCT SCHEMA
+  const schema = {
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  name: product.name,
+  image: [image],
+  description: product.shortDescription,
+  sku: product.id,
+  brand: {
+    "@type": "Brand",
+    name: "Thịnh Phú Food",
+  },
+  offers: {
+    "@type": "Offer",
+    url: `https://thinhphufood.vn/san-pham/${product.slug}`,
+    priceCurrency: "VND",
+    price: product.price,
+    priceValidUntil: "2026-12-31",
+    availability: "https://schema.org/InStock",
+    itemCondition: "https://schema.org/NewCondition",
+  },
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: 4.8,
+    reviewCount: 12,
+  },
+};
+
+  return (
+    <>
+      <script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+/>
+
+      <ProductDetail product={product} config={config} />
+    </>
+  );
 }

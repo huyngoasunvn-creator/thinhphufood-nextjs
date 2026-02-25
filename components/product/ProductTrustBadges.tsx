@@ -8,7 +8,7 @@ interface ProductTrustBadgesProps {
 }
 
 const ProductTrustBadges: React.FC<ProductTrustBadgesProps> = ({ config }) => {
-  if (!config.showTrustBadges) return null;
+  if (!config?.showTrustBadges) return null;
 
   return (
     <div className="grid grid-cols-2 gap-4 py-8 border-y border-slate-100">

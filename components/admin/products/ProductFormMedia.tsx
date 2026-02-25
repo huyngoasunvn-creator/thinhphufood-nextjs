@@ -23,7 +23,9 @@ const ProductFormMedia: React.FC<ProductFormMediaProps> = ({
 
   const [uploading, setUploading] = useState(false);
   const [mode, setMode] = useState<'upload' | 'url'>('upload');
-  const [image, setImage] = useState<string>(initialData?.image || '');
+  const [image, setImage] = useState<string>(
+  initialData?.images?.[0] || ''
+);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

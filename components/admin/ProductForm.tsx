@@ -27,21 +27,18 @@ const generateSlug = (text: string) => {
 };
 
 const ProductForm: React.FC<ProductFormProps> = ({ initialData, categories, onSave, onClose }) => {
-  const [formData, setFormData] = useState<Partial<Product>>(initialData || {
-    name: '',
-    slug: '',
-    category: categories[1] || 'Gạo trắng',
-    price: 0,
-    unit: 'kg',
-    image: '',
-    images: [],
-    videoUrl: '',
-    shortDescription: '',
-    description: '',
-    stock: 100,
-    rating: 5,
-    isBestseller: false
-  });
+  const [formData, setFormData] = useState<Partial<Product>>({
+  name: '',
+  slug: '',
+  category: '',
+  price: 0,
+  unit: 'kg',
+  images: [],
+  videoUrl: '',
+  shortDescription: '',
+  description: '',
+  stock: 0,
+});
 
   const handleNameChange = (name: string) => {
     const updates: Partial<Product> = { name };
@@ -131,12 +128,22 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData, categories, onSa
             </div>
 
             <div className="lg:col-span-5 space-y-8">
-              <ProductMultiMedia 
-                mainImage={formData.image || ''} 
-                otherImages={formData.images || []}
-                onMainImageChange={(url) => setFormData({...formData, image: url})}
-                onOtherImagesChange={(urls) => setFormData({...formData, images: urls})}
-              />
+              <ProductMultiMedia
+  mainImage={formData.images?.[0] || ''}
+  otherImages={formData.images?.slice(1) || []}
+  onMainImageChange={(url) =>
+    setFormData({
+      ...formData,
+      images: [url, ...(formData.images?.slice(1) || [])],
+    })
+  }
+  onOtherImagesChange={(urls) =>
+    setFormData({
+      ...formData,
+      images: [formData.images?.[0] || '', ...urls],
+    })
+  }
+/>
 
               <div className="bg-green-50 p-6 rounded-3xl border border-green-100">
                  <div className="flex items-center space-x-3 mb-4">
