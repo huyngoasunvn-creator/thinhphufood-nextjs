@@ -255,7 +255,7 @@ rounded-full text-xs font-bold uppercase tracking-widest">
             </div>
 
             <Link
-              href="/products"
+              href="/san-pham"
               className="inline-flex items-center 
 text-primary font-bold 
 bg-white px-5 py-3 rounded-xl 

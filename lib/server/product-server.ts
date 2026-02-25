@@ -70,3 +70,38 @@ export async function getProductBySlug(
 
   return product;
 }
+
+// ================= CREATE =================
+export async function createProduct(data: Omit<Product, "id">) {
+  const docRef = await adminDb.collection("products").add({
+    ...data,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
+  // đồng bộ id vào document
+  await docRef.update({ id: docRef.id });
+
+  return docRef.id;
+}
+
+
+// ================= UPDATE =================
+export async function updateProduct(
+  id: string,
+  data: Partial<Product>
+) {
+  await adminDb.collection("products").doc(id).update({
+    ...data,
+    updatedAt: new Date(),
+  });
+
+  return true;
+}
+
+
+// ================= DELETE =================
+export async function deleteProduct(id: string) {
+  await adminDb.collection("products").doc(id).delete();
+  return true;
+}
