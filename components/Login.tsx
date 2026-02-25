@@ -25,12 +25,29 @@ const Login: React.FC = () => {
     setErrorMessage(null);
     try {
       if (isRegister) {
-        await registerWithEmail(formData.email, formData.password, formData.name);
-      } else {
-        await loginWithEmail(formData.email, formData.password);
-      }
-      // router.back() or router.push('/') depending on context
-      router.push('/');
+  await registerWithEmail(formData.email, formData.password, formData.name);
+} else {
+  await loginWithEmail(formData.email, formData.password);
+}
+
+// 🔐 Lấy user hiện tại từ Firebase
+const currentUser = (await import("firebase/auth")).getAuth().currentUser;
+
+if (currentUser) {
+  const idToken = await currentUser.getIdToken();
+
+  // 🔥 Gửi token lên server để tạo cookie httpOnly
+  await fetch("/api/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ idToken }),
+  });
+}
+
+// 👉 Nếu là admin thì vào /admin
+router.push('/admin');
     } catch (error: any) {
       console.error("Auth Error:", error);
       let message = "Đã có lỗi xảy ra.";
@@ -50,7 +67,22 @@ const Login: React.FC = () => {
     setErrorMessage(null);
     try {
       await loginWithGoogle();
-      router.push('/');
+
+const currentUser = (await import("firebase/auth")).getAuth().currentUser;
+
+if (currentUser) {
+  const idToken = await currentUser.getIdToken();
+
+  await fetch("/api/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ idToken }),
+  });
+}
+
+router.push('/admin');
     } catch (error: any) {
       if (error.code === 'auth/operation-not-allowed') {
         setErrorMessage("Đăng nhập Google chưa được bật. Hãy bật 'Google' trong Authentication > Sign-in method.");
