@@ -1,24 +1,9 @@
 "use client";
-
+import type { Banner } from "@/types/site";
 import { useEffect, useState } from "react";
 import { Pencil, Eye, EyeOff, Trash2, Plus } from "lucide-react";
 import BannerForm from "./BannerForm";
 
-/* =========================
-   Interface đồng bộ BannerForm
-========================= */
-interface Banner {
-  id: string;
-  title: string;
-  subtitle: string;
-  imageUrl: string;
-  link: string;
-  buttonText: string;
-  placement: string;
-  textColor: string;
-  overlayOpacity: number;
-  isActive: boolean;
-}
 
 export default function Banners() {
   const [banners, setBanners] = useState<Banner[]>([]);
