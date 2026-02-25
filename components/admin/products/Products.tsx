@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { Plus, Search, Edit2, Trash2, Copy } from 'lucide-react';
 import { Product } from '@/types';
-import ProductFormMedia from './ProductFormMedia'
+import ProductForm from '../ProductForm'
 
 
 interface AdminProductsProps {
@@ -159,13 +159,13 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, categories, onA
       </div>
 
       {isModalOpen && (
-        <ProductFormMedia 
-          initialData={editingProduct} 
-          categories={categories}
-          onSave={handleSave} 
-          onClose={() => setIsModalOpen(false)} 
-        />
-      )}
+  <ProductForm
+    initialData={editingProduct} 
+    categories={categories}
+    onSave={handleSave} 
+    onClose={() => setIsModalOpen(false)} 
+  />
+)}
     </div>
   );
 };
