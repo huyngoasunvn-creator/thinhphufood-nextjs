@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Mail, Phone, MapPin, Facebook, Instagram, Youtube, Lock } from 'lucide-react';
+import { Mail, Phone, MapPin, Facebook, Instagram, Youtube } from 'lucide-react';
 // Use next/link instead of react-router-dom
 import Link from 'next/link';
 import { SiteConfig } from '@/types';
@@ -43,10 +43,7 @@ const Footer: React.FC<FooterProps> = ({ config }) => {
               <li><Link href="/products" className="hover:text-green-500 transition-colors">Tất cả sản phẩm</Link></li>
               <li><Link href="/products" className="hover:text-green-500 transition-colors">Gạo đặc sản ST25</Link></li>
               <li><a href="#" className="hover:text-green-500 transition-colors">Chính sách vận chuyển</a></li>
-              <li><Link href="/admin" className="flex items-center space-x-2 text-green-500 font-bold hover:underline">
-                <Lock className="h-3 w-3" />
-                <span>Trang quản trị (Admin)</span>
-              </Link></li>
+              
             </ul>
           </div>
 
