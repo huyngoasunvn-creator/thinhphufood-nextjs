@@ -24,8 +24,8 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
 
   const navs = [
     { label: 'Trang chủ', icon: Home, path: '/' },
-    { label: 'Cửa hàng', icon: ShoppingBag, path: '/products' },
-    ...(profileActive ? [{ label: 'Tài khoản', icon: User, path: '/profile' }] : [{ label: 'Tin tức', icon: Newspaper, path: '/tin-tuc' }]),
+    { label: 'Cửa hàng', icon: ShoppingBag, path: '/san-pham' },
+    { label: 'Tin tức', icon: Newspaper, path: '/tin-tuc' },
     { label: 'Giỏ hàng', icon: ShoppingCart, path: '/cart', badge: cartCount },
   ];
 
