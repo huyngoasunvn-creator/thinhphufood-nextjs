@@ -21,29 +21,67 @@ const AdminCommitments: React.FC<AdminCommitmentsProps> = ({ commitments, onUpda
     setEditingId(c.id);
   };
 
-  const handleSave = () => {
-    if (!formData.title || !formData.description) return;
+  const handleSave = async () => {
+  if (!formData.title || !formData.description) return;
 
-    let updated;
+  try {
     if (editingId) {
-      updated = commitments.map(c => c.id === editingId ? formData : c);
+      // UPDATE
+      await fetch("/api/commitments", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      onUpdate(
+        commitments.map(c =>
+          c.id === editingId ? formData : c
+        )
+      );
     } else {
-      updated = [...commitments, { ...formData, id: Date.now().toString() }];
+      // CREATE
+      const res = await fetch("/api/commitments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      const newCommitment = {
+        ...formData,
+        id: data.id,
+      };
+
+      onUpdate([...commitments, newCommitment]);
     }
-    onUpdate(updated);
+
     resetForm();
-  };
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   const resetForm = () => {
     setEditingId(null);
     setFormData({ id: '', iconName: 'Leaf', title: '', description: '', colorScheme: 'green' });
   };
 
-  const handleDelete = (id: string) => {
-    if (window.confirm('Xóa cam kết này?')) {
-      onUpdate(commitments.filter(c => c.id !== id));
-    }
-  };
+  const handleDelete = async (id: string) => {
+  if (!window.confirm("Xóa cam kết này?")) return;
+
+  try {
+    await fetch("/api/commitments", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+
+    onUpdate(commitments.filter(c => c.id !== id));
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   const getColorClasses = (scheme: string) => {
     switch (scheme) {

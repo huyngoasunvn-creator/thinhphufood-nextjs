@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "vi_VN",
-    url: "https://thinhphufood.vercel.app",
+    url: "https://thinhphufood.vn",
     siteName: "Thịnh Phú Food",
     title: "Thịnh Phú Food - Gạo ST25 Chính Hãng",
     description:
@@ -40,6 +40,9 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+  },
+  icons: {
+    icon: "/favicon.ico",
   },
 };
 

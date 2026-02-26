@@ -1,4 +1,4 @@
-
+import { slugify } from '@/lib/slugify';
 import React, { useState } from 'react';
 import { X, Save, Image as ImageIcon, FileText, Calendar, Upload, Loader2, Link as LinkIcon } from 'lucide-react';
 import { NewsPost } from '../../types';
@@ -28,7 +28,7 @@ const AdminNewsForm: React.FC<AdminNewsFormProps> = ({ initialData, onSave, onCl
     const postData = {
       ...formData,
       id: initialData?.id || Date.now().toString(),
-      slug: formData.title?.toLowerCase().replace(/ /g, '-') || '',
+      slug: formData.title ? slugify(formData.title) : '',
     } as NewsPost;
     onSave(postData);
   };
