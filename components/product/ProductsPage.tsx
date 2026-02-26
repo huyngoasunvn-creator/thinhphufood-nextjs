@@ -7,9 +7,14 @@ import { Search, SlidersHorizontal, ChevronRight } from 'lucide-react';
 import ProductCard from './ProductCard';
 import { Product } from '@/types';
 
+interface Category {
+  id: string;
+  name: string;
+}
+
 interface ProductsProps {
   products: Product[];
-  categories: string[];
+  categories: Category[];
   onAddToCart?: (product: Product) => void;
 }
 
@@ -19,7 +24,7 @@ const ProductsPage: React.FC<ProductsProps> = ({ products, categories, onAddToCa
 
   const router = useRouter();
   const pathname = usePathname();
-  const [activeCategory, setActiveCategory] = useState('Tất cả');
+  const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState(
   safeSearchParams.get('q') ?? ''
 );
@@ -49,17 +54,27 @@ const ProductsPage: React.FC<ProductsProps> = ({ products, categories, onAddToCa
   };
 
   const filteredProducts = useMemo(() => {
-    return products.filter(p => {
-      const matchesCategory = activeCategory === 'Tất cả' || p.category === activeCategory;
-      const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                           p.category.toLowerCase().includes(searchQuery.toLowerCase());
+  return products
+    .filter(p => {
+      const selectedCategoryName =
+        categories.find(c => c.id === activeCategory)?.name;
+
+      const matchesCategory =
+        activeCategory === 'all' ||
+        p.category === selectedCategoryName;
+
+      const matchesSearch =
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.category.toLowerCase().includes(searchQuery.toLowerCase());
+
       return matchesCategory && matchesSearch;
-    }).sort((a, b) => {
+    })
+    .sort((a, b) => {
       if (sortBy === 'price-asc') return a.price - b.price;
       if (sortBy === 'price-desc') return b.price - a.price;
       return 0;
     });
-  }, [products, activeCategory, searchQuery, sortBy]);
+}, [products, activeCategory, searchQuery, sortBy, categories]);
 
   return (
     <div className="min-h-screen bg-slate-50 pb-20 animate-in fade-in duration-500">
@@ -109,21 +124,28 @@ const ProductsPage: React.FC<ProductsProps> = ({ products, categories, onAddToCa
               <div>
                 <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Danh mục</h3>
                 <div className="space-y-2">
-                  {categories.map(cat => (
-                    <button
-                      key={cat}
-                      onClick={() => setActiveCategory(cat)}
-                      className={`w-full text-left px-5 py-3.5 rounded-2xl text-sm font-bold transition-all flex items-center justify-between group ${
-                        activeCategory === cat
-                          ? 'bg-green-600 text-white shadow-xl shadow-green-200'
-                          : 'text-slate-600 bg-white border border-slate-100 hover:border-green-200 hover:text-green-600'
-                      }`}
-                    >
-                      <span>{cat}</span>
-                      <ChevronRight className={`h-4 w-4 opacity-0 group-hover:opacity-100 transition-all translate-x-1 ${activeCategory === cat ? 'opacity-100 translate-x-0' : ''}`} />
-                    </button>
-                  ))}
-                </div>
+  {categories.map(cat => (
+    <button
+      key={cat.id}
+      onClick={() => setActiveCategory(cat.id)}
+      className={`group w-full flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 ${
+        activeCategory === cat.id
+          ? "bg-green-600 text-white shadow-lg shadow-green-200"
+          : "bg-white text-slate-700 border border-slate-200 hover:border-green-300 hover:text-green-600"
+      }`}
+    >
+      <span>{cat.name}</span>
+
+      <ChevronRight
+        className={`h-4 w-4 transition-all duration-200 ${
+          activeCategory === cat.id
+            ? "opacity-100 translate-x-0"
+            : "opacity-0 group-hover:opacity-100 group-hover:translate-x-1"
+        }`}
+      />
+    </button>
+  ))}
+</div>
               </div>
             </div>
 
@@ -135,18 +157,18 @@ const ProductsPage: React.FC<ProductsProps> = ({ products, categories, onAddToCa
               </div>
               <div className="flex overflow-x-auto pb-4 gap-2 scroll-hide no-scrollbar -mx-4 px-4">
                 {categories.map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => setActiveCategory(cat)}
-                    className={`whitespace-nowrap px-6 py-3 rounded-full text-xs font-bold transition-all border shadow-sm ${
-                      activeCategory === cat
-                        ? 'bg-green-600 text-white border-green-600 shadow-green-200'
-                        : 'bg-white text-slate-600 border-slate-200 hover:border-green-400'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
+  <button
+    key={cat.id}
+    onClick={() => setActiveCategory(cat.id)}
+    className={`whitespace-nowrap px-6 py-3 rounded-full text-xs font-bold transition-all border shadow-sm ${
+      activeCategory === cat.id
+        ? 'bg-green-600 text-white border-green-600 shadow-green-200'
+        : 'bg-white text-slate-600 border-slate-200 hover:border-green-400'
+    }`}
+  >
+    {cat.name}
+  </button>
+))}
               </div>
             </div>
           </aside>
@@ -182,7 +204,7 @@ const ProductsPage: React.FC<ProductsProps> = ({ products, categories, onAddToCa
                 <h3 className="text-xl font-bold text-slate-900">Không tìm thấy sản phẩm</h3>
                 <p className="text-slate-500 mt-2 mb-8">Thử tìm kiếm với từ khóa khác nhé!</p>
                 <button 
-                  onClick={() => {setActiveCategory('Tất cả'); handleSearchChange('');}} 
+                  onClick={() => {setActiveCategory('all'); handleSearchChange('');}} 
                   className="bg-green-600 text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-green-100 hover:bg-green-700 transition-all"
                 >
                   Xóa bộ lọc

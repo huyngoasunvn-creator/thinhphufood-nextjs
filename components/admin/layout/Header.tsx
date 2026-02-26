@@ -29,7 +29,7 @@ const Header: React.FC<HeaderProps> = ({
     { name: 'Trang chủ', path: '/' },
     { name: 'Sản phẩm', path: '/san-pham' },
     { name: 'Tin tức', path: '/tin-tuc' },
-    ...(profileActive ? [{ name: 'Trang cá nhân', path: '/profile' }] : []),
+    ...(profileActive ? [{ name: 'Giới thiệu', path: '/profile' }] : []),
     ...(aboutPageActive ? [{ name: 'Về chúng tôi', path: '/about-us' }] : []),
     { name: 'Liên hệ', path: '/contact' },
   ];

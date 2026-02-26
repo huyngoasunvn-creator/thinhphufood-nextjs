@@ -38,16 +38,17 @@ if (currentUser) {
 
   // 🔥 Gửi token lên server để tạo cookie httpOnly
   await fetch("/api/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ idToken }),
-  });
-}
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  credentials: "include",
+  body: JSON.stringify({ idToken }),
+});
+
+router.refresh();
 
 // 👉 Nếu là admin thì vào /admin
 router.push('/admin');
+}
     } catch (error: any) {
       console.error("Auth Error:", error);
       let message = "Đã có lỗi xảy ra.";
@@ -92,11 +93,7 @@ router.push('/admin');
     }
   };
 
-  if (user) {
-    router.push('/');
-    return null;
-  }
-
+ 
   const inputClass = "w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-green-500 focus:bg-white transition-all font-bold text-slate-900";
 
   return (
