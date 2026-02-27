@@ -8,55 +8,55 @@ interface Category {
 }
 
 export default function CategorySection({
-  categories,
+  categories = [], // 🔒 fallback an toàn
 }: {
-  categories: Category[];
+  categories?: Category[];
 }) {
+
+  // 🔒 Làm sạch dữ liệu
+  const safeCategories = Array.isArray(categories)
+    ? categories.filter((c) => c && c.id)
+    : [];
+
   return (
     <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
 
-        {/* Tiêu đề */}
-        <div className="text-center mb-14">
-          <h2 className="text-3xl lg:text-4xl font-bold text-slate-800">
-            Danh mục sản phẩm
-          </h2>
-          <div className="w-20 h-1 bg-primary mx-auto mt-4 rounded-full"></div>
-        </div>
-
-        {/* Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
 
-          {categories.map((category) => (
+          {safeCategories.map((category) => (
             <Link
               key={category.id}
-              href={`/danh-muc/${category.slug}`}
+              href={`/danh-muc/${category.slug || ''}`}
               className="group"
             >
               <div className="relative rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 bg-white border border-slate-100">
 
-                {/* Ảnh */}
                 <div className="aspect-square overflow-hidden">
                   <img
                     src={category.imageUrl || "/placeholder.jpg"}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    alt={category.name}
+                    alt={category.name || ''}
                   />
                 </div>
 
-                {/* Overlay nhẹ */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></div>
 
-                {/* Tên */}
                 <div className="absolute bottom-0 w-full p-4 text-white translate-y-6 group-hover:translate-y-0 transition-all duration-500">
                   <h3 className="text-lg font-semibold">
-                    {category.name}
+                    {category.name || ''}
                   </h3>
                 </div>
 
               </div>
             </Link>
           ))}
+
+          {safeCategories.length === 0 && (
+            <p className="col-span-full text-center text-slate-400 text-sm italic">
+              Chưa có danh mục.
+            </p>
+          )}
 
         </div>
       </div>

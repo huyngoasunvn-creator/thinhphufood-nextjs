@@ -26,7 +26,9 @@ export const generateProductSchema = (
     "@type": "Product",
     name: p.name,
     image: p.images?.[0] || "",
-    description: p.description.replace(/<[^>]*>?/gm, '').slice(0, 160),
+    description: (p.description ?? '')
+  .replace(/<[^>]*>?/gm, '')
+  .slice(0, 160),
     sku: p.id,
     brand: {
       "@type": "Brand",

@@ -2,29 +2,32 @@ export interface Product {
   id: string;
   name: string;
   slug: string;
-
-  description: string;
-  shortDescription?: string;
+  categoryId: string;
 
   price: number;
-  comparePrice?: number;
-  salePrice?: number;
+  unit: string;
 
-  unit?: string;
-  images: string[];
-  videoUrl?: string;
+  images?: string[];
 
-  category: string;
-  tags?: string[];
+  shortDescription?: string;
+  description?: string;
 
-  stock: number;
   rating?: number;
   reviewCount?: number;
+  stock: number;
 
-  isFeatured?: boolean;
   isBestseller?: boolean;
-  isActive: boolean;
+  isActive?: boolean;
+  isFeatured?: boolean;
 
+  comparePrice?: number;
+  salePrice?: number;
+  videoUrl?: string;
+  tags?: string[];
+
+  category?: string;
+
+  // ✅ thêm 2 dòng này
   createdAt?: string;
   updatedAt?: string;
 }

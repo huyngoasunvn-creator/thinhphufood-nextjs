@@ -1,92 +1,124 @@
 import { adminDb } from "../firebase-admin";
-import { Product } from "@/types";
-import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
+import type { Product } from "@/types";
+import type {
+  QueryDocumentSnapshot,
+  DocumentData,
+} from "firebase-admin/firestore";
+
+/* ================= SAFE DATE HELPER ================= */
+
+function safeDate(value: any): string {
+  if (!value) return "";
+
+  // Firestore Timestamp
+  if (typeof value?.toDate === "function") {
+    try {
+      return value.toDate().toISOString();
+    } catch {
+      return "";
+    }
+  }
+
+  // Native Date
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  // Already string
+  if (typeof value === "string") {
+    return value;
+  }
+
+  return "";
+}
+
+/* ================= MAP HELPER ================= */
+
+function mapProduct(
+  doc: QueryDocumentSnapshot<DocumentData>
+): Product {
+  const raw = doc?.data?.() ?? {};
+
+  return {
+    id: doc?.id ?? "",
+    name: raw?.name ?? "",
+    slug: raw?.slug ?? "",
+    description: raw?.description ?? "",
+    shortDescription: raw?.shortDescription ?? "",
+    price: raw?.price ?? 0,
+    salePrice: raw?.salePrice ?? 0,
+    comparePrice: raw?.comparePrice ?? 0,
+    unit: raw?.unit ?? "",
+    images: Array.isArray(raw?.images) ? raw.images : [],
+    categoryId: raw?.categoryId ?? "",
+    tags: Array.isArray(raw?.tags) ? raw.tags : [],
+    stock: raw?.stock ?? 0,
+    rating: raw?.rating ?? 0,
+    reviewCount: raw?.reviewCount ?? 0,
+    isFeatured: raw?.isFeatured ?? false,
+    isActive: raw?.isActive ?? true,
+    createdAt: safeDate(raw?.createdAt),
+    updatedAt: safeDate(raw?.updatedAt),
+  };
+}
+
+/* ================= GET ALL ================= */
 
 export async function getProducts(): Promise<Product[]> {
-  const snapshot = await adminDb.collection("products").get();
+  try {
+    const snapshot = await adminDb.collection("products").get();
 
-  return snapshot.docs.map(
-    (doc: QueryDocumentSnapshot<DocumentData>) => {
-      const raw = doc.data();
+    if (!snapshot?.docs) return [];
 
-      return {
-        id: doc.id,
-        name: raw.name || "",
-        slug: raw.slug || "",
-        description: raw.description || "",
-        shortDescription: raw.shortDescription || "",
-        price: raw.price || 0,
-        salePrice: raw.salePrice || 0,
-        images: raw.images || [],
-        category: raw.category || "",
-        tags: raw.tags || [],
-        stock: raw.stock || 0,
-        comparePrice: raw.comparePrice || 0,
-        rating: raw.rating || 0,
-        reviewCount: raw.reviewCount || 0,
-        isFeatured: raw.isFeatured || false,
-        isActive: raw.isActive ?? true,
-        createdAt: raw.createdAt?.toDate?.().toISOString?.() || "",
-        updatedAt: raw.updatedAt?.toDate?.().toISOString?.() || "",
-      };
-    }
-  );
-} // 👈 DẤU NÀY ANH BỊ THIẾU
+    return snapshot.docs.map(mapProduct).filter(Boolean);
+  } catch (error) {
+    console.error("getProducts error:", error);
+    return [];
+  }
+}
+
+/* ================= GET BY SLUG ================= */
 
 export async function getProductBySlug(
   slug: string
 ): Promise<Product | null> {
-  const snapshot = await adminDb
-    .collection("products")
-    .where("slug", "==", slug)
-    .limit(1)
-    .get();
+  try {
+    const snapshot = await adminDb
+      .collection("products")
+      .where("slug", "==", slug)
+      .limit(1)
+      .get();
 
-  if (snapshot.empty) return null;
+    if (!snapshot || snapshot.empty) return null;
 
-  const doc = snapshot.docs[0];
-  const raw = doc.data();
+    const doc = snapshot.docs[0];
+    if (!doc) return null;
 
-  const product: Product = {
-    id: doc.id,
-    name: raw.name || "",
-    slug: raw.slug || "",
-    description: raw.description || "",
-    shortDescription: raw.shortDescription || "",
-    price: raw.price || 0,
-    salePrice: raw.salePrice || 0,
-    images: raw.images || [],
-    category: raw.category || "",
-    tags: raw.tags || [],
-    stock: raw.stock || 0,
-    comparePrice: raw.comparePrice || 0,
-    rating: raw.rating || 0,
-    reviewCount: raw.reviewCount || 0,
-    isFeatured: raw.isFeatured || false,
-    isActive: raw.isActive ?? true,
-    createdAt: raw.createdAt?.toDate?.().toISOString?.() || "",
-    updatedAt: raw.updatedAt?.toDate?.().toISOString?.() || "",
-  };
-
-  return product;
+    return mapProduct(doc);
+  } catch (error) {
+    console.error("getProductBySlug error:", error);
+    return null;
+  }
 }
 
-// ================= CREATE =================
-export async function createProduct(data: Omit<Product, "id">) {
+/* ================= CREATE ================= */
+
+export async function createProduct(
+  data: Omit<Product, "id">
+) {
   const docRef = await adminDb.collection("products").add({
     ...data,
     createdAt: new Date(),
     updatedAt: new Date(),
   });
 
-  // đồng bộ id vào document
   await docRef.update({ id: docRef.id });
 
   return docRef.id;
 }
 
+/* ================= UPDATE ================= */
 
-// ================= UPDATE =================
 export async function updateProduct(
   id: string,
   data: Partial<Product>
@@ -99,8 +131,8 @@ export async function updateProduct(
   return true;
 }
 
+/* ================= DELETE ================= */
 
-// ================= DELETE =================
 export async function deleteProduct(id: string) {
   await adminDb.collection("products").doc(id).delete();
   return true;

@@ -21,7 +21,7 @@ export const INITIAL_BANNERS: Banner[] = [
     title: 'Gạo Ngon Nhất Thế Giới ST25',
     subtitle: 'Hạt gạo sạch, cơm dẻo thơm, trọn vẹn hương vị quê hương Sóc Trăng.',
     imageUrl: 'https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?auto=format&fit=crop&q=80&w=1920',
-    link: '/products',
+    link: '/san-pham',
     buttonText: 'MUA NGAY',
     isActive: true,
     placement: 'Trang chủ',
@@ -68,7 +68,7 @@ export const INITIAL_POPUP: PopupConfig = {
   title: 'Ưu đãi Khách hàng mới!',
   description: 'Tặng ngay 1kg gạo lứt tím than cho đơn hàng đầu tiên từ 300k.',
   imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=800',
-  link: '/products',
+  link: '/san-pham',
   buttonText: 'Xem sản phẩm',
   delay: 3
 };

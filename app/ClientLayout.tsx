@@ -12,7 +12,10 @@ export default function ClientLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const state = useAppState();
+  const state = useAppState() || {
+  cartCount: 0,
+  siteConfig: null,
+};
 
   return (
     <div className="flex flex-col min-h-screen">

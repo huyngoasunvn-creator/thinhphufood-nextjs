@@ -68,8 +68,25 @@ const Home: React.FC<HomeProps> = ({
     }
   };
 
-  const bestsellers = products.filter(p => p?.isBestseller).slice(0, 4);
-  const latestNews = news.slice(0, 3);
+  // 🔒 Làm sạch dữ liệu trước khi render (tránh lỗi build)
+
+const safeProducts = Array.isArray(products)
+  ? products.filter((p) => p && p.id)
+  : [];
+
+const safeNews = Array.isArray(news)
+  ? news.filter((n) => n && n.id)
+  : [];
+
+const safeCommitments = Array.isArray(commitments)
+  ? commitments.filter((c) => c && c.id)
+  : [];
+
+const bestsellers = safeProducts
+  .filter((p) => p.isBestseller === true)
+  .slice(0, 4);
+
+const latestNews = safeNews.slice(0, 3);
 
   const getColorClasses = (scheme?: string) => {
     switch (scheme) {
@@ -96,7 +113,7 @@ const Home: React.FC<HomeProps> = ({
       {/* Trust Badges */}
       <section className="bg-white py-12 border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8">
-          {commitments.map((item) => {
+          {safeCommitments.map((item) => {
             const IconComp = ICON_MAP[item?.iconName] || Heart;
             return (
               <div key={item?.id} className="flex items-center space-x-4">
@@ -115,7 +132,7 @@ const Home: React.FC<HomeProps> = ({
             );
           })}
 
-          {commitments.length === 0 && (
+          {safeCommitments.length === 0 && (
             <p className="col-span-full text-center text-slate-400 text-xs italic">
               Chưa có thông tin cam kết.
             </p>
@@ -124,7 +141,7 @@ const Home: React.FC<HomeProps> = ({
       </section>
 
       {/* About Section */}
-      <section className="py-28 bg-gradient-to-b from-white to-primary/5 overflow-hidden relative">
+      <section className="py-16 bg-gradient-to-b from-white to-primary/5 overflow-hidden relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
 
@@ -237,9 +254,9 @@ group"
       </section>
 
       {/* Featured Products */}
-      <section className="py-28 bg-gradient-to-b from-primary/5 to-white">
+      <section className="py-16 bg-gradient-to-b from-primary/5 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <header className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+          <header className="flex flex-col md:flex-row justify-between items-end mb-14 gap-4">
             <div className="text-center md:text-left">
               <div className="inline-block mb-3 px-4 py-1.5 
 bg-primary/10 text-primary 

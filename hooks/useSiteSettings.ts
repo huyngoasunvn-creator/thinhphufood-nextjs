@@ -10,6 +10,7 @@ import {
 } from "firebase/firestore";
 
 import { db } from "../services/firebase";
+
 import {
   Banner,
   Commitment,
@@ -20,6 +21,7 @@ import {
   ContactConfig,
   SiteConfig,
   NewsPost,
+  Category, // ✅ IMPORT THÊM
 } from "@/types";
 
 import {
@@ -39,78 +41,95 @@ export const useSiteSettings = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [news, setNews] = useState<NewsPost[]>([]);
   const [commitments, setCommitments] = useState<Commitment[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]); // ✅ ĐÚNG TYPE
 
   const [contact, setContact] = useState<ContactConfig>(INITIAL_CONTACT);
-  const [aboutPage, setAboutPage] = useState<AboutPageConfig>(INITIAL_ABOUT_PAGE);
-  const [profile, setProfile] = useState<ProfileConfig>(INITIAL_PROFILE);
-  const [aboutConfig, setAboutConfig] = useState<AboutConfig>(INITIAL_ABOUT_CONFIG);
-  const [popupConfig, setPopupConfig] = useState<PopupConfig>(INITIAL_POPUP);
-  const [siteConfig, setSiteConfig] = useState<SiteConfig>(INITIAL_SITE_CONFIG);
+  const [aboutPage, setAboutPage] =
+    useState<AboutPageConfig>(INITIAL_ABOUT_PAGE);
+  const [profile, setProfile] =
+    useState<ProfileConfig>(INITIAL_PROFILE);
+  const [aboutConfig, setAboutConfig] =
+    useState<AboutConfig>(INITIAL_ABOUT_CONFIG);
+  const [popupConfig, setPopupConfig] =
+    useState<PopupConfig>(INITIAL_POPUP);
+  const [siteConfig, setSiteConfig] =
+    useState<SiteConfig>(INITIAL_SITE_CONFIG);
 
   useEffect(() => {
-    // 1. News
+    /* ===============================
+       1. NEWS
+    =============================== */
     const newsQ = query(collection(db, "news"), orderBy("date", "desc"));
     const unsubNews = onSnapshot(
       newsQ,
       (snap) => {
-        const data: NewsPost[] = [];
-        snap.forEach((doc) =>
-          data.push({ id: doc.id, ...doc.data() } as NewsPost)
-        );
+        const data: NewsPost[] = snap.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        })) as NewsPost[];
+
         setNews(data.length > 0 ? data : SAMPLE_NEWS);
       },
       () => setNews(SAMPLE_NEWS)
     );
 
-    // 2. Banners
+    /* ===============================
+       2. BANNERS
+    =============================== */
     const unsubBanners = onSnapshot(
       collection(db, "banners"),
       (snap) => {
-        const data: Banner[] = [];
-        snap.forEach((doc) =>
-          data.push({ id: doc.id, ...doc.data() } as Banner)
-        );
+        const data: Banner[] = snap.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        })) as Banner[];
+
         setBanners(data.length > 0 ? data : INITIAL_BANNERS);
       },
       () => setBanners(INITIAL_BANNERS)
     );
 
-    // 3. Commitments
+    /* ===============================
+       3. COMMITMENTS
+    =============================== */
     const unsubCommitments = onSnapshot(
       collection(db, "commitments"),
       (snap) => {
-        const data: Commitment[] = [];
-        snap.forEach((doc) =>
-          data.push({ id: doc.id, ...doc.data() } as Commitment)
-        );
+        const data: Commitment[] = snap.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        })) as Commitment[];
+
         setCommitments(data.length > 0 ? data : INITIAL_COMMITMENTS);
       },
       () => setCommitments(INITIAL_COMMITMENTS)
     );
 
-    // 4. Categories (🔥 mới thêm)
+    /* ===============================
+       4. CATEGORIES (FIX CHUẨN)
+    =============================== */
     const unsubCategories = onSnapshot(
       collection(db, "categories"),
       (snap) => {
-        const data: string[] = [];
-        snap.forEach((doc) => data.push(doc.data().name));
+        const data: Category[] = snap.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        })) as Category[];
 
-        if (data.length === 0) {
-          setCategories(["Tất cả"]);
-        } else {
-          setCategories(["Tất cả", ...data.filter(c => c !== "Tất cả")]);
-        }
+        setCategories(data);
       },
-      () => setCategories(["Tất cả"])
+      () => setCategories([])
     );
 
-    // 5. Global settings
+    /* ===============================
+       5. GLOBAL SETTINGS
+    =============================== */
     const unsubSettings = onSnapshot(
       doc(db, "settings", "global"),
       (snap) => {
         if (snap.exists()) {
           const data = snap.data();
+
           if (data.contact) setContact(data.contact);
           if (data.aboutPage) setAboutPage(data.aboutPage);
           if (data.profile) setProfile(data.profile);
@@ -130,16 +149,18 @@ export const useSiteSettings = () => {
     };
   }, []);
 
-  // ================= SAVE FUNCTIONS =================
+  /* ===============================
+     SAVE FUNCTIONS
+  =============================== */
 
   const saveNews = async (updated: NewsPost[]) => {
     const currentIds = updated.map((n) => n.id);
 
-    news.forEach(async (old) => {
+    for (const old of news) {
       if (!currentIds.includes(old.id)) {
         await deleteDoc(doc(db, "news", old.id));
       }
-    });
+    }
 
     for (const item of updated) {
       await setDoc(doc(db, "news", item.id), item);
@@ -149,11 +170,11 @@ export const useSiteSettings = () => {
   const saveBanners = async (updated: Banner[]) => {
     const currentIds = updated.map((b) => b.id);
 
-    banners.forEach(async (old) => {
+    for (const old of banners) {
       if (!currentIds.includes(old.id)) {
         await deleteDoc(doc(db, "banners", old.id));
       }
-    });
+    }
 
     for (const item of updated) {
       await setDoc(doc(db, "banners", item.id), item);
@@ -163,36 +184,40 @@ export const useSiteSettings = () => {
   const saveCommitments = async (updated: Commitment[]) => {
     const currentIds = updated.map((c) => c.id);
 
-    commitments.forEach(async (old) => {
+    for (const old of commitments) {
       if (!currentIds.includes(old.id)) {
         await deleteDoc(doc(db, "commitments", old.id));
       }
-    });
+    }
 
     for (const item of updated) {
       await setDoc(doc(db, "commitments", item.id), item);
     }
   };
 
-  // 🔥 SAVE CATEGORIES
-  const saveCategories = async (updated: string[]) => {
-    const filtered = updated.filter((c) => c !== "Tất cả");
+  /* ===============================
+     SAVE CATEGORIES (FIX CHUẨN)
+  =============================== */
+  const saveCategories = async (updated: Category[]) => {
+    const currentIds = updated.map((c) => c.id);
 
-    // Xóa cái không còn
-    categories.forEach(async (old) => {
-      if (old !== "Tất cả" && !filtered.includes(old)) {
-        await deleteDoc(doc(db, "categories", old));
+    for (const old of categories) {
+      if (!currentIds.includes(old.id)) {
+        await deleteDoc(doc(db, "categories", old.id));
       }
-    });
+    }
 
-    // Thêm / cập nhật
-    for (const name of filtered) {
-      await setDoc(doc(db, "categories", name), { name });
+    for (const item of updated) {
+      await setDoc(doc(db, "categories", item.id), item);
     }
   };
 
   const updateGlobalSettings = async (key: string, value: any) => {
-    await setDoc(doc(db, "settings", "global"), { [key]: value }, { merge: true });
+    await setDoc(
+      doc(db, "settings", "global"),
+      { [key]: value },
+      { merge: true }
+    );
   };
 
   const updateSiteConfig = (config: SiteConfig) =>
@@ -217,7 +242,7 @@ export const useSiteSettings = () => {
     banners,
     news,
     commitments,
-    categories, // 🔥 thêm
+    categories,
     contact,
     aboutPage,
     profile,
@@ -228,7 +253,7 @@ export const useSiteSettings = () => {
     saveNews,
     saveBanners,
     saveCommitments,
-    saveCategories, // 🔥 thêm
+    saveCategories,
     saveContact,
     saveAboutConfig,
     saveAboutPage,

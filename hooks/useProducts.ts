@@ -10,7 +10,12 @@ import {
 
 export const useProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
+  interface Category {
+  id: string;
+  name: string;
+}
+
+const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     // 1. Lắng nghe sản phẩm Real-time với xử lý lỗi
@@ -60,9 +65,9 @@ export const useProducts = () => {
     setProducts(updated);
   };
 
-  const saveCategories = async (updated: string[]) => {
-    setCategories(updated);
-  };
+  const saveCategories = async (updated: Category[]) => {
+  setCategories(updated);
+};
 
   return { products, categories, saveProducts, saveCategories };
 };

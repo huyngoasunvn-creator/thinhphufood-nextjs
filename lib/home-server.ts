@@ -17,14 +17,16 @@ export async function getHomeData() {
       ]);
 
     const data = {
-      products: products || [],
-      banners: banners || [],
-      news: news || [],
-      commitments: commitments || [],
-      aboutConfig: settings?.aboutConfig || null,
+      products: (products ?? []).filter(Boolean),
+      banners: (banners ?? []).filter(Boolean),
+      news: (news ?? []).filter(Boolean),
+      commitments: (commitments ?? []).filter(Boolean),
+      aboutConfig: settings?.aboutConfig ?? undefined,
     };
 
+    // 🔥 QUAN TRỌNG: convert về plain object
     return JSON.parse(JSON.stringify(data));
+
   } catch (error) {
     console.error("getHomeData error:", error);
 
@@ -33,7 +35,7 @@ export async function getHomeData() {
       banners: [],
       news: [],
       commitments: [],
-      aboutConfig: null,
+      aboutConfig: undefined,
     };
   }
 }

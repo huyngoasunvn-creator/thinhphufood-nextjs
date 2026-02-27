@@ -2,13 +2,13 @@
 
 import React, { useState, useMemo } from 'react';
 import { Plus, Search, Edit2, Trash2, Copy } from 'lucide-react';
-import { Product } from '@/types';
+import { Product, Category } from '@/types';
 import ProductForm from '../ProductForm'
 
 
 interface AdminProductsProps {
   products: Product[];
-  categories: string[];
+  categories: Category[];
   onAdd: (p: Product) => void;
   onUpdate: (p: Product) => void;
   onDelete: (id: string) => void;
@@ -20,11 +20,16 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, categories, onA
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const filteredProducts = useMemo(() => {
-    return products.filter(p =>
-  p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  (p.category || '').toLowerCase().includes(searchTerm.toLowerCase())
-);
-  }, [products, searchTerm]);
+  return products.filter((p) => {
+    const categoryName =
+      categories.find((c) => c.id === p.categoryId)?.name || '';
+
+    return (
+      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      categoryName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
+}, [products, searchTerm, categories]);
 
   const handleOpenAddModal = () => {
     setEditingProduct(null);
@@ -111,7 +116,9 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, categories, onA
                     </div>
                   </td>
                   <td className="px-8 py-5">
-                    <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-bold uppercase">{p.category}</span>
+                    <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-bold uppercase">{
+  categories.find((c) => c.id === p.categoryId)?.name || "Không có"
+}</span>
                   </td>
                   <td className="px-8 py-5 text-sm font-bold text-green-700">
                     {p.price.toLocaleString()}đ <span className="text-[10px] text-slate-400 font-normal">/{p.unit}</span>

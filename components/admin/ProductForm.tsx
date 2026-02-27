@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { X, Save } from "lucide-react";
-import { Product } from "../../types";
+import { Product, Category } from "../../types";
 import RichTextEditor from "../../components/admin/RichTextEditor";
 import ProductMultiMedia from "../../components/admin/products/ProductMultiMedia";
 
 interface ProductFormProps {
   initialData?: Product | null;
-  categories: string[];
+  categories: Category[]; // ✅ sửa từ string[] -> Category[]
   onSave: (product: Product) => void;
   onClose: () => void;
 }
@@ -36,7 +36,7 @@ export default function ProductForm({
   const [formData, setFormData] = useState<Partial<Product>>({
     name: "",
     slug: "",
-    category: categories[0] || "",
+    categoryId: categories[0]?.id || "", // ✅ đúng
     price: 0,
     unit: "kg",
     images: [],
@@ -45,15 +45,29 @@ export default function ProductForm({
     description: "",
     stock: 0,
     isBestseller: false,
+    isActive: true,
   });
 
-  // Load data khi edit
   useEffect(() => {
-    if (initialData) {
-      setFormData(initialData);
-    }
-  }, [initialData]);
+  if (initialData) {
+    const {
+      id,
+      createdAt,
+      updatedAt,
+      ...rest
+    } = initialData;
 
+    setFormData(rest);
+  }
+}, [initialData]);
+  useEffect(() => {
+  if (!initialData && categories.length > 0) {
+    setFormData((prev) => ({
+      ...prev,
+      categoryId: prev.categoryId || categories[0].id,
+    }));
+  }
+}, [categories, initialData]);
   const handleChange = (field: keyof Product, value: any) => {
     setFormData((prev) => ({
       ...prev,
@@ -72,6 +86,11 @@ export default function ProductForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    if (!formData.categoryId) {
+  alert("Vui lòng chọn danh mục");
+  setLoading(false);
+  return;
+}
 
     const method = initialData ? "PUT" : "POST";
     const url = initialData
@@ -105,7 +124,6 @@ export default function ProductForm({
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      {/* Overlay */}
       <div
         className="absolute inset-0 bg-slate-900/70 backdrop-blur-md"
         onClick={onClose}
@@ -125,180 +143,185 @@ export default function ProductForm({
 
         {/* Body */}
         <form
-  onSubmit={handleSubmit}
-  className="flex-1 overflow-y-auto p-8"
->
-  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          onSubmit={handleSubmit}
+          className="flex-1 overflow-y-auto p-8"
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-    {/* LEFT CONTENT */}
-    <div className="lg:col-span-2 space-y-6">
+            {/* LEFT */}
+            <div className="lg:col-span-2 space-y-6">
 
-      {/* Tên */}
-      <div>
-        <label className="block mb-2 font-semibold">
-          Tên sản phẩm *
-        </label>
-        <input
-          required
-          type="text"
-          className={inputClass}
-          value={formData.name}
-          onChange={(e) => handleNameChange(e.target.value)}
-        />
-      </div>
+              {/* Tên */}
+              <div>
+                <label className="block mb-2 font-semibold">
+                  Tên sản phẩm *
+                </label>
+                <input
+                  required
+                  type="text"
+                  className={inputClass}
+                  value={formData.name || ""}
+                  onChange={(e) => handleNameChange(e.target.value)}
+                />
+              </div>
 
-      {/* Slug */}
-      <div>
-        <label className="block mb-2 font-semibold">
-          Đường dẫn SEO (Slug)
-        </label>
-        <input
-          type="text"
-          className={inputClass}
-          value={formData.slug}
-          onChange={(e) =>
-            handleChange("slug", generateSlug(e.target.value))
-          }
-        />
-      </div>
+              {/* Slug */}
+              <div>
+                <label className="block mb-2 font-semibold">
+                  Đường dẫn SEO (Slug)
+                </label>
+                <input
+                  type="text"
+                  className={inputClass}
+                  value={formData.slug || ""}
+                  onChange={(e) =>
+                    handleChange("slug", generateSlug(e.target.value))
+                  }
+                />
+              </div>
 
-      {/* Danh mục + Giá */}
-      <div className="grid grid-cols-3 gap-4">
-        <div>
-          <label className="block mb-2 font-semibold">
-            Danh mục
-          </label>
-          <select
-            className={inputClass}
-            value={formData.category}
-            onChange={(e) =>
-              handleChange("category", e.target.value)
-            }
-          >
-            {categories.map((cat) => (
-              <option key={cat}>{cat}</option>
-            ))}
-          </select>
-        </div>
+              {/* Danh mục + Giá */}
+              <div className="grid grid-cols-3 gap-4">
 
-        <div>
-          <label className="block mb-2 font-semibold">
-            Giá bán
-          </label>
-          <input
-            type="number"
-            className={inputClass}
-            value={formData.price}
-            onChange={(e) =>
-              handleChange("price", Number(e.target.value))
-            }
-          />
-        </div>
+                {/* Category */}
+                <div>
+                  <label className="block mb-2 font-semibold">
+                    Danh mục
+                  </label>
+                  <select
+                    className={inputClass}
+                    value={formData.categoryId || ""}
+                    onChange={(e) =>
+                      handleChange("categoryId", e.target.value)
+                    }
+                  >
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-        <div>
-          <label className="block mb-2 font-semibold">
-            Đơn vị
-          </label>
-          <input
-            type="text"
-            className={inputClass}
-            value={formData.unit}
-            onChange={(e) =>
-              handleChange("unit", e.target.value)
-            }
-          />
-        </div>
-      </div>
+                {/* Giá */}
+                <div>
+                  <label className="block mb-2 font-semibold">
+                    Giá bán
+                  </label>
+                  <input
+                    type="number"
+                    className={inputClass}
+                    value={formData.price || 0}
+                    onChange={(e) =>
+                      handleChange("price", Number(e.target.value))
+                    }
+                  />
+                </div>
 
-      {/* Mô tả ngắn */}
-      <div>
-        <label className="block mb-2 font-semibold">
-          Mô tả ngắn
-        </label>
-        <textarea
-          rows={3}
-          className={inputClass}
-          value={formData.shortDescription}
-          onChange={(e) =>
-            handleChange("shortDescription", e.target.value)
-          }
-        />
-      </div>
+                {/* Đơn vị */}
+                <div>
+                  <label className="block mb-2 font-semibold">
+                    Đơn vị
+                  </label>
+                  <input
+                    type="text"
+                    className={inputClass}
+                    value={formData.unit || ""}
+                    onChange={(e) =>
+                      handleChange("unit", e.target.value)
+                    }
+                  />
+                </div>
 
-      {/* Mô tả chi tiết */}
-      <div>
-        <label className="block mb-2 font-semibold">
-          Mô tả chi tiết
-        </label>
-        <RichTextEditor
-          value={formData.description || ""}
-          onChange={(value) =>
-            handleChange("description", value)
-          }
-        />
-      </div>
-    </div>
+              </div>
 
-    {/* RIGHT SIDEBAR */}
-    <div className="space-y-6">
+              {/* Mô tả ngắn */}
+              <div>
+                <label className="block mb-2 font-semibold">
+                  Mô tả ngắn
+                </label>
+                <textarea
+                  rows={3}
+                  className={inputClass}
+                  value={formData.shortDescription || ""}
+                  onChange={(e) =>
+                    handleChange("shortDescription", e.target.value)
+                  }
+                />
+              </div>
 
-      <div className="bg-slate-50 rounded-2xl p-6 space-y-6">
+              {/* Mô tả chi tiết */}
+              <div>
+                <label className="block mb-2 font-semibold">
+                  Mô tả chi tiết
+                </label>
+                <RichTextEditor
+                  value={formData.description || ""}
+                  onChange={(value) =>
+                    handleChange("description", value)
+                  }
+                />
+              </div>
 
-        {/* Media */}
-        <ProductMultiMedia
-          images={formData.images || []}
-          videoUrl={formData.videoUrl || ""}
-          onChange={(images, videoUrl) => {
-            handleChange("images", images);
-            handleChange("videoUrl", videoUrl);
-          }}
-        />
+            </div>
 
-        {/* Bestseller */}
-        <div className="flex items-center gap-3">
-          <input
-            type="checkbox"
-            checked={formData.isBestseller}
-            onChange={(e) =>
-              handleChange("isBestseller", e.target.checked)
-            }
-          />
-          <label className="font-semibold">
-            Sản phẩm bán chạy
-          </label>
-        </div>
+            {/* RIGHT */}
+            <div className="space-y-6">
 
-        {/* Tồn kho */}
-        <div>
-          <label className="block mb-2 font-semibold">
-            Số lượng tồn kho
-          </label>
-          <input
-            type="number"
-            className={inputClass}
-            value={formData.stock}
-            onChange={(e) =>
-              handleChange("stock", Number(e.target.value))
-            }
-          />
-        </div>
+              <div className="bg-slate-50 rounded-2xl p-6 space-y-6">
 
-      </div>
+                <ProductMultiMedia
+                  images={formData.images || []}
+                  videoUrl={formData.videoUrl || ""}
+                  onChange={(images, videoUrl) => {
+                    handleChange("images", images);
+                    handleChange("videoUrl", videoUrl);
+                  }}
+                />
 
-    </div>
-  </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={formData.isBestseller || false}
+                    onChange={(e) =>
+                      handleChange("isBestseller", e.target.checked)
+                    }
+                  />
+                  <label className="font-semibold">
+                    Sản phẩm bán chạy
+                  </label>
+                </div>
 
-  {/* Footer Button */}
-  <div className="flex justify-end mt-8">
-    <button
-      type="submit"
-      className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl transition"
-    >
-      <Save className="inline mr-2" />
-      Lưu sản phẩm
-    </button>
-  </div>
-</form>
+                <div>
+                  <label className="block mb-2 font-semibold">
+                    Số lượng tồn kho
+                  </label>
+                  <input
+                    type="number"
+                    className={inputClass}
+                    value={formData.stock || 0}
+                    onChange={(e) =>
+                      handleChange("stock", Number(e.target.value))
+                    }
+                  />
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+
+          <div className="flex justify-end mt-8">
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl transition"
+            >
+              <Save className="inline mr-2" />
+              {loading ? "Đang lưu..." : "Lưu sản phẩm"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

@@ -1,4 +1,3 @@
-
 import { Product } from '@/types';
 
 export const PRODUCTS: Product[] = [
@@ -6,7 +5,9 @@ export const PRODUCTS: Product[] = [
     id: 'st25-premium',
     name: 'Gạo ST25 Ông Cua Chính Hiệu',
     slug: 'gao-st25-ong-cua-loai-1',
-    category: 'Gạo trắng',
+
+    categoryId: 'gao-trang', // ✅ thêm
+
     price: 38000,
     unit: 'kg',
     images: [
@@ -23,7 +24,9 @@ export const PRODUCTS: Product[] = [
     id: 'brown-rice',
     name: 'Gạo Lứt Tím Than Sóc Trăng',
     slug: 'gao-lut-tim-than-organic',
-    category: 'Gạo lứt',
+
+    categoryId: 'gao-lut', // ✅ thêm
+
     price: 55000,
     unit: 'kg',
     images: [
@@ -36,5 +39,9 @@ export const PRODUCTS: Product[] = [
     isActive: true
   }
 ];
-
-export const CATEGORIES = ['Tất cả', 'Gạo trắng', 'Gạo lứt', 'Nông sản sạch', 'Gia vị'];
+export const CATEGORIES = [
+  { id: 'gao-trang', name: 'Gạo trắng' },
+  { id: 'gao-lut', name: 'Gạo lứt' },
+  { id: 'nong-san', name: 'Nông sản sạch' },
+  { id: 'gia-vi', name: 'Gia vị' }
+];

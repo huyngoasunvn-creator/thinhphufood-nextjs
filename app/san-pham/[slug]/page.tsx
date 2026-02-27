@@ -31,14 +31,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${product.name} Chính Hãng, Giá Tốt | Thịnh Phú Food`,
     description:
-      product.shortDescription ||
-      `Mua ${product.name} chất lượng cao tại Thịnh Phú Food.`,
+  product.shortDescription ??
+  `Mua ${product.name} chất lượng cao tại Thịnh Phú Food.`,
     alternates: {
       canonical: url,
     },
     openGraph: {
       title: product.name,
-      description: product.shortDescription,
+      description:
+  product.shortDescription ??
+  `Mua ${product.name} chất lượng cao tại Thịnh Phú Food.`,
       url: url,
       siteName: "Thịnh Phú Food",
       images: [
@@ -74,12 +76,14 @@ export default async function Page({ params }: Props) {
   const image = product.images?.[0] || "/placeholder.jpg";
 
   // 🔥 PRODUCT SCHEMA
-  const schema = {
+  const schema: any = {
   "@context": "https://schema.org/",
   "@type": "Product",
   name: product.name,
   image: [image],
-  description: product.shortDescription,
+  description:
+    product.shortDescription ??
+    `Mua ${product.name} chất lượng cao tại Thịnh Phú Food.`,
   sku: product.id,
   brand: {
     "@type": "Brand",
@@ -91,15 +95,21 @@ export default async function Page({ params }: Props) {
     priceCurrency: "VND",
     price: product.price,
     priceValidUntil: "2026-12-31",
-    availability: "https://schema.org/InStock",
+    availability:
+      product.stock > 0
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
     itemCondition: "https://schema.org/NewCondition",
   },
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: 4.8,
-    reviewCount: 12,
-  },
 };
+
+if (product.rating && product.reviewCount) {
+  schema.aggregateRating = {
+    "@type": "AggregateRating",
+    ratingValue: product.rating,
+    reviewCount: product.reviewCount,
+  };
+}
 
   return (
     <>

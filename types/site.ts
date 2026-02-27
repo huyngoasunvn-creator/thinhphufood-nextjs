@@ -1,10 +1,15 @@
 import { Product } from "./product";
 
-export interface CartItem extends Product {
+export interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  images: string[];
+  unit?: string;
   quantity: number;
+  category?: string;
 }
 
-export type Category = 'Tất cả' | 'Gạo trắng' | 'Gạo lứt' | 'Nông sản sạch' | 'Gia vị';
 
 export interface Order {
   id: string;
@@ -124,4 +129,11 @@ export interface SiteConfig {
   shippingLabel: string;
   shippingValue: string;
   
+}
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  parentId: string | null;
+  isActive: boolean;
 }

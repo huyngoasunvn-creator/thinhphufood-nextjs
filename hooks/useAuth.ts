@@ -8,7 +8,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   updateProfile,
-} from "firebase/auth"; // ✅ sửa lại ở đây
+} from "firebase/auth";
 
 import { auth } from "../services/firebase";
 
@@ -17,52 +17,49 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-    });
+  if (typeof window === "undefined" || !auth) {
+    setLoading(false);
+    return;
+  }
 
-    return () => unsubscribe();
-  }, []);
+  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    setUser(currentUser);
+    setLoading(false);
+  });
+
+  return () => unsubscribe();
+}, []);
 
   const loginWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error("Login Error:", error);
-      throw error;
-    }
-  };
+  if (!auth) return;
+  const provider = new GoogleAuthProvider();
+  return signInWithPopup(auth, provider);
+};
 
-  const loginWithEmail = async (email: string, pass: string) => {
-    try {
-      await signInWithEmailAndPassword(auth, email, pass);
-    } catch (error) {
-      console.error("Email Login Error:", error);
-      throw error;
-    }
-  };
+const loginWithEmail = (email: string, pass: string) => {
+  if (!auth) return;
+  return signInWithEmailAndPassword(auth, email, pass);
+};
 
-  const registerWithEmail = async (
-    email: string,
-    pass: string,
-    name: string
-  ) => {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        pass
-      );
-      await updateProfile(userCredential.user, { displayName: name });
-    } catch (error) {
-      console.error("Register Error:", error);
-      throw error;
-    }
-  };
+const registerWithEmail = async (
+  email: string,
+  pass: string,
+  name: string
+) => {
+  if (!auth) return;
 
-  const logout = () => signOut(auth);
+  const userCredential = await createUserWithEmailAndPassword(
+    auth,
+    email,
+    pass
+  );
+  await updateProfile(userCredential.user, { displayName: name });
+};
+
+const logout = () => {
+  if (!auth) return;
+  return signOut(auth);
+};
 
   return {
     user,

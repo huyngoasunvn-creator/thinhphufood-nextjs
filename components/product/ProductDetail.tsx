@@ -111,7 +111,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, config }) => {
 
           <div
             className="prose prose-lg max-w-none prose-slate prose-img:rounded-3xl prose-a:text-green-600 text-slate-700 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: product.description }}
+            dangerouslySetInnerHTML={{ __html: product.description ?? '' }}
           />
 
         </div>
