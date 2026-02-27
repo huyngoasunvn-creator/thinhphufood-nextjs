@@ -4,8 +4,18 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'res.cloudinary.com' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
-      { protocol: 'https', hostname: 'w.ladicdn.com' }, // thêm dòng này
+      { protocol: 'https', hostname: 'w.ladicdn.com' },
     ],
+  },
+
+  async redirects() {
+    return [
+      {
+        source: "/products",
+        destination: "/san-pham",
+        permanent: true,
+      },
+    ];
   },
 };
 
