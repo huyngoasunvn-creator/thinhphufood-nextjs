@@ -2,7 +2,6 @@ import { adminDb } from "@/lib/firebase-admin";
 import { notFound } from "next/navigation";
 import { QueryDocumentSnapshot, DocumentData } from "firebase-admin/firestore";
 
-export const dynamic = "force-dynamic"; // 🔥 tránh prerender crash
 
 interface Props {
   params: {

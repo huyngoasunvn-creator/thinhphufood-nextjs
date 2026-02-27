@@ -2,7 +2,6 @@ import ProductsPage from "@/components/product/ProductsPage";
 import { getProducts } from "@/lib/server/product-server";
 import { getCategories } from "@/lib/server/category-server";
 
-export const dynamic = "force-dynamic";
 
 interface PageProps {
   searchParams?: {
