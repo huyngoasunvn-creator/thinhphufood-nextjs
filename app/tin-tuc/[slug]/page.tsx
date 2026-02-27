@@ -1,12 +1,4 @@
-import type { QueryDocumentSnapshot, Timestamp } from "firebase-admin/firestore"
-interface News {
-  title: string
-  slug: string
-  content: string
-  image?: string
-  createdAt?: Timestamp
-  updatedAt?: Timestamp
-}
+import { NewsPost } from "@/types";
 import { adminDb } from "@/lib/firebase-admin";
 import { notFound } from "next/navigation";
 import { decode } from "html-entities";
@@ -24,7 +16,9 @@ interface Props {
 
 /* ================= FETCH ================= */
 
-async function getNewsBySlug(slug: string) {
+async function getNewsBySlug(
+  slug: string
+): Promise<NewsPost | null> {
   const snapshot = await adminDb
     .collection("news")
     .where("slug", "==", slug)
@@ -37,12 +31,15 @@ async function getNewsBySlug(slug: string) {
 
   return {
     id: doc.id,
-    ...doc.data(),
+    ...(doc.data() as Omit<NewsPost, "id">),
   };
 }
 
-async function getRelatedPosts(category?: string, currentSlug?: string) {
-  if (!category) return []; // tránh undefined
+async function getRelatedPosts(
+  category?: string,
+  currentSlug?: string
+): Promise<NewsPost[]> {
+  if (!category) return [];
 
   const snapshot = await adminDb
     .collection("news")
@@ -51,11 +48,15 @@ async function getRelatedPosts(category?: string, currentSlug?: string) {
     .get();
 
   return snapshot.docs
-    .map((doc: QueryDocumentSnapshot<News>) => ({
-      id: doc.id,
-      ...doc.data(),
-    }))
-    .filter((item: any) => item.slug !== currentSlug);
+    .map((doc) => {
+      const data = doc.data() as Omit<NewsPost, "id">;
+
+      return {
+        id: doc.id,
+        ...data,
+      };
+    })
+    .filter((item) => item.slug !== currentSlug);
 }
 
 /* ================= SEO ================= */
@@ -63,7 +64,7 @@ async function getRelatedPosts(category?: string, currentSlug?: string) {
 export async function generateMetadata(
   { params }: Props
 ): Promise<Metadata> {
-  const post: any = await getNewsBySlug(params.slug);
+  const post = await getNewsBySlug(params.slug);
 
   if (!post) {
     return { title: "Không tìm thấy bài viết" };
@@ -95,7 +96,7 @@ export async function generateMetadata(
 /* ================= PAGE ================= */
 
 export default async function Page({ params }: Props) {
-  const post: any = await getNewsBySlug(params.slug);
+  const post = await getNewsBySlug(params.slug);
   if (!post) return notFound();
 
   const decodedContent = decode(post.content || "");
@@ -172,7 +173,7 @@ mb-16"
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {relatedPosts.map((item: any) => (
+            {relatedPosts.map((item) => (
               <article
                 key={item.id}
                 className="bg-white rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden group"

@@ -12,18 +12,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const snapshot = await adminDb.collection("news").get()
 
-  const newsUrls = snapshot.docs.map(
-    (doc: QueryDocumentSnapshot<News>) => {
-      const data = doc.data()
+  const newsUrls = snapshot.docs.map((doc) => {
+  const data = doc.data() as News;
 
-      return {
-        url: `${baseUrl}/tin-tuc/${data.slug}`,
-        lastModified: data.updatedAt?.toDate() ?? new Date(),
-        changeFrequency: "weekly" as const,
-        priority: 0.8,
-      }
-    }
-  )
+  return {
+    url: `/tin-tuc/${data.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  };
+});
 
   return [
     {

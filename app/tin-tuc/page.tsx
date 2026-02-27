@@ -1,18 +1,8 @@
-import type { QueryDocumentSnapshot, Timestamp } from "firebase-admin/firestore"
-interface News {
-  title: string
-  slug: string
-  content: string
-  image?: string
-  createdAt?: Timestamp
-  updatedAt?: Timestamp
-}
-
+import { NewsPost } from "@/types";
 import { adminDb } from "@/lib/firebase-admin";
 import Link from "next/link";
 import { Metadata } from "next";
 
-export const dynamic = "force-dynamic";
 
 const PAGE_SIZE = 6;
 const baseUrl = "https://thinhphufood.vn";
@@ -51,14 +41,13 @@ export const metadata: Metadata = {
 /* FETCH DATA */
 /* ============================= */
 
-async function getNews() {
+async function getNews(): Promise<NewsPost[]> {
   const snapshot = await adminDb.collection("news").get();
 
-  return snapshot.docs.map(
-  (doc: QueryDocumentSnapshot<News>) => ({
+  return snapshot.docs.map((doc) => ({
     id: doc.id,
-    ...doc.data(),
-  })) as any[];
+    ...(doc.data() as Omit<NewsPost, "id">),
+  }));
 }
 
 /* ============================= */
