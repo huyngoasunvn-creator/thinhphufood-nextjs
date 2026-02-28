@@ -4,7 +4,6 @@ import { adminAuth } from "@/lib/firebase-admin";
 import AdminSidebar from "@/components/admin/layout/AdminSidebar";
 import AdminHeader from "@/components/admin/layout/AdminHeader";
 
-export const dynamic = "force-dynamic";
 
 export default async function AdminLayout({
   children,
@@ -12,7 +11,7 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const cookieStore = cookies();
-  const token = cookieStore.get("admin-token")?.value;
+  const token = cookieStore.get("session")?.value;
 
   // Không có cookie → đá về login
   if (!token) {

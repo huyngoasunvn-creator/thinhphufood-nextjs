@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get("admin-token");
+  const session = request.cookies.get("session");
 
-  if (request.nextUrl.pathname.startsWith("/admin")) {
-    if (!token) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
+  const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
+
+  if (isAdminRoute && !session) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();

@@ -1,7 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, GripVertical, Edit2, Trash2, Check, X } from 'lucide-react';
+import {
+  Plus,
+  GripVertical,
+  Edit2,
+  Trash2,
+  Check,
+  X,
+} from 'lucide-react';
 
 interface Category {
   id: string;
@@ -29,16 +36,35 @@ const AdminCategories = () => {
     fetchCategories();
   }, []);
 
+  /* ================= TREE UTILS ================= */
+
+  const getChildren = (parentId: string | null) => {
+    return categories.filter(
+      (c) => (c.parentId || null) === parentId
+    );
+  };
+
+  const getDescendants = (id: string): string[] => {
+    const children = getChildren(id);
+    let result: string[] = [];
+
+    children.forEach((child) => {
+      result.push(child.id);
+      result = [...result, ...getDescendants(child.id)];
+    });
+
+    return result;
+  };
+
   /* ================= ADD ================= */
   const handleAdd = async () => {
-    const trimmed = newCat.trim();
-    if (!trimmed) return;
+    if (!newCat.trim()) return;
 
     const res = await fetch('/api/admin/categories', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name: trimmed,
+        name: newCat.trim(),
         parentId: parentId || null,
       }),
     });
@@ -50,13 +76,13 @@ const AdminCategories = () => {
       setParentId('');
       fetchCategories();
     } else {
-      alert('Lỗi khi thêm danh mục');
+      alert('Thêm thất bại');
     }
   };
 
   /* ================= DELETE ================= */
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Bạn có chắc muốn xóa?')) return;
+    if (!confirm('Xóa danh mục này và toàn bộ cấp con?')) return;
 
     const res = await fetch('/api/admin/categories', {
       method: 'DELETE',
@@ -66,11 +92,7 @@ const AdminCategories = () => {
 
     const data = await res.json();
 
-    if (data.success) {
-      fetchCategories();
-    } else {
-      alert('Xóa thất bại');
-    }
+    if (data.success) fetchCategories();
   };
 
   /* ================= EDIT ================= */
@@ -82,6 +104,19 @@ const AdminCategories = () => {
 
   const handleSaveEdit = async () => {
     if (!editingId) return;
+
+    // không cho chọn chính nó hoặc con cháu làm cha
+    const descendants = getDescendants(editingId);
+
+    if (descendants.includes(editParentId)) {
+      alert('Không thể chọn danh mục con làm danh mục cha');
+      return;
+    }
+
+    if (editingId === editParentId) {
+      alert('Không thể chọn chính nó làm cha');
+      return;
+    }
 
     const res = await fetch('/api/admin/categories', {
       method: 'PUT',
@@ -104,10 +139,77 @@ const AdminCategories = () => {
   };
 
   /* ================= RENDER TREE ================= */
-  const parents = categories.filter((c) => !c.parentId);
+
+  const renderTree = (parentId: string | null = null, level = 0) => {
+    const items = getChildren(parentId);
+
+    return items.map((item) => (
+      <div key={item.id} style={{ marginLeft: level * 24 }}>
+        <div className="flex justify-between items-center py-2 border-b">
+          <div className="flex items-center gap-3 flex-1">
+            <GripVertical size={16} />
+
+            {editingId === item.id ? (
+              <div className="flex gap-2 flex-1">
+                <input
+                  autoFocus
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  className="flex-1 px-3 py-1 border rounded-lg"
+                />
+
+                <select
+                  value={editParentId}
+                  onChange={(e) => setEditParentId(e.target.value)}
+                  className="px-3 py-1 border rounded-lg"
+                >
+                  <option value="">-- Không có cha --</option>
+                  {categories
+                    .filter((c) => c.id !== item.id)
+                    .map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                </select>
+
+                <button onClick={handleSaveEdit}>
+                  <Check size={18} />
+                </button>
+
+                <button onClick={() => setEditingId(null)}>
+                  <X size={18} />
+                </button>
+              </div>
+            ) : (
+              <span className="font-medium">
+                {'— '.repeat(level)}
+                {item.name}
+              </span>
+            )}
+          </div>
+
+          {editingId !== item.id && (
+            <div className="flex gap-2">
+              <button onClick={() => handleStartEdit(item)}>
+                <Edit2 size={16} />
+              </button>
+              <button onClick={() => handleDelete(item.id)}>
+                <Trash2 size={16} />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {renderTree(item.id, level + 1)}
+      </div>
+    ));
+  };
+
+  /* ================= RENDER ================= */
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="max-w-3xl space-y-6">
 
       {/* ADD BOX */}
       <div className="bg-white p-6 rounded-2xl border shadow-sm">
@@ -129,115 +231,26 @@ const AdminCategories = () => {
             onChange={(e) => setParentId(e.target.value)}
             className="px-4 py-2 border rounded-xl"
           >
-            <option value="">-- Danh mục cha (cấp 1) --</option>
-            {parents.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
+            <option value="">-- Danh mục cha --</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
               </option>
             ))}
           </select>
 
           <button
             onClick={handleAdd}
-            className="bg-green-600 text-white px-6 py-2 rounded-xl"
+            className="bg-green-600 text-white px-6 py-2 rounded-xl hover:bg-green-700"
           >
             Thêm
           </button>
         </div>
       </div>
 
-      {/* LIST TREE */}
-<div className="bg-white rounded-2xl border shadow-sm divide-y">
-  {parents.map((parent) => {
-    const children = categories.filter(
-      (c) => c.parentId === parent.id
-    );
-
-    return (
-      <div key={parent.id} className="p-4">
-
-        {/* ================= PARENT ================= */}
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-3 flex-1">
-            <GripVertical size={16} />
-
-            {editingId === parent.id ? (
-              <div className="flex gap-2 flex-1">
-                <input
-                  autoFocus
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  className="flex-1 px-3 py-1 border rounded-lg"
-                />
-                <button onClick={handleSaveEdit}>
-                  <Check size={18} />
-                </button>
-                <button onClick={() => setEditingId(null)}>
-                  <X size={18} />
-                </button>
-              </div>
-            ) : (
-              <span className="font-semibold">{parent.name}</span>
-            )}
-          </div>
-
-          {editingId !== parent.id && (
-            <div className="flex gap-2">
-              <button onClick={() => handleStartEdit(parent)}>
-                <Edit2 size={16} />
-              </button>
-              <button onClick={() => handleDelete(parent.id)}>
-                <Trash2 size={16} />
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* ================= CHILDREN ================= */}
-        {children.map((child) => (
-          <div
-            key={child.id}
-            className="flex justify-between items-center mt-3 ml-6 text-gray-600"
-          >
-            <div className="flex items-center gap-3 flex-1">
-              <GripVertical size={16} />
-
-              {editingId === child.id ? (
-                <div className="flex gap-2 flex-1">
-                  <input
-                    autoFocus
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    className="flex-1 px-3 py-1 border rounded-lg"
-                  />
-                  <button onClick={handleSaveEdit}>
-                    <Check size={18} />
-                  </button>
-                  <button onClick={() => setEditingId(null)}>
-                    <X size={18} />
-                  </button>
-                </div>
-              ) : (
-                <span>└ {child.name}</span>
-              )}
-            </div>
-
-            {editingId !== child.id && (
-              <div className="flex gap-2">
-                <button onClick={() => handleStartEdit(child)}>
-                  <Edit2 size={16} />
-                </button>
-                <button onClick={() => handleDelete(child.id)}>
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    );
-  })}
-
+      {/* TREE */}
+      <div className="bg-white rounded-2xl border shadow-sm p-4">
+        {renderTree(null)}
       </div>
     </div>
   );

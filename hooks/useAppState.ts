@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useProducts } from './useProducts';
@@ -15,10 +14,10 @@ export const useAppState = () => {
   const contactMessagesState = useContactMessages();
 
   return {
-    ...productsState,
-    ...cartState,
-    ...ordersState,
-    ...siteSettingsState,
-    ...contactMessagesState
-  };
+  ...productsState,
+  ...cartState,
+  ...ordersState,
+  ...siteSettingsState,
+  ...contactMessagesState,
+};
 };

@@ -55,8 +55,12 @@ function mapProduct(
     stock: raw?.stock ?? 0,
     rating: raw?.rating ?? 0,
     reviewCount: raw?.reviewCount ?? 0,
+
+    /* 🔥 QUAN TRỌNG */
     isFeatured: raw?.isFeatured ?? false,
+    isBestseller: raw?.isBestseller ?? false,   // ✅ FIX LỖI Ở ĐÂY
     isActive: raw?.isActive ?? true,
+
     createdAt: safeDate(raw?.createdAt),
     updatedAt: safeDate(raw?.updatedAt),
   };
@@ -70,7 +74,9 @@ export async function getProducts(): Promise<Product[]> {
 
     if (!snapshot?.docs) return [];
 
-    return snapshot.docs.map(mapProduct).filter(Boolean);
+    return snapshot.docs
+      .map(mapProduct)
+      .filter((product) => product && product.isActive !== false);
   } catch (error) {
     console.error("getProducts error:", error);
     return [];
@@ -91,10 +97,7 @@ export async function getProductBySlug(
 
     if (!snapshot || snapshot.empty) return null;
 
-    const doc = snapshot.docs[0];
-    if (!doc) return null;
-
-    return mapProduct(doc);
+    return mapProduct(snapshot.docs[0]);
   } catch (error) {
     console.error("getProductBySlug error:", error);
     return null;

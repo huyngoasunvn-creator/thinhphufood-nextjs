@@ -108,11 +108,10 @@ const latestNews = safeNews.slice(0, 3);
       />
 
       <Hero banners={banners} />
-      <CategorySection categories={categories} />
 
       {/* Trust Badges */}
       <section className="bg-white py-12 border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6">
           {safeCommitments.map((item) => {
             const IconComp = ICON_MAP[item?.iconName] || Heart;
             return (
@@ -200,7 +199,7 @@ shadow-md shadow-primary/40">
               </div>
             </div>
 
-            <div className="space-y-8 order-1 lg:order-2">
+            <div className="space-y-6 order-1 lg:order-2">
 
               <div className="space-y-4">
                 <span className="inline-block px-4 py-1.5 bg-primary-light/10 text-primary rounded-full text-xs font-bold uppercase tracking-widest">
@@ -216,7 +215,7 @@ shadow-md shadow-primary/40">
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-8 py-8 border-y border-slate-100">
+              <div className="grid grid-cols-2 gap-6 py-8 border-y border-slate-100">
                 <div>
                   <p className="text-5xl font-extrabold text-primary mb-2 tracking-tight">
                     {safeAbout?.stats?.value1 || ''}
@@ -254,7 +253,7 @@ group"
       </section>
 
       {/* Featured Products */}
-      <section className="py-16 bg-gradient-to-b from-primary/5 to-white">
+      <section className="py-12 bg-gradient-to-b from-primary/5 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <header className="flex flex-col md:flex-row justify-between items-end mb-14 gap-4">
             <div className="text-center md:text-left">
@@ -298,7 +297,7 @@ transition-all group"
       </section>
 
       {/* News */}
-      <section className="py-20 bg-white">
+      <section className="py-14 bg-white">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <div className="inline-flex items-center space-x-2 text-green-600 font-black uppercase tracking-widest text-xs mb-4">
             <Newspaper className="h-4 w-4" />
@@ -309,7 +308,7 @@ transition-all group"
             Cẩm Nang Sống Khỏe
           </h2>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-6">
             {latestNews.map(post => (
               <Link
                 key={post?.id}
