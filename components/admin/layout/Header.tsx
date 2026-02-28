@@ -23,7 +23,7 @@ const Header: React.FC<HeaderProps> = ({
   const [searchKeyword, setSearchKeyword] = useState('');
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin, loading } = useAuth();
 
   const navLinks = [
     { name: 'Trang chủ', path: '/' },
@@ -86,12 +86,17 @@ const Header: React.FC<HeaderProps> = ({
               <Search className="absolute left-3.5 h-4 w-4 text-slate-400 group-focus-within:text-green-600 transition-colors" />
             </form>
             
-            {isAdmin && (
-              <Link href="/admin" className="p-2 text-slate-500 hover:text-green-600 transition-colors hidden sm:flex items-center space-x-1 border border-slate-100 rounded-full px-3 hover:bg-slate-50">
-                <ShieldCheck className="h-4 w-4" />
-                <span className="text-[10px] font-black uppercase tracking-tighter">Quản trị</span>
-              </Link>
-            )}
+            {!loading && isAdmin && (
+  <Link
+    href="/admin"
+    className="p-2 text-slate-500 hover:text-green-600 transition-colors hidden sm:flex items-center space-x-1 border border-slate-100 rounded-full px-3 hover:bg-slate-50"
+  >
+    <ShieldCheck className="h-4 w-4" />
+    <span className="text-[10px] font-black uppercase tracking-tighter">
+      Quản trị
+    </span>
+  </Link>
+)}
 
             <Link href="/cart" className="p-2 text-slate-500 hover:text-green-600 transition-colors relative">
               <ShoppingCart className="h-5 w-5" />
