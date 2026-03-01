@@ -1,21 +1,25 @@
 import { adminDb } from "@/lib/firebase-admin";
 import { Product } from "@/types";
-import { QueryDocumentSnapshot } from "firebase-admin/firestore";
+import {
+  Query,
+  QueryDocumentSnapshot,
+} from "firebase-admin/firestore";
 
-export async function getProducts(): Promise<Product[]> {
-  const snapshot = await adminDb
-    .collection("products")
-    .where("isActive", "==", true)
-    .get();
+export async function getProducts(
+  onlyActive: boolean = true
+): Promise<Product[]> {
+  const collectionRef = adminDb.collection("products");
 
-  return snapshot.docs.map((doc: QueryDocumentSnapshot) => {
-    const data = doc.data() as Omit<Product, "id">;
+  const query: Query = onlyActive
+    ? collectionRef.where("isActive", "==", true)
+    : collectionRef;
 
-    return {
-      id: doc.id,
-      ...data,
-    };
-  });
+  const snapshot = await query.get();
+
+  return snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...(doc.data() as Omit<Product, "id">),
+  }));
 }
 
 export async function getProductBySlug(
@@ -31,10 +35,9 @@ export async function getProductBySlug(
   if (snapshot.empty) return null;
 
   const doc: QueryDocumentSnapshot = snapshot.docs[0];
-  const data = doc.data() as Omit<Product, "id">;
 
   return {
     id: doc.id,
-    ...data,
+    ...(doc.data() as Omit<Product, "id">),
   };
 }

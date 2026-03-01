@@ -291,6 +291,18 @@ export default function ProductForm({
                     Sản phẩm bán chạy
                   </label>
                 </div>
+                <div className="flex items-center gap-3">
+  <input
+    type="checkbox"
+    checked={formData.isActive === true}
+    onChange={(e) =>
+      handleChange("isActive", e.target.checked)
+    }
+  />
+  <label className="font-semibold">
+    Hiển thị sản phẩm
+  </label>
+</div>
 
                 <div>
                   <label className="block mb-2 font-semibold">

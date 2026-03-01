@@ -17,6 +17,11 @@ export async function DELETE(
   req: Request,
   { params }: { params: { id: string } }
 ) {
+  console.log("Deleting ID:", params.id);
+
   await deleteProduct(params.id);
+
+  console.log("Deleted OK");
+
   return NextResponse.json({ success: true });
 }

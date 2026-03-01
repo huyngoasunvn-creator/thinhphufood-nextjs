@@ -56,13 +56,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
       </div>
 
       <div className="p-4">
-        <div className="flex items-center space-x-1 mb-2">
-          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-          <span className="text-xs font-semibold text-slate-700">
-            {product.rating ?? 0}
-          </span>
-          <span className="text-xs text-slate-400">(42)</span>
-        </div>
+        
 
         <Link href={`/san-pham/${productSlug}`}>
           <h3 className="text-sm font-semibold text-slate-900 mb-1 line-clamp-2 hover:text-green-600 transition-colors">
@@ -75,14 +69,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
         </p>
 
         <div className="flex items-end justify-between">
-          <div>
-            <span className="text-lg font-bold text-green-700">
-              {price.toLocaleString('vi-VN')}đ
-            </span>
-            <span className="text-[10px] text-slate-400 ml-1">
-              /{product.unit || ""}
-            </span>
-          </div>
+          {price > 0 ? (
+  <div>
+    <span className="text-lg font-bold text-green-700">
+      {price.toLocaleString('vi-VN')}đ
+    </span>
+    <span className="text-[10px] text-slate-400 ml-1">
+      /{product.unit || ""}
+    </span>
+  </div>
+) : (
+  <a
+    href="https://zalo.me/0978529390"
+    target="_blank"
+    className="text-sm font-semibold text-white bg-green-600 px-3 py-1.5 rounded-md hover:bg-green-700 transition"
+  >
+    Liên hệ
+  </a>
+)}
 
           {(product.stock ?? 0) < 20 && (
             <span className="text-[10px] text-orange-500 font-medium italic">

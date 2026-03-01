@@ -68,15 +68,23 @@ function mapProduct(
 
 /* ================= GET ALL ================= */
 
-export async function getProducts(): Promise<Product[]> {
+export async function getProducts(
+  onlyActive: boolean = true
+): Promise<Product[]> {
   try {
     const snapshot = await adminDb.collection("products").get();
 
     if (!snapshot?.docs) return [];
 
-    return snapshot.docs
-      .map(mapProduct)
-      .filter((product) => product && product.isActive !== false);
+    const products = snapshot.docs.map(mapProduct);
+
+    if (onlyActive) {
+      return products.filter(
+        (product) => product && product.isActive !== false
+      );
+    }
+
+    return products; // 🔥 admin sẽ vào đây
   } catch (error) {
     console.error("getProducts error:", error);
     return [];
@@ -107,10 +115,18 @@ export async function getProductBySlug(
 /* ================= CREATE ================= */
 
 export async function createProduct(
-  data: Omit<Product, "id">
+  data: Omit<Product, "id" | "createdAt" | "updatedAt">
 ) {
   const docRef = await adminDb.collection("products").add({
     ...data,
+
+    rating: data.rating ?? 5,
+    reviewCount: data.reviewCount ?? 1,
+    isActive: data.isActive ?? true,
+    isFeatured: data.isFeatured ?? false,
+    isBestseller: data.isBestseller ?? false,
+    stock: data.stock ?? 0,
+
     createdAt: new Date(),
     updatedAt: new Date(),
   });
@@ -126,8 +142,12 @@ export async function updateProduct(
   id: string,
   data: Partial<Product>
 ) {
+  const cleanData = Object.fromEntries(
+    Object.entries(data).filter(([_, v]) => v !== undefined)
+  );
+
   await adminDb.collection("products").doc(id).update({
-    ...data,
+    ...cleanData,
     updatedAt: new Date(),
   });
 
