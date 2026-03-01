@@ -2,6 +2,7 @@ import { NewsPost } from "@/types";
 import { adminDb } from "@/lib/firebase-admin";
 import Link from "next/link";
 import { Metadata } from "next";
+import { getNewsServer } from "@/lib/server/news-server";
 
 
 const PAGE_SIZE = 6;
@@ -41,21 +42,13 @@ export const metadata: Metadata = {
 /* FETCH DATA */
 /* ============================= */
 
-async function getNews(): Promise<NewsPost[]> {
-  const snapshot = await adminDb.collection("news").get();
-
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...(doc.data() as Omit<NewsPost, "id">),
-  }));
-}
 
 /* ============================= */
 /* PAGE */
 /* ============================= */
 
 export default async function NewsPage({ searchParams }: Props) {
-  const allNews = await getNews();
+  const allNews = await getNewsServer();
 
   const page = Number(searchParams?.page || 1);
   const category = searchParams?.category || "";

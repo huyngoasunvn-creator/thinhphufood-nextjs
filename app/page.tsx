@@ -1,9 +1,15 @@
 import HomePage from "@/components/home/HomePage";
 import { getHomeData } from "@/lib/home-server";
-import { Product, Banner, NewsPost, Commitment, AboutConfig } from "@/types";
+import { getNewsServer } from "@/lib/server/news-server";
+import {
+  Product,
+  Banner,
+  NewsPost,
+  Commitment,
+  AboutConfig,
+} from "@/types";
 
 export default async function Page() {
-
   let data: {
     products: Product[];
     banners: Banner[];
@@ -21,11 +27,14 @@ export default async function Page() {
   try {
     const result = await getHomeData();
 
+    // 👇 LẤY NEWS ĐÃ FILTER isActive
+    const activeNews = await getNewsServer();
+
     if (result) {
       data = {
         products: result.products ?? [],
         banners: result.banners ?? [],
-        news: result.news ?? [],
+        news: activeNews.slice(0, 3), // 👈 LẤY 3 BÀI MỚI NHẤT
         commitments: result.commitments ?? [],
         aboutConfig: result.aboutConfig ?? undefined,
       };

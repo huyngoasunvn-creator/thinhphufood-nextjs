@@ -17,20 +17,34 @@ export default function AdminLayout({
   useEffect(() => {
     if (loading) return;
 
+    // ❌ chưa đăng nhập
     if (!user) {
       router.replace("/login");
       return;
     }
 
+    // ❌ không phải admin
     if (!isAdmin) {
       router.replace("/");
       return;
     }
   }, [user, isAdmin, loading, router]);
 
-  if (loading) return null;
-  if (!isAdmin) return null;
+  // 🔄 Đang kiểm tra quyền
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-gray-500">Đang kiểm tra quyền truy cập...</p>
+      </div>
+    );
+  }
 
+  // 🚫 Không đủ quyền → không render gì
+  if (!user || !isAdmin) {
+    return null;
+  }
+
+  // ✅ Đủ quyền → render admin UI
   return (
     <div className="flex min-h-screen bg-slate-100">
       <AdminSidebar />

@@ -36,6 +36,7 @@ export interface NewsPost {
   author: string;
   date: string;
   relatedIds?: string[];
+  isActive: boolean;
 }
 
 export interface ContactMessage {

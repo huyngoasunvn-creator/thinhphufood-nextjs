@@ -35,7 +35,6 @@ import {
   INITIAL_CONTACT,
 } from "../data/siteSettings";
 
-import { SAMPLE_NEWS } from "../data/news";
 
 export const useSiteSettings = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -60,18 +59,19 @@ export const useSiteSettings = () => {
        1. NEWS
     =============================== */
     const newsQ = query(collection(db, "news"), orderBy("date", "desc"));
-    const unsubNews = onSnapshot(
-      newsQ,
-      (snap) => {
-        const data: NewsPost[] = snap.docs.map((d) => ({
-          id: d.id,
-          ...d.data(),
-        })) as NewsPost[];
 
-        setNews(data.length > 0 ? data : SAMPLE_NEWS);
-      },
-      () => setNews(SAMPLE_NEWS)
-    );
+const unsubNews = onSnapshot(
+  newsQ,
+  (snap) => {
+    const data: NewsPost[] = snap.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+    })) as NewsPost[];
+
+    setNews(data); // 🔥 chỉ lấy data từ Firestore
+  },
+  () => setNews([]) // 🔥 nếu lỗi thì trả mảng rỗng
+);
 
     /* ===============================
        2. BANNERS
