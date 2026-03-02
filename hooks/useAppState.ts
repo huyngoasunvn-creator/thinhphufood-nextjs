@@ -5,6 +5,7 @@ import { useOrders } from './useOrders';
 import { useSiteSettings } from './useSiteSettings';
 import { useContactMessages } from './useContactMessages';
 import { useNews } from './useNews';
+import { useEventEmbed } from './useEventEmbed';
 
 export const useAppState = () => {
   const productsState = useProducts();
@@ -12,6 +13,7 @@ export const useAppState = () => {
   const siteSettingsState = useSiteSettings();
   const contactMessagesState = useContactMessages();
   const newsState = useNews();
+  const eventEmbedState = useEventEmbed(); // ✅ thêm
 
   return {
     ...productsState,
@@ -19,5 +21,6 @@ export const useAppState = () => {
     ...siteSettingsState,
     ...contactMessagesState,
     ...newsState,
+    ...eventEmbedState, // ✅ thêm
   };
 };

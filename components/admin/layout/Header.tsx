@@ -1,5 +1,5 @@
 'use client';
-
+import EventMenu from "@/components/header/EventMenu"
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -88,6 +88,7 @@ const Header: React.FC<HeaderProps> = ({
                 {link.name}
               </Link>
             ))}
+            <EventMenu />
           </nav>
 
           {/* RIGHT SIDE */}
