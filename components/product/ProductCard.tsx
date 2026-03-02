@@ -2,29 +2,52 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ShoppingCart, Star, Heart } from 'lucide-react';
+import { ShoppingCart, Heart } from 'lucide-react';
 import { Product } from '@/types';
+import { useCart } from '@/context/CartContext';
 
 interface ProductCardProps {
-  product?: Product; // 👈 cho phép undefined để an toàn
-  onAddToCart?: (product: Product) => void;
+  product?: Product;
+  onAddToCart?: (product: Product) => void; // vẫn cho phép truyền từ ngoài
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
+const ProductCard: React.FC<ProductCardProps> = ({
+  product,
+  onAddToCart,
+}) => {
+  const { addToCart } = useCart();
 
-  // 🔒 Chặn crash khi prerender
   if (!product || !product.id) return null;
 
   const imageUrl = product.images?.[0] || "/placeholder.jpg";
   const productName = product.name || "Sản phẩm";
   const productSlug = product.slug || "";
-  const price = Number(product.price || 0);
+  const price = typeof product.price === "number" ? product.price : 0;
+  const canAddToCart = price > 0;
+
+  const handleAddToCart = () => {
+    // Nếu truyền từ ngoài vào thì dùng cái đó
+    if (onAddToCart) {
+      onAddToCart(product);
+      return;
+    }
+
+    // Không thì dùng context
+    addToCart({
+  id: product.id,
+  name: product.name,
+  price: price,
+  images: product.images || [],
+  unit: product.unit || "",
+  category: product.category || "",
+});
+  };
 
   return (
     <div className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl transition-all duration-300">
       
       <div className="relative aspect-square overflow-hidden">
-        
+
         {product.isBestseller && (
           <span className="absolute top-4 left-4 z-10 bg-yellow-400 text-yellow-900 text-[10px] font-bold uppercase px-2 py-1 rounded-full shadow-sm">
             Bán chạy
@@ -43,21 +66,21 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
           />
         </Link>
 
-        <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-          <button
-            onClick={() => onAddToCart?.(product)}
-            className="w-full bg-green-600 text-white py-2.5 rounded-xl font-medium flex items-center justify-center space-x-2 hover:bg-green-700 active:scale-95 transition-all shadow-lg shadow-green-600/20"
-          >
-            <ShoppingCart className="h-4 w-4" />
-            <span>Thêm vào giỏ</span>
-          </button>
-        </div>
+        {canAddToCart && (
+          <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+            <button
+              onClick={handleAddToCart}
+              className="w-full bg-green-600 text-white py-2.5 rounded-xl font-medium flex items-center justify-center space-x-2 hover:bg-green-700 active:scale-95 transition-all shadow-lg shadow-green-600/20"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              <span>Thêm vào giỏ</span>
+            </button>
+          </div>
+        )}
 
       </div>
 
       <div className="p-4">
-        
-
         <Link href={`/san-pham/${productSlug}`}>
           <h3 className="text-sm font-semibold text-slate-900 mb-1 line-clamp-2 hover:text-green-600 transition-colors">
             {productName}
@@ -70,23 +93,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
 
         <div className="flex items-end justify-between">
           {price > 0 ? (
-  <div>
-    <span className="text-lg font-bold text-green-700">
-      {price.toLocaleString('vi-VN')}đ
-    </span>
-    <span className="text-[10px] text-slate-400 ml-1">
-      /{product.unit || ""}
-    </span>
-  </div>
-) : (
-  <a
-    href="https://zalo.me/0978529390"
-    target="_blank"
-    className="text-sm font-semibold text-white bg-green-600 px-3 py-1.5 rounded-md hover:bg-green-700 transition"
-  >
-    Liên hệ
-  </a>
-)}
+            <div>
+              <span className="text-lg font-bold text-green-700">
+                {price.toLocaleString('vi-VN')}đ
+              </span>
+              <span className="text-[10px] text-slate-400 ml-1">
+                /{product.unit || ""}
+              </span>
+            </div>
+          ) : (
+            <a
+              href="https://zalo.me/0978529390"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-semibold text-white bg-green-600 px-3 py-1.5 rounded-md hover:bg-green-700 transition"
+            >
+              Liên hệ
+            </a>
+          )}
 
           {(product.stock ?? 0) < 20 && (
             <span className="text-[10px] text-orange-500 font-medium italic">

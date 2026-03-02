@@ -1,101 +1,84 @@
 import { useState, useEffect } from "react";
-import { Order, CartItem } from "@/types";
-import { PRODUCTS as INITIAL_PRODUCTS } from "../data/products";
+import { Order } from "@/types";
 
-/* ===============================
-   Helper: Product -> CartItem
-=============================== */
-const mapProductToCartItem = (
-  product: any,
-  quantity: number
-): CartItem => {
-  if (!product) {
-    return {
-      id: "unknown",
-      name: "Sản phẩm",
-      price: 0,
-      unit: "",
-      category: "",
-      images: [],
-      quantity,
-    };
-  }
-
-  return {
-    id: product.id ?? "unknown",
-    name: product.name ?? "Sản phẩm",
-    price: product.price ?? 0,
-    unit: product.unit ?? "",
-    category: product.category ?? "",
-    images: product.images ?? [],
-    quantity,
-  };
-};
-
-/* ===============================
-   MOCK DATA
-=============================== */
-const INITIAL_ORDERS_MOCK: Order[] = [
-  {
-    id: "DH001",
-    customerName: "Nguyễn Văn A",
-    phone: "0987654321",
-    address: "123 Cách Mạng Tháng 8, Quận 3, TP.HCM",
-    items: [
-  mapProductToCartItem(INITIAL_PRODUCTS?.[0], 2),
-  mapProductToCartItem(INITIAL_PRODUCTS?.[1], 1),
-],
-    shippingFee: 0,
-    total: 115000,
-    status: "pending",
-    createdAt: "12/05/2024",
-    paymentMethod: "cod",
-    note: "Giao sau 5h chiều",
-  },
-  {
-    id: "DH002",
-    customerName: "Trần Thị B",
-    phone: "0123456789",
-    address: "456 Lê Lợi, Quận 1, TP.HCM",
-    items: [mapProductToCartItem(INITIAL_PRODUCTS?.[2], 5)],
-    shippingFee: 30000,
-    total: 170000,
-    status: "shipping",
-    createdAt: "11/05/2024",
-    paymentMethod: "transfer",
-  },
-];
-
-/* ===============================
-   HOOK
-=============================== */
 export const useOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  /* ===============================
+     LOAD ORDERS FROM DATABASE
+  =============================== */
   useEffect(() => {
-    const saved = localStorage.getItem("thinhphu_orders");
+    const fetchOrders = async () => {
+      try {
+        const res = await fetch("/api/orders");
 
-    if (saved) {
-      setOrders(JSON.parse(saved));
-    } else {
-      setOrders(INITIAL_ORDERS_MOCK);
-      localStorage.setItem(
-        "thinhphu_orders",
-        JSON.stringify(INITIAL_ORDERS_MOCK)
-      );
-    }
+        if (!res.ok) throw new Error("Lỗi tải đơn hàng");
+
+        const data = await res.json();
+        setOrders(data);
+      } catch (error) {
+        console.error("Lỗi load orders:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
   }, []);
 
-  const addOrder = (order: Order) => {
-    const updated = [order, ...orders];
-    setOrders(updated);
-    localStorage.setItem("thinhphu_orders", JSON.stringify(updated));
+  /* ===============================
+     ADD ORDER (KHÁCH ĐẶT HÀNG)
+  =============================== */
+  const addOrder = async (order: Order) => {
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(order),
+      });
+
+      if (!res.ok) throw new Error("Tạo đơn thất bại");
+
+      const savedOrder = await res.json();
+
+      setOrders((prev) => [savedOrder, ...prev]);
+    } catch (error) {
+      console.error("Lỗi tạo đơn:", error);
+    }
   };
 
-  const saveOrders = (updated: Order[]) => {
-    setOrders(updated);
-    localStorage.setItem("thinhphu_orders", JSON.stringify(updated));
-  };
+  /* ===============================
+     UPDATE ORDER (ADMIN ĐỔI STATUS)
+  =============================== */
+  const updateOrder = async (id: string, updatedData: Partial<Order>) => {
 
-  return { orders, addOrder, saveOrders };
+  // 🔥 ĐỔI UI NGAY LẬP TỨC
+  setOrders(prev =>
+    prev.map(order =>
+      order.id === id
+        ? { ...order, ...updatedData }
+        : order
+    )
+  );
+
+  try {
+    await fetch(`/api/orders/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedData),
+    });
+  } catch (error) {
+    console.error("Lỗi update order:", error);
+  }
+};
+
+  return {
+    orders,
+    loading,
+    addOrder,
+    updateOrder,
+  };
 };

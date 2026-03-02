@@ -1,26 +1,18 @@
+'use client';
 
 import React from 'react';
-// Use next/link and next/navigation instead of react-router-dom
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, ShoppingBag, Newspaper, ShoppingCart, User } from 'lucide-react';
+import { Home, ShoppingBag, Newspaper, ShoppingCart } from 'lucide-react';
+import { useCart } from '@/context/CartContext'; // 👈 thêm
 
-interface MobileBottomNavProps {
-  cartCount?: number;
-  profileActive?: boolean;
-}
-
-const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
-  cartCount = 0,
-  profileActive = true
-}) => {
-
+const MobileBottomNav: React.FC = () => {
   const pathname = usePathname();
+  const { cartCount } = useCart(); // 👈 lấy trực tiếp từ context
+
   const isActive = (path: string) => pathname === path;
 
-  // Không hiển thị trong trang quản trị
   if (pathname?.startsWith('/admin')) return null;
-
 
   const navs = [
     { label: 'Trang chủ', icon: Home, path: '/' },
@@ -42,15 +34,18 @@ const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           >
             <div className={`relative p-1 rounded-xl transition-all ${isActive(nav.path) ? 'scale-110' : ''}`}>
               <nav.icon className={`h-5 w-5 ${isActive(nav.path) ? 'stroke-[2.5px]' : 'stroke-[2px]'}`} />
-              {nav.badge !== undefined && nav.badge > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] font-black h-4 w-4 flex items-center justify-center rounded-full border-2 border-white">
-                  {nav.badge}
-                </span>
-              )}
+
+              {(nav.badge ?? 0) > 0 && (
+  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] font-black h-4 w-4 flex items-center justify-center rounded-full border-2 border-white">
+    {nav.badge}
+  </span>
+)}
             </div>
+
             <span className={`text-[10px] mt-1 font-bold tracking-tight ${isActive(nav.path) ? 'opacity-100' : 'opacity-70'}`}>
               {nav.label}
             </span>
+
             {isActive(nav.path) && (
               <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-green-600 rounded-b-full shadow-lg shadow-green-200"></span>
             )}

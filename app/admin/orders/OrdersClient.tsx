@@ -1,10 +1,9 @@
 'use client';
 
-import React from 'react';
 import AdminOrders from '@/components/admin/Orders';
-import { useAppState } from '../../../hooks/useAppState';
+import { useAppState } from '@/hooks/useAppState';
 
-export default function AdminOrdersPage() {
+export default function OrdersClient() {
   const { orders, updateOrder } = useAppState();
 
   return (

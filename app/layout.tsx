@@ -3,6 +3,7 @@ import "./globals.css";
 import ClientLayout from "./ClientLayout";
 import { Be_Vietnam_Pro } from "next/font/google";
 import type { Metadata } from "next";
+import { CartProvider } from "@/context/CartContext"; // 👈 thêm dòng này
 
 const beVietnam = Be_Vietnam_Pro({
   subsets: ["latin", "vietnamese"],
@@ -39,7 +40,7 @@ export const metadata: Metadata = {
       "Gạo ST25 thơm ngon, đạt chuẩn VietGAP, giao hàng toàn quốc.",
     images: [
       {
-        url: "/og-image.jpg", // bạn nhớ tạo ảnh này trong thư mục public
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Thịnh Phú Food - Gạo ST25 Chính Hãng",
@@ -78,7 +79,9 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body className={`${beVietnam.className} antialiased`}>
-        <ClientLayout>{children}</ClientLayout>
+        <CartProvider> {/* 👈 bọc ở đây */}
+          <ClientLayout>{children}</ClientLayout>
+        </CartProvider>
       </body>
     </html>
   );

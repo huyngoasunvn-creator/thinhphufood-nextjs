@@ -9,27 +9,34 @@ import { SiteConfig } from '@/types';
 
 interface LayoutProps {
   children: React.ReactNode;
-  cartCount: number;
   profileActive: boolean;
   aboutActive: boolean;
   siteConfig: SiteConfig;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, cartCount, profileActive, aboutActive, siteConfig }) => {
+const Layout: React.FC<LayoutProps> = ({ children, profileActive, aboutActive, siteConfig }) => {
   const pathname = usePathname();
 const isAdmin = pathname?.startsWith('/admin') ?? false;
 
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {!isAdmin && <Header cartCount={cartCount} profileActive={profileActive} aboutPageActive={aboutActive} />}
-      <main className={`flex-grow ${!isAdmin ? 'pb-16 md:pb-0' : ''}`}>
-        {children}
-      </main>
-      {!isAdmin && <Footer config={siteConfig} />}
-      <MobileBottomNav cartCount={cartCount} profileActive={profileActive} />
-    </div>
-  );
+  <div className="flex flex-col min-h-screen">
+    {!isAdmin && (
+      <Header
+        profileActive={profileActive}
+        aboutPageActive={aboutActive}
+      />
+    )}
+
+    <main className={`flex-grow ${!isAdmin ? 'pb-16 md:pb-0' : ''}`}>
+      {children}
+    </main>
+
+    {!isAdmin && <Footer config={siteConfig} />}
+
+    <MobileBottomNav />
+  </div>
+);
 };
 
 export default Layout;

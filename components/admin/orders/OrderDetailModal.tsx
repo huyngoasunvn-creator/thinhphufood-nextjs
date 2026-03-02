@@ -10,7 +10,15 @@ interface OrderDetailModalProps {
 }
 
 const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClose, onUpdateStatus }) => {
-  const subtotal = order.items?.reduce((acc, item) => acc + (item.price * item.quantity), 0) || (order.total - order.shippingFee);
+  const shippingFee = order.shippingFee ?? 0;
+
+const subtotal =
+  order.items?.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  ) ?? 0;
+
+const total = order.total ?? subtotal + shippingFee;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -123,11 +131,13 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({ order, onClose, onU
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-slate-400 font-medium">Phí giao hàng:</span>
-                    <span className="font-bold text-green-600">{order.shippingFee === 0 ? 'MIỄN PHÍ' : `${order.shippingFee.toLocaleString()}đ`}</span>
+                    <span className="font-bold text-green-600">{shippingFee === 0
+  ? 'MIỄN PHÍ'
+  : `${shippingFee.toLocaleString()}đ`}</span>
                   </div>
                   <div className="pt-4 border-t border-dashed border-slate-100 flex justify-between items-end">
                     <span className="text-sm font-black text-slate-900 uppercase">Tổng cộng:</span>
-                    <span className="text-3xl font-black text-green-700">{order.total.toLocaleString()}đ</span>
+                    <span className="text-3xl font-black text-green-700">{total.toLocaleString()}đ</span>
                   </div>
                 </div>
               </section>

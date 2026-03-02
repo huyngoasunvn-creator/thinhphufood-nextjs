@@ -1,14 +1,13 @@
-
 import React, { useState } from 'react';
-// Use next/link and next/navigation instead of react-router-dom
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, ShoppingBag } from 'lucide-react';
-import { CartItem, Order } from '../types';
+import { CartItem } from '../types';
 import CartEmpty from '../components/cart/CartEmpty';
 import CartItemRow from '../components/cart/CartItemRow';
 import CheckoutForm from '../components/cart/CheckoutForm';
 import OrderSummary from '../components/cart/OrderSummary';
+import { Order } from '@/types';
 
 interface CartProps {
   cartItems: CartItem[];
@@ -16,11 +15,19 @@ interface CartProps {
   onSetQuantity: (id: string, quantity: number) => void;
   onRemoveItem: (id: string) => void;
   onClearCart: () => void;
-  onAddOrder: (order: Order) => void;
+  onAddOrder: (order: Order) => Promise<void>;
 }
 
-const Cart: React.FC<CartProps> = ({ cartItems, onUpdateQuantity, onSetQuantity, onRemoveItem, onClearCart, onAddOrder }) => {
+const Cart: React.FC<CartProps> = ({
+  cartItems,
+  onUpdateQuantity,
+  onSetQuantity,
+  onRemoveItem,
+  onClearCart,
+}) => {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
   const [checkoutData, setCheckoutData] = useState({
     fullName: '',
     phone: '',
@@ -29,45 +36,70 @@ const Cart: React.FC<CartProps> = ({ cartItems, onUpdateQuantity, onSetQuantity,
     district: '',
     ward: '',
     streetAddress: '',
-    address: '', // Sẽ được tổng hợp trước khi submit
+    address: '',
     note: '',
-    paymentMethod: 'cod'
+    paymentMethod: 'cod',
   });
 
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const subtotal = cartItems.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
   const shipping = subtotal > 500000 ? 0 : 30000;
   const total = subtotal + shipping;
 
-  const handleOrderSubmit = (e: React.FormEvent) => {
+  const handleOrderSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (cartItems.length === 0) return;
 
-    // Tổng hợp địa chỉ đầy đủ
-    const fullAddress = `${checkoutData.streetAddress}, ${checkoutData.ward}, ${checkoutData.district}, ${checkoutData.province}`;
-    
-    // Tạo đối tượng đơn hàng mới với đầy đủ thông tin
-    const newOrder: Order = {
-      id: `DH${Date.now().toString().slice(-6)}`,
+    if (!checkoutData.fullName || !checkoutData.phone) {
+      alert('Vui lòng nhập đầy đủ Họ tên và Số điện thoại');
+      return;
+    }
+
+    setLoading(true);
+
+    const fullAddress =
+      checkoutData.address ||
+      `${checkoutData.streetAddress}, ${checkoutData.ward}, ${checkoutData.district}, ${checkoutData.province}`;
+
+    const orderData = {
       customerName: checkoutData.fullName,
       phone: checkoutData.phone,
+      email: checkoutData.email,
       address: fullAddress,
-      items: [...cartItems],
+      province: checkoutData.province,
+      district: checkoutData.district,
+      ward: checkoutData.ward,
+      streetAddress: checkoutData.streetAddress,
+      note: checkoutData.note,
+      paymentMethod: checkoutData.paymentMethod,
+      items: cartItems,
       shippingFee: shipping,
       total: total,
       status: 'pending',
-      createdAt: new Date().toLocaleDateString('vi-VN'),
-      note: checkoutData.note,
-      paymentMethod: checkoutData.paymentMethod
+      createdAt: new Date(),
     };
 
-    // Lưu đơn hàng vào hệ thống
-    onAddOrder(newOrder);
-    
-    alert(`Cảm ơn ${checkoutData.fullName}! Đơn hàng ${newOrder.id} của bạn đã được tiếp nhận. Chúng tôi sẽ liên hệ sớm nhất.`);
-    
-    // Xóa giỏ hàng và quay về trang chủ
-    onClearCart();
-    router.push('/');
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData),
+      });
+
+      if (!res.ok) throw new Error('Tạo đơn thất bại');
+
+      alert('🎉 Đặt hàng thành công! Chúng tôi sẽ liên hệ sớm.');
+
+      onClearCart();
+      router.push('/');
+    } catch (error) {
+      console.error(error);
+      alert('Có lỗi xảy ra khi đặt hàng!');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (cartItems.length === 0) {
@@ -78,25 +110,31 @@ const Cart: React.FC<CartProps> = ({ cartItems, onUpdateQuantity, onSetQuantity,
     <div className="bg-slate-50 min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center space-x-2 mb-8">
-          <Link href="/products" className="text-slate-400 hover:text-green-600 transition-colors">
+          <Link
+            href="/san-pham"
+            className="text-slate-400 hover:text-green-600 transition-colors"
+          >
             <ArrowLeft className="h-5 w-5" />
           </Link>
-          <h1 className="text-3xl font-bold text-slate-900">Thanh toán đơn hàng</h1>
+          <h1 className="text-3xl font-bold text-slate-900">
+            Thanh toán đơn hàng
+          </h1>
         </div>
 
         <div className="grid lg:grid-cols-12 gap-10">
           <div className="lg:col-span-8 space-y-10">
-            {/* List Items Container */}
+            {/* Cart Items */}
             <div className="bg-white p-6 sm:p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
               <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center">
                 <ShoppingBag className="h-5 w-5 mr-2 text-green-600" />
                 Sản phẩm trong giỏ ({cartItems.length})
               </h2>
+
               <div className="divide-y divide-slate-100">
                 {cartItems.map((item) => (
-                  <CartItemRow 
-                    key={item.id} 
-                    item={item} 
+                  <CartItemRow
+                    key={item.id}
+                    item={item}
                     onUpdateQuantity={onUpdateQuantity}
                     onSetQuantity={onSetQuantity}
                     onRemoveItem={onRemoveItem}
@@ -105,19 +143,21 @@ const Cart: React.FC<CartProps> = ({ cartItems, onUpdateQuantity, onSetQuantity,
               </div>
             </div>
 
-            {/* Checkout Form Container */}
-            <CheckoutForm 
-              data={checkoutData} 
-              onChange={setCheckoutData} 
-              onSubmit={handleOrderSubmit} 
+            {/* Checkout Form */}
+            <CheckoutForm
+              data={checkoutData}
+              onChange={setCheckoutData}
+              onSubmit={handleOrderSubmit}
+              loading={loading}
             />
           </div>
 
+          {/* Order Summary */}
           <div className="lg:col-span-4">
-            <OrderSummary 
-              subtotal={subtotal} 
-              shipping={shipping} 
-              total={total} 
+            <OrderSummary
+              subtotal={subtotal}
+              shipping={shipping}
+              total={total}
               itemsCount={cartItems.length}
             />
           </div>

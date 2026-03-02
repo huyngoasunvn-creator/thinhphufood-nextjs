@@ -7,7 +7,7 @@ import OrderDetailModal from '../../components/admin/orders/OrderDetailModal';
 
 interface AdminOrdersProps {
   orders: Order[];
-  onUpdateOrders: (orders: Order[]) => void;
+  onUpdateOrders: (id: string, updatedData: Partial<Order>) => void; // ✅ đúng
 }
 
 const AdminOrders: React.FC<AdminOrdersProps> = ({ orders, onUpdateOrders }) => {
@@ -24,15 +24,31 @@ const AdminOrders: React.FC<AdminOrdersProps> = ({ orders, onUpdateOrders }) => 
     }).sort((a, b) => b.id.localeCompare(a.id));
   }, [orders, searchTerm, filterStatus]);
 
-  const handleUpdateStatus = (id: string, status: Order['status']) => {
-    const updatedOrders = orders.map(o => o.id === id ? { ...o, status } : o);
-    onUpdateOrders(updatedOrders);
-    
-    if (selectedOrder && selectedOrder.id === id) {
-      setSelectedOrder({ ...selectedOrder, status });
-    }
-  };
+  const handleUpdateStatus = async (id: string, status: Order["status"]) => {
 
+  // 1️⃣ Cập nhật UI ngay (optimistic update)
+  if (typeof onUpdateOrders === "function") {
+    onUpdateOrders(id, { status });
+  }
+
+  if (selectedOrder?.id === id) {
+    setSelectedOrder(prev =>
+      prev ? { ...prev, status } : prev
+    );
+  }
+
+  // 2️⃣ Gọi API
+  try {
+    await fetch(`/api/orders/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+  } catch (err) {
+    console.error("Update failed:", err);
+  }
+};
+  
   const getStatusStyle = (status: string) => {
     switch(status) {
       case 'pending': return 'bg-yellow-100 text-yellow-700';
