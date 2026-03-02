@@ -8,7 +8,7 @@ export const INITIAL_SITE_CONFIG: SiteConfig = {
   address: 'Hẻm 123, Đường Số 7, Quận 7, TP. Hồ Chí Minh',
   facebookUrl: 'https://facebook.com/thinhphufood.gaosach',
   showStock: true,
-  showTrustBadges: true,
+  showTrustBadges: false,
   certLabel: 'CHỨNG NHẬN',
   certValue: 'Chuẩn VietGAP',
   shippingLabel: 'GIAO HÀNG',

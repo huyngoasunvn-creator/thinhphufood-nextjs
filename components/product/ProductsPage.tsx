@@ -1,11 +1,9 @@
-'use client';
+"use client";
 
-import React, { useState, useMemo } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { Search } from 'lucide-react';
-import ProductCard from './ProductCard';
-import { Product } from '@/types';
-import { removeVietnameseTones } from '@/lib/utils/removeVietnameseTones';
+import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import ProductCard from "./ProductCard";
+import { Product } from "@/types";
 
 interface Category {
   id: string;
@@ -13,266 +11,263 @@ interface Category {
   parentId?: string | null;
 }
 
-interface ProductsProps {
+interface Props {
   products: Product[];
   categories: Category[];
   initialCategory?: string;
   initialSearch?: string;
-  onAddToCart?: (product: Product) => void;
 }
 
-const ProductsPage: React.FC<ProductsProps> = ({
-  products,
-  categories,
-  initialCategory = 'all',
-  initialSearch = '',
-  onAddToCart
-}) => {
+interface CategoryNode extends Category {
+  children: CategoryNode[];
+}
 
+export default function ProductsPage({
+  products = [],
+  categories = [],
+  initialCategory = "all",
+  initialSearch = "",
+}: Props) {
   const router = useRouter();
-  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  const [activeCategory, setActiveCategory] = useState(initialCategory);
-  const [searchQuery, setSearchQuery] = useState(initialSearch);
-  const [sortBy, setSortBy] = useState('newest');
-
-  // ✅ QUAN TRỌNG: dùng Set thay vì 1 string
+  const [activeCategory, setActiveCategory] = useState<string | null>(
+    initialCategory !== "all" ? initialCategory : null
+  );
+  const [search, setSearch] = useState(initialSearch);
   const [openCategories, setOpenCategories] = useState<Set<string>>(new Set());
+  const [mobileCategoryOpen, setMobileCategoryOpen] = useState(false);
 
-  /* =========================== UPDATE URL =========================== */
+  /* ================= CATEGORY TREE ================= */
 
-  const updateURL = (category: string, search: string) => {
-    const params = new URLSearchParams();
+  const categoryTree: CategoryNode[] = useMemo(() => {
+    const map = new Map<string, CategoryNode>();
 
-    if (category !== 'all') params.set('category', category);
-    if (search.trim()) params.set('q', search);
-
-    router.push(`${pathname}?${params.toString()}`);
-  };
-
-  const handleCategoryChange = (categoryId: string) => {
-    setActiveCategory(categoryId);
-    updateURL(categoryId, searchQuery);
-  };
-
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    updateURL(activeCategory, value);
-  };
-
-  /* =========================== BUILD TREE =========================== */
-
-  const buildTree = (parentId: string | null = null): any[] => {
-    return categories
-      .filter(cat => cat.parentId === parentId)
-      .map(cat => ({
-        ...cat,
-        children: buildTree(cat.id)
-      }));
-  };
-
-  const categoryTree = useMemo(() => buildTree(null), [categories]);
-
-  /* =========================== GET DESCENDANTS =========================== */
-
-  const getAllChildIds = (id: string): string[] => {
-    const directChildren = categories.filter(c => c.parentId === id);
-    let ids: string[] = [];
-
-    directChildren.forEach(child => {
-      ids.push(child.id);
-      ids = ids.concat(getAllChildIds(child.id));
+    categories.forEach((cat) => {
+      map.set(cat.id, { ...cat, children: [] });
     });
 
+    const roots: CategoryNode[] = [];
+
+    map.forEach((node) => {
+      if (node.parentId && map.has(node.parentId)) {
+        map.get(node.parentId)!.children.push(node);
+      } else {
+        roots.push(node);
+      }
+    });
+
+    return roots;
+  }, [categories]);
+
+  /* ================= AUTO OPEN ================= */
+
+  useEffect(() => {
+    if (!activeCategory) return;
+
+    const parents = new Set<string>();
+
+    const findParents = (nodes: CategoryNode[], chain: string[] = []) => {
+      for (const node of nodes) {
+        if (node.id === activeCategory) {
+          chain.forEach((id) => parents.add(id));
+        }
+        if (node.children.length > 0) {
+          findParents(node.children, [...chain, node.id]);
+        }
+      }
+    };
+
+    findParents(categoryTree);
+    setOpenCategories(parents);
+  }, [activeCategory, categoryTree]);
+
+  /* ================= FILTER ================= */
+
+  const getAllChildIds = (id: string): string[] => {
+    const ids: string[] = [];
+
+    const find = (nodes: CategoryNode[]) => {
+      for (const node of nodes) {
+        if (node.id === id) {
+          collect(node);
+        } else {
+          find(node.children);
+        }
+      }
+    };
+
+    const collect = (node: CategoryNode) => {
+      ids.push(node.id);
+      node.children.forEach(collect);
+    };
+
+    find(categoryTree);
     return ids;
   };
 
-  /* =========================== FILTER =========================== */
-
   const filteredProducts = useMemo(() => {
+    let list = [...products];
 
-    const normalizedSearch = removeVietnameseTones(
-      searchQuery.toLowerCase()
-    );
-
-    let result = products.filter(product => {
-
-      const categoryName =
-        categories.find(c => c.id === product.categoryId)?.name || '';
-
-      const descendantIds =
-        activeCategory !== 'all'
-          ? getAllChildIds(activeCategory)
-          : [];
-
-      const matchesCategory =
-        activeCategory === 'all' ||
-        product.categoryId === activeCategory ||
-        descendantIds.includes(product.categoryId);
-
-      const matchesSearch =
-        removeVietnameseTones(product.name.toLowerCase()).includes(normalizedSearch) ||
-        removeVietnameseTones(categoryName.toLowerCase()).includes(normalizedSearch);
-
-      return matchesCategory && matchesSearch;
-    });
-
-    result = [...result];
-
-    switch (sortBy) {
-      case 'price-asc':
-        result.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        result.sort((a, b) => b.price - a.price);
-        break;
-      default:
-        result.sort(
-          (a, b) =>
-            new Date(b.createdAt || '').getTime() -
-            new Date(a.createdAt || '').getTime()
-        );
+    if (activeCategory) {
+      const ids = getAllChildIds(activeCategory);
+      list = list.filter((p) => ids.includes(p.categoryId));
     }
 
-    return result;
+    if (search.trim()) {
+      list = list.filter((p) =>
+        p.name.toLowerCase().includes(search.toLowerCase())
+      );
+    }
 
-  }, [products, categories, activeCategory, searchQuery, sortBy]);
+    return list;
+  }, [products, activeCategory, search, categoryTree]);
 
-  /* =========================== TOGGLE OPEN =========================== */
+  /* ================= HANDLERS ================= */
+
+  const handleCategoryChange = (id: string | null) => {
+    setActiveCategory(id);
+    setMobileCategoryOpen(false);
+
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (!id) {
+      params.delete("category");
+    } else {
+      params.set("category", id);
+    }
+
+    router.push(`/san-pham?${params.toString()}`);
+  };
 
   const toggleOpen = (id: string) => {
-    setOpenCategories(prev => {
+    setOpenCategories((prev) => {
       const newSet = new Set(prev);
-
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-
+      newSet.has(id) ? newSet.delete(id) : newSet.add(id);
       return newSet;
     });
   };
 
-  /* =========================== RENDER TREE =========================== */
+  /* ================= RENDER CATEGORY ================= */
 
-  const renderCategories = (nodes: any[], level = 0) => {
-    return nodes.map(node => {
-
+  const renderCategories = (nodes: CategoryNode[], level = 0) => {
+    return nodes.map((node) => {
       const isOpen = openCategories.has(node.id);
       const isActive = activeCategory === node.id;
 
       return (
-        <div key={node.id} className="mb-3">
-
+        <div key={node.id} className="mb-1">
           <div
-            className={`flex items-center justify-between px-4 py-2 rounded-xl transition-all duration-200
-            ${
+            className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm cursor-pointer transition ${
               isActive
-                ? 'bg-green-600 text-white shadow-md'
-                : 'bg-white border hover:bg-green-50'
+                ? "bg-green-600 text-white"
+                : "hover:bg-green-50"
             }`}
-            style={{
-              paddingLeft: `${16 + level * 20}px`
-            }}
+            style={{ paddingLeft: `${12 + level * 14}px` }}
           >
-
-            <button
+            <span
               onClick={() => handleCategoryChange(node.id)}
-              className="flex-1 text-left font-medium"
+              className="flex-1"
             >
               {node.name}
-            </button>
+            </span>
 
             {node.children.length > 0 && (
               <button
                 onClick={() => toggleOpen(node.id)}
-                className={`ml-2 transition ${
-                  isActive ? 'text-white' : 'text-slate-400'
-                }`}
+                className="text-xs ml-2"
               >
-                {isOpen ? '−' : '+'}
+                {isOpen ? "−" : "+"}
               </button>
             )}
-
           </div>
 
           {isOpen && node.children.length > 0 && (
-            <div className="mt-2 border-l border-slate-200">
+            <div className="mt-1">
               {renderCategories(node.children, level + 1)}
             </div>
           )}
-
         </div>
       );
     });
   };
 
-  /* =========================== UI =========================== */
+  /* ================= UI ================= */
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-20">
+    <div className="max-w-7xl mx-auto px-4 py-6 lg:py-10 flex flex-col lg:flex-row gap-6 lg:gap-8">
 
-      <div className="max-w-7xl mx-auto px-4 mt-8 flex gap-8">
+      {/* MOBILE CATEGORY BUTTON */}
+      <div className="lg:hidden">
+        <button
+          onClick={() => setMobileCategoryOpen(!mobileCategoryOpen)}
+          className="w-full bg-green-600 text-white py-2 rounded-xl font-semibold"
+        >
+          Danh mục sản phẩm
+        </button>
 
-        {/* Sidebar */}
-        <aside className="hidden lg:block w-64">
-          <h3 className="text-xs uppercase font-bold text-slate-400 mb-4">
-            Danh mục
-          </h3>
-
-          <button
-            onClick={() => handleCategoryChange('all')}
-            className={`mb-4 w-full text-left px-4 py-2 rounded-xl font-semibold ${
-              activeCategory === 'all'
-                ? 'bg-green-600 text-white'
-                : 'bg-white border'
-            }`}
-          >
-            Tất cả
-          </button>
-
-          {renderCategories(categoryTree)}
-        </aside>
-
-        {/* Main */}
-        <main className="flex-1">
-
-          <div className="flex justify-end mb-6">
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="border rounded-lg px-3 py-2"
+        {mobileCategoryOpen && (
+          <div className="mt-3 bg-white border rounded-xl p-3 shadow-md max-h-96 overflow-y-auto">
+            <button
+              onClick={() => handleCategoryChange(null)}
+              className={`mb-3 w-full text-left px-3 py-2 rounded-lg text-sm ${
+                !activeCategory
+                  ? "bg-green-600 text-white"
+                  : "bg-slate-50"
+              }`}
             >
-              <option value="newest">Mới nhất</option>
-              <option value="price-asc">Giá tăng dần</option>
-              <option value="price-desc">Giá giảm dần</option>
-            </select>
+              Tất cả
+            </button>
+
+            {renderCategories(categoryTree)}
           </div>
-
-          {filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-              {filteredProducts.map(product => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onAddToCart={onAddToCart}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-20 bg-white rounded-2xl border border-dashed">
-              <Search className="mx-auto mb-4 h-8 w-8 text-slate-300" />
-              <h3 className="text-lg font-bold">
-                Không tìm thấy sản phẩm
-              </h3>
-            </div>
-          )}
-
-        </main>
+        )}
       </div>
+
+      {/* DESKTOP SIDEBAR */}
+      <aside className="hidden lg:block w-64">
+        <h3 className="text-xs uppercase font-bold text-slate-400 mb-4">
+          Danh mục
+        </h3>
+
+        <button
+          onClick={() => handleCategoryChange(null)}
+          className={`mb-4 w-full text-left px-4 py-2 rounded-xl font-semibold ${
+            !activeCategory
+              ? "bg-green-600 text-white"
+              : "bg-white border"
+          }`}
+        >
+          Tất cả
+        </button>
+
+        {renderCategories(categoryTree)}
+      </aside>
+
+      {/* MAIN CONTENT */}
+      <main className="flex-1">
+
+        {/* SEARCH */}
+        <div className="mb-4">
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Tìm sản phẩm..."
+            className="w-full border rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          />
+        </div>
+
+        {/* PRODUCT GRID */}
+        {filteredProducts.length === 0 ? (
+          <p className="text-slate-500">Không có sản phẩm phù hợp.</p>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+            {filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
+      </main>
     </div>
   );
-};
-
-export default ProductsPage;
+}

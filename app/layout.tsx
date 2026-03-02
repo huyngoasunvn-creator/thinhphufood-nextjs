@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   },
 
   description:
-    "Thịnh Phú Food chuyên cung cấp gạo ST25 chính hãng, gạo sạch đạt chuẩn VietGAP. Giao hàng toàn quốc, đảm bảo chất lượng và an toàn thực phẩm.",
+    "Thịnh Phú Food chuyên cung cấp gạo ST25 chính hãng, gạo sạch đạt chuẩn. Giao hàng toàn quốc, đảm bảo chất lượng và an toàn thực phẩm.",
 
   keywords: [
     "gạo ST25",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     siteName: "Thịnh Phú Food",
     title: "Thịnh Phú Food - Gạo ST25 Chính Hãng",
     description:
-      "Gạo ST25 thơm ngon, đạt chuẩn VietGAP, giao hàng toàn quốc.",
+      "Gạo ST25 thơm ngon, đạt chuẩn, giao hàng toàn quốc.",
     images: [
       {
         url: "/og-image.jpg",
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Thịnh Phú Food - Gạo ST25",
-    description: "Gạo sạch chất lượng cao, đạt chuẩn VietGAP",
+    description: "Gạo sạch chất lượng cao, đạt chuẩn",
     images: ["/og-image.jpg"],
   },
 

@@ -22,12 +22,12 @@ const ProductActionPanel: React.FC<ProductActionPanelProps> = ({ product, onAddT
   };
 
   return (
-    <div className="flex flex-col sm:flex-row gap-6 pt-4 sticky bottom-0 bg-white/80 backdrop-blur-md py-4">
+    <div className="flex flex-col sm:flex-row gap-4 pt-2 md:pt-4 bg-white">
       {/* Bộ chọn số lượng */}
-      <div className="flex items-center bg-slate-100 border border-slate-200 rounded-2xl h-16 px-3 shadow-inner">
+      <div className="flex items-center justify-between bg-slate-100 rounded-2xl h-12 px-2">
         <button 
           onClick={() => handleQtyChange(-1)}
-          className="p-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl transition-all disabled:bg-slate-300 shadow-sm"
+          className="w-9 h-9 flex items-center justify-center rounded-xl bg-white text-slate-700 shadow-sm active:scale-95 transition disabled:opacity-40"
           disabled={qty <= 1}
         >
           <Minus className="h-5 w-5" />
@@ -35,13 +35,13 @@ const ProductActionPanel: React.FC<ProductActionPanelProps> = ({ product, onAddT
         <input 
           type="number" 
           min="1"
-          className="w-16 text-center font-black text-xl text-slate-900 bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          className="w-10 text-center font-bold text-base text-slate-900 bg-transparent outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           value={qty}
           onChange={handleInputQtyChange}
         />
         <button 
           onClick={() => handleQtyChange(1)}
-          className="p-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl transition-all shadow-sm"
+          className="w-9 h-9 flex items-center justify-center rounded-xl bg-green-600 text-white shadow-md shadow-green-600/20 active:scale-95 transition"
         >
           <Plus className="h-5 w-5" />
         </button>
@@ -53,7 +53,7 @@ const ProductActionPanel: React.FC<ProductActionPanelProps> = ({ product, onAddT
           alert(`Đã thêm ${qty} ${product.unit} ${product.name} vào giỏ hàng!`);
         }}
         disabled={product.stock <= 0}
-        className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-slate-300 text-white h-16 rounded-2xl font-bold text-xl flex items-center justify-center space-x-3 transition-all shadow-xl shadow-green-100 active:scale-95"
+        className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-slate-300 text-white h-12 md:h-14 rounded-2xl font-semibold text-base md:text-lg flex items-center justify-center space-x-2 transition-all shadow-lg shadow-green-600/30 active:scale-95"
       >
         <ShoppingCart className="h-7 w-7" />
         <span>{product.stock > 0 ? 'Thêm Vào Giỏ Hàng' : 'Hết hàng'}</span>

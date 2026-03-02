@@ -35,7 +35,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, config }) => {
 
   return (
     <div className="bg-gradient-to-b from-[#f6f9f4] to-white min-h-screen pb-32">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-12">
 
         <Link
           href="/san-pham"
@@ -60,21 +60,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, config }) => {
             )}
 
             {/* ✅ HIỂN THỊ GIÁ ĐÚNG LOGIC */}
-            {!isContactOnly ? (
-              <div className="text-4xl font-bold text-green-700">
-                {price.toLocaleString()}đ
-                {product.unit && (
-                  <span className="text-lg font-medium text-slate-500 ml-2">
-                    / {product.unit}
-                  </span>
-                )}
-              </div>
-            ) : (
-              <div className="text-3xl font-bold text-slate-500">
-                Liên hệ
-              </div>
-            )}
-
+            
             <ProductInfo product={product} />
 
             {product.stock < 20 && !isContactOnly && (
@@ -109,7 +95,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, config }) => {
 
               <div className="flex flex-col items-center space-y-2">
                 <ShieldCheck className="h-6 w-6 text-green-600" />
-                <span className="text-slate-600">Đạt chuẩn VietGAP</span>
+                <span className="text-slate-600">Chuẩn an toàn</span>
               </div>
 
               <div className="flex flex-col items-center space-y-2">
@@ -125,13 +111,13 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, config }) => {
           <ProductTrustBadges config={config} />
         </div>
 
-        <div className="mt-24 bg-white rounded-[3rem] shadow-sm border border-slate-100 p-10 lg:p-16">
+        <div className="mt-14 md:mt-24 bg-white rounded-3xl md:rounded-[3rem] shadow-sm border border-slate-100 p-6 md:p-10 lg:p-16">
           <header className="flex items-center space-x-4 mb-10 border-b border-slate-100 pb-6">
             <div className="p-3 bg-green-50 text-green-600 rounded-2xl">
               <BookOpen className="h-6 w-6" />
             </div>
             <div>
-              <h2 className="text-3xl font-black text-slate-900">
+              <h2 className="text-xl md:text-3xl font-black text-slate-900">
                 Thông tin chi tiết
               </h2>
             </div>

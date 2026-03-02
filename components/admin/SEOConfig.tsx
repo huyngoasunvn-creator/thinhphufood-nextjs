@@ -60,7 +60,7 @@ const SEOConfig: React.FC<SEOConfigProps> = ({ config }) => {
               {config.siteName} - Tinh Hoa Gạo Việt | Gạo ST25 & Nông Sản Sạch
             </h4>
             <p className="text-sm text-[#4d5156] leading-relaxed">
-              Chuyên cung cấp gạo ST25 ngon nhất thế giới, gạo lứt hữu cơ và nông sản sạch đạt chuẩn VietGAP. Giao hàng hỏa tốc 2h tại nội thành...
+              Chuyên cung cấp gạo ST25 ngon nhất thế giới, gạo lứt hữu cơ và nông sản sạch đạt chuẩn. Giao hàng hỏa tốc 2h tại nội thành...
             </p>
           </div>
         </div>
@@ -87,7 +87,7 @@ const SEOConfig: React.FC<SEOConfigProps> = ({ config }) => {
           <div className="p-4 bg-slate-50 border-t border-slate-100">
             <p className="text-[10px] text-slate-400 font-bold uppercase">THINHPHUFOOD.VN</p>
             <h5 className="font-bold text-slate-900 mt-1">{config.siteName} - Tinh Hoa Gạo Việt</h5>
-            <p className="text-xs text-slate-500 mt-1 line-clamp-2">Chuyên cung cấp gạo ST25, gạo lứt hữu cơ và nông sản sạch đạt chuẩn VietGAP...</p>
+            <p className="text-xs text-slate-500 mt-1 line-clamp-2">Chuyên cung cấp gạo ST25, gạo lứt hữu cơ và nông sản sạch đạt chuẩn...</p>
           </div>
         </div>
         

@@ -1,5 +1,6 @@
 'use client';
-import EventMenu from "@/components/header/EventMenu"
+
+import EventMenu from "@/components/header/EventMenu";
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -15,7 +16,7 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/context/CartContext';
 
-interface HeaderProps {  
+interface HeaderProps {
   profileActive?: boolean;
   aboutPageActive?: boolean;
 }
@@ -31,8 +32,6 @@ const Header: React.FC<HeaderProps> = ({
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout, isAdmin, loading } = useAuth();
-
-  // ✅ LẤY TỪ CART CONTEXT
   const { cartCount } = useCart();
 
   const navLinks = [
@@ -49,9 +48,7 @@ const Header: React.FC<HeaderProps> = ({
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchKeyword.trim()) {
-      router.push(
-        `/san-pham?q=${encodeURIComponent(searchKeyword.trim())}`
-      );
+      router.push(`/san-pham?q=${encodeURIComponent(searchKeyword.trim())}`);
       setSearchKeyword('');
       setIsMenuOpen(false);
     }
@@ -61,8 +58,13 @@ const Header: React.FC<HeaderProps> = ({
     <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-green-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 sm:h-20">
+
           {/* LOGO */}
-          <Link href="/" className="flex items-center space-x-3 group shrink-0">
+          <Link
+            href="/"
+            className="flex items-center space-x-3 group shrink-0"
+            onClick={() => setIsMenuOpen(false)}
+          >
             <img
               src="https://res.cloudinary.com/dozhznwuf/image/upload/v1770731483/logo-tp-5_yizb09.png"
               alt="ThinhPhuFood Logo"
@@ -74,7 +76,7 @@ const Header: React.FC<HeaderProps> = ({
           </Link>
 
           {/* DESKTOP NAV */}
-          <nav className="hidden lg:flex space-x-8">
+          <nav className="hidden lg:flex items-center space-x-8">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
@@ -93,7 +95,8 @@ const Header: React.FC<HeaderProps> = ({
 
           {/* RIGHT SIDE */}
           <div className="flex items-center space-x-2 sm:space-x-4">
-            {/* SEARCH */}
+
+            {/* SEARCH DESKTOP */}
             <form
               onSubmit={handleSearch}
               className="hidden md:flex items-center relative group"
@@ -112,7 +115,7 @@ const Header: React.FC<HeaderProps> = ({
             {!loading && isAdmin && (
               <Link
                 href="/admin"
-                className="p-2 text-slate-500 hover:text-green-600 transition-colors hidden sm:flex items-center space-x-1 border border-slate-100 rounded-full px-3 hover:bg-slate-50"
+                className="hidden sm:flex items-center space-x-1 border border-slate-100 rounded-full px-3 py-2 text-slate-500 hover:text-green-600 hover:bg-slate-50 transition-colors"
               >
                 <ShieldCheck className="h-4 w-4" />
                 <span className="text-[10px] font-black uppercase tracking-tighter">
@@ -177,7 +180,7 @@ const Header: React.FC<HeaderProps> = ({
               </Link>
             )}
 
-            {/* MOBILE MENU */}
+            {/* MOBILE BUTTON */}
             <button
               className="lg:hidden p-2 text-slate-500"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -188,9 +191,50 @@ const Header: React.FC<HeaderProps> = ({
                 <Menu className="h-6 w-6" />
               )}
             </button>
+
           </div>
         </div>
       </div>
+
+      {/* ================= MOBILE NAV ================= */}
+      {isMenuOpen && (
+        <div className="lg:hidden border-t border-green-100 bg-white shadow-md">
+          <nav className="flex flex-col px-4 py-4 space-y-4">
+
+            {/* SEARCH MOBILE */}
+            <form onSubmit={handleSearch} className="flex items-center relative">
+              <input
+                type="text"
+                placeholder="Tìm sản phẩm..."
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-full text-sm focus:ring-2 focus:ring-green-500 outline-none"
+              />
+              <Search className="absolute left-3 h-4 w-4 text-slate-400" />
+            </form>
+
+            {/* NAV LINKS */}
+            {navLinks.map((link) => (
+              <Link
+                key={link.path}
+                href={link.path}
+                onClick={() => setIsMenuOpen(false)}
+                className={`text-sm font-bold ${
+                  isActive(link.path)
+                    ? 'text-green-600'
+                    : 'text-slate-600'
+                }`}
+              >
+                {link.name}
+              </Link>
+            ))}
+
+            {/* EVENT MENU MOBILE */}
+            <EventMenu />
+
+          </nav>
+        </div>
+      )}
     </header>
   );
 };
