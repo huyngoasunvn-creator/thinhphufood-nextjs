@@ -17,19 +17,24 @@ interface ProductDetailProps {
 
 const ProductDetail: React.FC<ProductDetailProps> = ({ product, config }) => {
 
-  // ✅ LẤY addToCart từ Context
   const { addToCart } = useCart();
 
+  // ✅ Chuẩn hoá giá
+  const price = typeof product.price === "number" ? product.price : 0;
+  const isContactOnly = !price || price <= 0;
+
+  // ✅ Tính giảm giá (chỉ khi có giá thật)
   const discount =
-    product.comparePrice && product.comparePrice > product.price
+    !isContactOnly &&
+    product.comparePrice &&
+    product.comparePrice > price
       ? Math.round(
-          ((product.comparePrice - product.price) / product.comparePrice) * 100
+          ((product.comparePrice - price) / product.comparePrice) * 100
         )
       : null;
 
   return (
     <div className="bg-gradient-to-b from-[#f6f9f4] to-white min-h-screen pb-32">
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
         <Link
@@ -54,29 +59,48 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, config }) => {
               </div>
             )}
 
+            {/* ✅ HIỂN THỊ GIÁ ĐÚNG LOGIC */}
+            {!isContactOnly ? (
+              <div className="text-4xl font-bold text-green-700">
+                {price.toLocaleString()}đ
+                {product.unit && (
+                  <span className="text-lg font-medium text-slate-500 ml-2">
+                    / {product.unit}
+                  </span>
+                )}
+              </div>
+            ) : (
+              <div className="text-3xl font-bold text-slate-500">
+                Liên hệ
+              </div>
+            )}
+
             <ProductInfo product={product} />
 
-            {product.stock < 20 && (
+            {product.stock < 20 && !isContactOnly && (
               <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-xl text-sm text-yellow-700 font-medium">
                 🔥 Chỉ còn {product.stock} sản phẩm – đặt ngay trước khi hết hàng!
               </div>
             )}
 
-            {/* ✅ NÚT THÊM GIỎ HÀNG */}
-            <ProductActionPanel
-  product={product}
-  onAddToCart={(product, quantity) => {
-    addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price || 0,
-      images: product.images || [],
-      unit: product.unit || "",
-      category: product.category || "",
-    });
-  }}
-/>
+            {/* ✅ CHỈ HIỆN NÚT GIỎ HÀNG KHI CÓ GIÁ */}
+            {!isContactOnly && (
+              <ProductActionPanel
+                product={product}
+                onAddToCart={(product, quantity) => {
+                  addToCart({
+                    id: product.id,
+                    name: product.name,
+                    price: price,
+                    images: product.images ?? [],
+                    unit: product.unit ?? "",
+                    category: product.category ?? "",
+                  });
+                }}
+              />
+            )}
 
+            {/* Badges */}
             <div className="grid grid-cols-3 gap-4 text-center text-sm mt-6">
               <div className="flex flex-col items-center space-y-2">
                 <Leaf className="h-6 w-6 text-green-600" />
