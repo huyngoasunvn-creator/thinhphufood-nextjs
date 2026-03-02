@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import connectDB from "@/lib/connectDB"
 import EventEmbed from "@/models/EventEmbed"
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function GET() {
   await connectDB()
