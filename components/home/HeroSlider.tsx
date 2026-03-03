@@ -60,19 +60,29 @@ export default function HeroSlider({ banners }: Props) {
 
                     {/* Title */}
                     <h2
-                      className="
-                        font-extrabold
-                        leading-tight
-                        drop-shadow-xl
-                        text-[clamp(20px,5vw,60px)]
-                      "
-                    >
-                      {banner.title?.split('\n').map((line, index) => (
-                        <span key={index} className="block">
-                          {line}
-                        </span>
-                      ))}
-                    </h2>
+  className="
+    font-extrabold
+    leading-[1.15]
+    text-[clamp(20px,3.5vw,56px)]
+    drop-shadow-xl
+  "
+>
+  {banner.title?.split('\n').map((line, index, arr) => {
+    const isLast = index === arr.length - 1
+
+    return (
+      <span
+        key={index}
+        className={`
+          block
+          ${isLast ? "md:whitespace-nowrap" : ""}
+        `}
+      >
+        {line}
+      </span>
+    )
+  })}
+</h2>
 
                     {/* Subtitle */}
                     {banner.subtitle && (
