@@ -60,6 +60,7 @@ export interface Banner {
   placement: 'Trang chủ' | 'Tin tức' | 'Cửa hàng';
   textColor: string;
   overlayOpacity: number;
+  order?: number;
 }
 
 export interface Commitment {

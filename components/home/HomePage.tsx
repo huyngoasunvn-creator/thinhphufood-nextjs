@@ -3,6 +3,7 @@
 import CategorySection from "./CategorySection";
 import React from 'react';
 import Link from 'next/link';
+import HeroSlider from './HeroSlider';
 import {
   ArrowRight,
   Newspaper,
@@ -52,6 +53,16 @@ const Home: React.FC<HomeProps> = ({
   categories = [], // 👈 thêm
   onAddToCart
 }) => {
+
+  const heroBanners = Array.isArray(banners)
+  ? banners.filter(
+      (b) =>
+        b &&
+        b.id &&
+        b.placement === 'Trang chủ' &&
+        b.isActive
+    )
+  : [];
 
   // ✅ Safe fallback để không bao giờ crash
   const safeAbout = aboutConfig || {
@@ -107,7 +118,11 @@ const latestNews = safeNews.slice(0, 3);
         description="Chào mừng bạn đến với ThinhPhuFood, nơi cung cấp gạo ngon nhất thế giới ST25 và nông sản sạch chuẩn hữu cơ."
       />
 
-      <Hero banners={banners} />
+      {heroBanners.length > 1 ? (
+  <HeroSlider banners={heroBanners} />
+) : heroBanners.length === 1 ? (
+  <Hero banners={heroBanners} />
+) : null}
 
       {/* Trust Badges */}
       <section className="bg-white py-12 border-b border-slate-100">

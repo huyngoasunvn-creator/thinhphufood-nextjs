@@ -11,16 +11,17 @@ interface BannerFormProps {
 
 const BannerForm: React.FC<BannerFormProps> = ({ initialData, onSave, onClose }) => {
   const [formData, setFormData] = useState<Partial<Banner>>(initialData || {
-    title: '',
-    subtitle: '',
-    imageUrl: '',
-    link: '',
-    buttonText: 'Xem thêm',
-    isActive: true,
-    placement: 'Trang chủ',
-    textColor: '#ffffff',
-    overlayOpacity: 0.4
-  });
+  title: '',
+  subtitle: '',
+  imageUrl: '',
+  link: '',
+  buttonText: 'Xem thêm',
+  isActive: true,
+  placement: 'Trang chủ',
+  textColor: '#ffffff',
+  overlayOpacity: 0.4,
+  order: 0
+});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,13 +62,31 @@ const BannerForm: React.FC<BannerFormProps> = ({ initialData, onSave, onClose })
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">Chữ nút bấm</label>
                 <input type="text" className={inputClass} value={formData.buttonText} onChange={e => setFormData({...formData, buttonText: e.target.value})} />
               </div>
+
+            <div>
+  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">
+    Thứ tự hiển thị
+  </label>
+  <input
+    type="number"
+    className={inputClass}
+    value={formData.order ?? 0}
+    onChange={(e) =>
+      setFormData({
+        ...formData,
+        order: Number(e.target.value)
+      })
+    }
+  />
+</div>
               <div>
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">Đường dẫn link</label>
-                <input type="text" className={inputClass} placeholder="/products" value={formData.link} onChange={e => setFormData({...formData, link: e.target.value})} />
+                <input type="text" className={inputClass} placeholder="/san-pham" value={formData.link} onChange={e => setFormData({...formData, link: e.target.value})} />
               </div>
             </div>
             <div>
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">Vị trí hiển thị</label>
+
               <select className={inputClass} value={formData.placement} onChange={e => setFormData({...formData, placement: e.target.value as any})}>
                 <option value="Trang chủ">Trang chủ (Hero)</option>
                 <option value="Tin tức">Trang Tin tức (Header)</option>

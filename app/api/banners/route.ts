@@ -8,8 +8,12 @@ import { QueryDocumentSnapshot } from "firebase-admin/firestore";
 interface Banner {
   id: string;
   title: string;
-  image: string;
+  subtitle?: string;
+  imageUrl: string;
   link?: string;
+  placement?: string;
+  order?: number;
+  isActive?: boolean;
   createdAt?: number;
 }
 
@@ -44,21 +48,18 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-
-    // Validate cơ bản
-    if (!body?.title || !body?.image) {
-      return NextResponse.json(
-        { error: "Title and image are required" },
-        { status: 400 }
-      );
-    }
+    console.log("BODY:", body);
 
     const docRef = await adminDb.collection("banners").add({
-      title: body.title,
-      image: body.image,
-      link: body.link || "",
-      createdAt: Date.now(),
-    });
+  title: body.title,
+  subtitle: body.subtitle,
+  imageUrl: body.imageUrl,
+  link: body.link,
+  placement: body.placement ?? "Trang chủ",
+  order: body.order ?? 0,
+  isActive: body.isActive ?? true,
+  createdAt: Date.now(),
+});
 
     return NextResponse.json({ id: docRef.id });
   } catch (error) {

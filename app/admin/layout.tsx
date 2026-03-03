@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import AdminSidebar from "@/components/admin/layout/AdminSidebar";
 import AdminHeader from "@/components/admin/layout/AdminHeader";
 
@@ -14,23 +14,22 @@ export default function AdminLayout({
   const { user, isAdmin, loading } = useAuth();
   const router = useRouter();
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   useEffect(() => {
     if (loading) return;
 
-    // ❌ chưa đăng nhập
     if (!user) {
       router.replace("/login");
       return;
     }
 
-    // ❌ không phải admin
     if (!isAdmin) {
       router.replace("/");
       return;
     }
   }, [user, isAdmin, loading, router]);
 
-  // 🔄 Đang kiểm tra quyền
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -39,18 +38,34 @@ export default function AdminLayout({
     );
   }
 
-  // 🚫 Không đủ quyền → không render gì
   if (!user || !isAdmin) {
     return null;
   }
 
-  // ✅ Đủ quyền → render admin UI
   return (
     <div className="flex min-h-screen bg-slate-100">
-      <AdminSidebar />
-      <main className="flex-1 ml-64 min-h-screen relative">
-        <AdminHeader />
-        <div className="p-8 pb-20">{children}</div>
+      
+      {/* Sidebar */}
+      <AdminSidebar
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+      />
+
+      {/* Overlay mobile */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-30 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Main */}
+      <main className="flex-1 min-h-screen relative">
+        <AdminHeader setSidebarOpen={setSidebarOpen} />
+
+        <div className="p-4 md:p-8 pb-20">
+          {children}
+        </div>
       </main>
     </div>
   );

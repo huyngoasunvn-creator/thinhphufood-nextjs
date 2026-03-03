@@ -39,3 +39,16 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Ẩn mũi tên trên mobile */
+@media (max-width: 768px) {
+  .swiper-button-prev,
+  .swiper-button-next {
+    display: none !important;
+  }
+
+  .swiper-pagination-bullet {
+    width: 6px;
+    height: 6px;
+  }
+}

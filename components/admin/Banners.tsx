@@ -94,7 +94,9 @@ export default function Banners() {
 
       {/* ================= LIST ================= */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {banners.map((banner) => (
+        {[...banners]
+  .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+  .map((banner) => (
           <div
             key={banner.id}
             className="relative group bg-white rounded-2xl shadow-md overflow-hidden"
@@ -142,6 +144,9 @@ export default function Banners() {
               <p className="text-gray-500 text-sm line-clamp-2">
                 {banner.subtitle}
               </p>
+              <p className="text-xs text-gray-400">
+  Thứ tự: {banner.order ?? 0}
+</p>
 
               <div className="flex items-center justify-between pt-3">
                 <span

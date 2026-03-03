@@ -31,6 +31,13 @@ export interface MenuItem {
   path: string;
 }
 
+interface Props {
+  sidebarOpen: boolean;
+  setSidebarOpen: (value: boolean) => void;
+}
+
+/* ================= MENU ITEMS ================= */
+
 export const ADMIN_MENU_ITEMS: MenuItem[] = [
   { icon: LayoutDashboard, label: 'Tổng quan', path: '/admin' },
   { icon: Package, label: 'Sản phẩm', path: '/admin/products' },
@@ -42,7 +49,7 @@ export const ADMIN_MENU_ITEMS: MenuItem[] = [
   { icon: Search, label: 'Cấu hình SEO', path: '/admin/seo' },
   { icon: Info, label: 'Vùng Giới thiệu', path: '/admin/about' },
   { icon: HelpCircle, label: 'Nhúng Giới thiệu', path: '/admin/about-page' },
-  { icon: Calendar, label: 'Nhúng Sự kiện', path: '/admin/event-embeds' }, // ✅ MỚI THÊM
+  { icon: Calendar, label: 'Nhúng Sự kiện', path: '/admin/event-embeds' },
   { icon: PhoneCall, label: 'Cấu hình Liên hệ', path: '/admin/contact' },
   { icon: Mail, label: 'Tin nhắn khách hàng', path: '/admin/messages' },
   { icon: UserCircle, label: 'Nhúng Profile', path: '/admin/profile' },
@@ -50,7 +57,12 @@ export const ADMIN_MENU_ITEMS: MenuItem[] = [
   { icon: Settings, label: 'Cấu hình', path: '/admin/config' },
 ];
 
-const AdminSidebar: React.FC = () => {
+/* ================= COMPONENT ================= */
+
+const AdminSidebar: React.FC<Props> = ({
+  sidebarOpen,
+  setSidebarOpen
+}) => {
   const pathname = usePathname() ?? '';
 
   const isActivePath = (path: string) => {
@@ -61,7 +73,22 @@ const AdminSidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-64 bg-slate-900 text-slate-400 flex flex-col fixed h-full z-20 shadow-2xl">
+    <aside
+  className={`
+    fixed md:static
+    top-0 left-0
+    h-full
+    w-64
+    bg-slate-900
+    text-slate-400
+    flex flex-col
+    z-50
+    shadow-2xl
+    transform transition-transform duration-300
+    ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+    md:translate-x-0
+  `}
+>
       {/* Logo */}
       <div className="p-6 flex items-center space-x-3 bg-slate-950 border-b border-white/5">
         <img
@@ -83,6 +110,7 @@ const AdminSidebar: React.FC = () => {
             <Link
               key={item.path}
               href={item.path}
+              onClick={() => setSidebarOpen(false)} // ✅ auto close mobile
               className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 ${
                 isActive
                   ? 'bg-green-600 text-white shadow-lg shadow-green-900/40 translate-x-1'
@@ -99,6 +127,7 @@ const AdminSidebar: React.FC = () => {
                   {item.label}
                 </span>
               </div>
+
               {isActive && <ChevronRight className="h-4 w-4" />}
             </Link>
           );
