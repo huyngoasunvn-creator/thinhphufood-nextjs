@@ -120,6 +120,13 @@ export default function ProductsPage({
       );
     }
 
+    // 🔥 ƯU TIÊN BÁN CHẠY
+    list.sort((a, b) => {
+      if (a.isBestseller && !b.isBestseller) return -1;
+      if (!a.isBestseller && b.isBestseller) return 1;
+      return 0;
+    });
+
     return list;
   }, [products, activeCategory, search, categoryTree]);
 
@@ -137,7 +144,7 @@ export default function ProductsPage({
       params.set("category", id);
     }
 
-    router.push(`/san-pham?${params.toString()}`);
+    router.push(`/san-pham?${params.toString()}`, { scroll: false });
   };
 
   const toggleOpen = (id: string) => {
@@ -197,7 +204,7 @@ export default function ProductsPage({
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 lg:py-10 flex flex-col lg:flex-row gap-6 lg:gap-8">
 
-      {/* MOBILE CATEGORY BUTTON */}
+      {/* MOBILE CATEGORY */}
       <div className="lg:hidden">
         <button
           onClick={() => setMobileCategoryOpen(!mobileCategoryOpen)}
@@ -244,7 +251,7 @@ export default function ProductsPage({
         {renderCategories(categoryTree)}
       </aside>
 
-      {/* MAIN CONTENT */}
+      {/* MAIN */}
       <main className="flex-1">
 
         {/* SEARCH */}
@@ -261,12 +268,19 @@ export default function ProductsPage({
         {filteredProducts.length === 0 ? (
           <p className="text-slate-500">Không có sản phẩm phù hợp.</p>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          <>
+            <p className="text-sm font-medium text-green-700 mb-3">
+              {filteredProducts.length} sản phẩm
+            </p>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-4 gap-4">
+              {filteredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          </>
         )}
+
       </main>
     </div>
   );

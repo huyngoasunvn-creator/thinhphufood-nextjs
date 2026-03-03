@@ -1,19 +1,19 @@
 "use client";
 import type { Banner } from "@/types/site";
 import { useEffect, useState } from "react";
-import { Pencil, Eye, EyeOff, Trash2, Plus } from "lucide-react";
+import { Pencil, Eye, EyeOff, Trash2, Plus, Monitor } from "lucide-react";
 import BannerForm from "./BannerForm";
-
+import HeroSlider from "@/components/home/HeroSlider";
 
 export default function Banners() {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [previewBanner, setPreviewBanner] = useState<Banner | null>(null);
 
-  /* =========================
-     Fetch banners
-  ========================= */
+  /* ================= FETCH ================= */
+
   useEffect(() => {
     fetchBanners();
   }, []);
@@ -30,9 +30,8 @@ export default function Banners() {
     }
   };
 
-  /* =========================
-     Delete
-  ========================= */
+  /* ================= DELETE ================= */
+
   const handleDelete = async (id: string) => {
     if (!confirm("Bạn có chắc muốn xoá banner?")) return;
 
@@ -43,9 +42,8 @@ export default function Banners() {
     fetchBanners();
   };
 
-  /* =========================
-     Toggle active
-  ========================= */
+  /* ================= TOGGLE ================= */
+
   const handleToggle = async (banner: Banner) => {
     await fetch(`/api/banners/${banner.id}`, {
       method: "PUT",
@@ -56,9 +54,8 @@ export default function Banners() {
     fetchBanners();
   };
 
-  /* =========================
-     Open modal
-  ========================= */
+  /* ================= MODAL ================= */
+
   const openCreate = () => {
     setEditingBanner(null);
     setShowModal(true);
@@ -95,94 +92,109 @@ export default function Banners() {
       {/* ================= LIST ================= */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {[...banners]
-  .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-  .map((banner) => (
-          <div
-            key={banner.id}
-            className="relative group bg-white rounded-2xl shadow-md overflow-hidden"
-          >
-            {/* Image */}
-            <div className="relative">
-              <img
-                src={banner.imageUrl}
-                alt={banner.title}
-                className="w-full h-60 object-cover"
-              />
+          .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+          .map((banner) => (
+            <div
+              key={banner.id}
+              className="relative group bg-white rounded-2xl shadow-md overflow-hidden"
+            >
+              {/* Image */}
+              <div className="relative">
+                <img
+                  src={banner.imageUrl}
+                  alt={banner.title}
+                  className="w-full h-60 object-cover"
+                />
 
-              {/* Overlay Actions */}
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-4">
-                <button
-                  onClick={() => openEdit(banner)}
-                  className="bg-white p-3 rounded-xl shadow hover:scale-110 transition"
-                >
-                  <Pencil size={18} />
-                </button>
+                {/* Overlay Actions */}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-4">
 
-                <button
-                  onClick={() => handleToggle(banner)}
-                  className="bg-white p-3 rounded-xl shadow hover:scale-110 transition"
-                >
-                  {banner.isActive ? (
-                    <Eye size={18} />
-                  ) : (
-                    <EyeOff size={18} />
-                  )}
-                </button>
+                  {/* EDIT */}
+                  <button
+                    onClick={() => openEdit(banner)}
+                    className="bg-white p-3 rounded-xl shadow hover:scale-110 transition"
+                  >
+                    <Pencil size={18} />
+                  </button>
 
-                <button
-                  onClick={() => handleDelete(banner.id)}
-                  className="bg-white p-3 rounded-xl shadow hover:scale-110 transition text-red-500"
-                >
-                  <Trash2 size={18} />
-                </button>
+                  {/* PREVIEW */}
+                  <button
+                    onClick={() => setPreviewBanner(banner)}
+                    className="bg-white p-3 rounded-xl shadow hover:scale-110 transition"
+                  >
+                    <Monitor size={18} />
+                  </button>
+
+                  {/* TOGGLE */}
+                  <button
+                    onClick={() => handleToggle(banner)}
+                    className="bg-white p-3 rounded-xl shadow hover:scale-110 transition"
+                  >
+                    {banner.isActive ? (
+                      <Eye size={18} />
+                    ) : (
+                      <EyeOff size={18} />
+                    )}
+                  </button>
+
+                  {/* DELETE */}
+                  <button
+                    onClick={() => handleDelete(banner.id)}
+                    className="bg-white p-3 rounded-xl shadow hover:scale-110 transition text-red-500"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-5 space-y-2">
+                <h3 className="font-semibold text-lg whitespace-pre-line">
+                  {banner.title}
+                </h3>
+
+                <p className="text-gray-500 text-sm line-clamp-2">
+                  {banner.subtitle}
+                </p>
+
+                <p className="text-xs text-gray-400">
+                  Thứ tự: {banner.order ?? 0}
+                </p>
+
+                <div className="flex items-center justify-between pt-3">
+                  <span
+                    className={`text-xs px-3 py-1 rounded-full ${
+                      banner.isActive
+                        ? "bg-green-100 text-green-600"
+                        : "bg-gray-200 text-gray-500"
+                    }`}
+                  >
+                    {banner.isActive ? "Hiển thị" : "Đang ẩn"}
+                  </span>
+
+                  <span className="text-xs text-gray-400">
+                    {banner.placement}
+                  </span>
+                </div>
               </div>
             </div>
-
-            {/* Content */}
-            <div className="p-5 space-y-2">
-              <h3 className="font-semibold text-lg">{banner.title}</h3>
-              <p className="text-gray-500 text-sm line-clamp-2">
-                {banner.subtitle}
-              </p>
-              <p className="text-xs text-gray-400">
-  Thứ tự: {banner.order ?? 0}
-</p>
-
-              <div className="flex items-center justify-between pt-3">
-                <span
-                  className={`text-xs px-3 py-1 rounded-full ${
-                    banner.isActive
-                      ? "bg-green-100 text-green-600"
-                      : "bg-gray-200 text-gray-500"
-                  }`}
-                >
-                  {banner.isActive ? "Hiển thị" : "Đang ẩn"}
-                </span>
-
-                <span className="text-xs text-gray-400">
-                  {banner.placement}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
+          ))}
       </div>
 
-      {/* ================= MODAL ================= */}
+      {/* ================= MODAL FORM ================= */}
       {showModal && (
         <BannerForm
           initialData={editingBanner}
           onClose={() => setShowModal(false)}
           onSave={async (banner) => {
             if (editingBanner) {
-              // UPDATE
               await fetch(`/api/banners/${editingBanner.id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(banner),
               });
             } else {
-              // CREATE
               await fetch("/api/banners", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -194,6 +206,26 @@ export default function Banners() {
             fetchBanners();
           }}
         />
+      )}
+
+      {/* ================= PREVIEW ================= */}
+      {previewBanner && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-6">
+          <div className="bg-white w-full max-w-6xl rounded-2xl overflow-hidden relative">
+
+            <HeroSlider banners={[previewBanner]} />
+
+            <div className="p-4 text-right">
+              <button
+                onClick={() => setPreviewBanner(null)}
+                className="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded-xl"
+              >
+                Đóng Preview
+              </button>
+            </div>
+
+          </div>
+        </div>
       )}
     </div>
   );

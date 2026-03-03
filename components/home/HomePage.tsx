@@ -125,7 +125,7 @@ const latestNews = safeNews.slice(0, 3);
 ) : null}
 
       {/* Trust Badges */}
-      <section className="bg-white py-12 border-b border-slate-100">
+      <section className="py-10 md:py-16 bg-gradient-to-b from-white to-primary/5 overflow-hidden relative">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6">
           {safeCommitments.map((item) => {
             const IconComp = ICON_MAP[item?.iconName] || Heart;
@@ -221,16 +221,16 @@ shadow-md shadow-primary/40">
                   Câu chuyện thương hiệu
                 </span>
 
-                <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 leading-tight whitespace-pre-line tracking-tight">
+                <h2 className="text-2xl md:text-5xl font-extrabold text-slate-900 leading-tight whitespace-pre-line tracking-tight">
                   {safeAbout.title}
                 </h2>
 
-                <p className="text-slate-500 text-lg leading-relaxed font-medium">
+                <p className="text-slate-500 text-base md:text-lg leading-relaxed font-medium">
                   {safeAbout.description}
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-6 py-8 border-y border-slate-100">
+              <div className="grid grid-cols-2 gap-4 py-6 md:py-8 border-y border-slate-100">
                 <div>
                   <p className="text-5xl font-extrabold text-primary mb-2 tracking-tight">
                     {safeAbout?.stats?.value1 || ''}
@@ -270,7 +270,7 @@ group"
       {/* Featured Products */}
       <section className="py-12 bg-gradient-to-b from-primary/5 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <header className="flex flex-col md:flex-row justify-between items-end mb-14 gap-4">
+          <header className="flex flex-col md:flex-row justify-between items-end mb-14 gap-3">
             <div className="text-center md:text-left">
               <div className="inline-block mb-3 px-4 py-1.5 
 bg-primary/10 text-primary 
@@ -299,7 +299,7 @@ transition-all group"
             </Link>
           </header>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
             {bestsellers.map(product => (
               <ProductCard
                 key={product?.id}
@@ -312,7 +312,7 @@ transition-all group"
       </section>
 
       {/* News */}
-      <section className="py-14 bg-white">
+      <section className="py-10 md:py-14 bg-white">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <div className="inline-flex items-center space-x-2 text-green-600 font-black uppercase tracking-widest text-xs mb-4">
             <Newspaper className="h-4 w-4" />

@@ -25,8 +25,8 @@ export default function HeroSlider({ banners }: Props) {
         autoplay={{ delay: 5000 }}
         loop
         pagination={{ clickable: true }}
-        navigation
-        className="h-[350px] md:h-[500px] lg:h-[650px]"
+        navigation={false} // 🔥 TẮT MŨI TÊN TRÊN MOBILE
+        className="h-[320px] sm:h-[400px] md:h-[500px] lg:h-[650px]"
       >
         {banners.map((banner) => {
           const buttonText = banner.buttonText?.trim();
@@ -34,7 +34,7 @@ export default function HeroSlider({ banners }: Props) {
           return (
             <SwiperSlide key={banner.id}>
               <div className="relative w-full h-full flex items-center">
-                
+
                 {/* Background */}
                 <Image
                   src={banner.imageUrl}
@@ -53,15 +53,22 @@ export default function HeroSlider({ banners }: Props) {
 
                 {/* Content */}
                 <div
-                  className="relative z-10 w-full max-w-7xl mx-auto px-6"
+                  className="relative z-10 w-full max-w-7xl mx-auto px-5 md:px-8"
                   style={{ color: banner.textColor || '#fff' }}
                 >
                   <div className="max-w-xl space-y-4 md:space-y-6">
-                    
+
                     {/* Title */}
-                    <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-[1.1] tracking-tight drop-shadow-lg">
-                      {banner.title?.split('/').map((line, i) => (
-                        <span key={i} className="block">
+                    <h2
+                      className="
+                        font-extrabold
+                        leading-tight
+                        drop-shadow-xl
+                        text-[clamp(20px,5vw,60px)]
+                      "
+                    >
+                      {banner.title?.split('\n').map((line, index) => (
+                        <span key={index} className="block">
                           {line}
                         </span>
                       ))}
@@ -69,7 +76,7 @@ export default function HeroSlider({ banners }: Props) {
 
                     {/* Subtitle */}
                     {banner.subtitle && (
-                      <p className="text-sm md:text-lg opacity-90">
+                      <p className="text-xs sm:text-sm md:text-lg opacity-90 leading-relaxed">
                         {banner.subtitle}
                       </p>
                     )}
@@ -78,7 +85,20 @@ export default function HeroSlider({ banners }: Props) {
                     {banner.link && buttonText && (
                       <Link
                         href={banner.link}
-                        className="inline-block mt-4 bg-green-600 hover:bg-green-700 text-white px-6 md:px-8 py-3 md:py-4 rounded-full font-bold transition"
+                        className="
+                          inline-block
+                          mt-3
+                          sm:mt-4
+                          bg-green-600
+                          hover:bg-green-700
+                          text-white
+                          px-5 sm:px-6 md:px-8
+                          py-2.5 sm:py-3 md:py-4
+                          text-sm sm:text-base
+                          rounded-full
+                          font-bold
+                          transition
+                        "
                       >
                         {buttonText}
                       </Link>
