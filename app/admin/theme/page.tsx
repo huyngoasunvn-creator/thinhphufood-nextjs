@@ -12,15 +12,24 @@ export default function AdminTheme() {
   }, [])
 
   const updateTheme = async (data: any) => {
+  // ✅ Update UI ngay lập tức
+  setTheme(data);
+
+  try {
     const res = await fetch("/api/theme", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
-    })
+    });
 
-    const updated = await res.json()
-    setTheme(updated)
+    const updated = await res.json();
+
+    // ✅ Sync lại nếu API trả về dữ liệu mới
+    setTheme(updated);
+  } catch (error) {
+    console.error("Update theme error:", error);
   }
+};
 
   if (!theme) return <div>Loading...</div>
 
