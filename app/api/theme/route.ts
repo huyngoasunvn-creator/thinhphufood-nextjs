@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { adminDb } from "@/lib/firebase-admin"
 
+export const runtime = "nodejs" // 🔥 THÊM DÒNG NÀY
+
 export async function GET() {
   const snap = await adminDb.collection("siteConfig").doc("theme").get()
 
@@ -23,6 +25,5 @@ export async function PUT(req: Request) {
     .doc("theme")
     .set(body, { merge: true })
 
-  // 🔥 QUAN TRỌNG: phải return JSON
   return NextResponse.json(body)
 }
