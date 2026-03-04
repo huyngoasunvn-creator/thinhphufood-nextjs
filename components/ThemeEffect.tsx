@@ -15,7 +15,10 @@ export default function ThemeEffect() {
   useEffect(() => {
     const fetchTheme = async () => {
       try {
-        const res = await fetch("/api/theme"); // ✅ relative path
+        const res = await fetch("/api/theme", {
+          cache: "no-store", // 🔥 thêm dòng này
+        });
+
         const data = await res.json();
         setConfig(data);
       } catch (error) {
