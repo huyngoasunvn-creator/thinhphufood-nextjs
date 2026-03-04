@@ -5,6 +5,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import ProductCard from "./ProductCard";
 import { Product } from "@/types";
 
+/* ================= NORMALIZE (BỎ DẤU) ================= */
+const normalizeText = (text: string) => {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+};
+
 interface Category {
   id: string;
   name: string;
@@ -34,9 +42,34 @@ export default function ProductsPage({
   const [activeCategory, setActiveCategory] = useState<string | null>(
     initialCategory !== "all" ? initialCategory : null
   );
+
   const [search, setSearch] = useState(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
+
   const [openCategories, setOpenCategories] = useState<Set<string>>(new Set());
   const [mobileCategoryOpen, setMobileCategoryOpen] = useState(false);
+
+  /* ================= DEBOUNCE SEARCH ================= */
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  /* ================= SYNC SEARCH TO URL ================= */
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (debouncedSearch.trim()) {
+      params.set("q", debouncedSearch);
+    } else {
+      params.delete("q");
+    }
+
+    router.replace(`/san-pham?${params.toString()}`, { scroll: false });
+  }, [debouncedSearch]);
 
   /* ================= CATEGORY TREE ================= */
 
@@ -60,7 +93,7 @@ export default function ProductsPage({
     return roots;
   }, [categories]);
 
-  /* ================= AUTO OPEN ================= */
+  /* ================= AUTO OPEN CATEGORY ================= */
 
   useEffect(() => {
     if (!activeCategory) return;
@@ -82,7 +115,7 @@ export default function ProductsPage({
     setOpenCategories(parents);
   }, [activeCategory, categoryTree]);
 
-  /* ================= FILTER ================= */
+  /* ================= GET ALL CHILD IDS ================= */
 
   const getAllChildIds = (id: string): string[] => {
     const ids: string[] = [];
@@ -106,21 +139,33 @@ export default function ProductsPage({
     return ids;
   };
 
+  /* ================= FILTER PRODUCTS ================= */
+
   const filteredProducts = useMemo(() => {
     let list = [...products];
 
+    // FILTER CATEGORY
     if (activeCategory) {
       const ids = getAllChildIds(activeCategory);
       list = list.filter((p) => ids.includes(p.categoryId));
     }
 
-    if (search.trim()) {
-      list = list.filter((p) =>
-        p.name.toLowerCase().includes(search.toLowerCase())
-      );
+    // FILTER SEARCH
+    if (debouncedSearch.trim()) {
+      const keyword = normalizeText(debouncedSearch);
+
+      list = list.filter((p) => {
+        const name = normalizeText(p.name);
+        const description = normalizeText(p.description || "");
+
+        return (
+          name.includes(keyword) ||
+          description.includes(keyword)
+        );
+      });
     }
 
-    // 🔥 ƯU TIÊN BÁN CHẠY
+    // PRIORITY BESTSELLER
     list.sort((a, b) => {
       if (a.isBestseller && !b.isBestseller) return -1;
       if (!a.isBestseller && b.isBestseller) return 1;
@@ -128,7 +173,7 @@ export default function ProductsPage({
     });
 
     return list;
-  }, [products, activeCategory, search, categoryTree]);
+  }, [products, activeCategory, debouncedSearch, categoryTree]);
 
   /* ================= HANDLERS ================= */
 

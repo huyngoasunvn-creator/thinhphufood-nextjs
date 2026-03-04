@@ -28,7 +28,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <Link href={`/san-pham/${productSlug}`} className="block group">
-      <div className="bg-white rounded-xl border border-slate-200 hover:border-green-500 overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col">
+      <div className="bg-white rounded-2xl border border-slate-100 hover:border-green-400 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col">
 
         {/* IMAGE */}
         <div className="relative aspect-[1/1] overflow-hidden">
@@ -49,7 +49,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           <img
             src={imageUrl}
             alt={productName}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
           />
 
           {/* Hover nhẹ */}
@@ -63,11 +63,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
         {/* CONTENT */}
         <div className="px-3 py-2 flex flex-col gap-1">
 
-          <h3 className="text-[13px] font-semibold text-green-800 truncate group-hover:text-green-600 transition-colors">
+          <h3 className="text-[13px] font-semibold text-green-900 truncate group-hover:text-green-700 transition-colors">
             {productName}
           </h3>
 
-          <p className="text-[11px] text-slate-500 truncate">
+          <p className="text-[12px] text-slate-400 truncate">
             {product.category || ""}
           </p>
 

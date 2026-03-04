@@ -97,6 +97,11 @@ const bestsellers = safeProducts
   .filter((p) => p.isBestseller === true)
   .slice(0, 4);
 
+const displayedProducts =
+  bestsellers.length >= 4
+    ? bestsellers
+    : safeProducts.slice(0, 4);
+
 const latestNews = safeNews.slice(0, 3);
 
   const getColorClasses = (scheme?: string) => {
@@ -125,39 +130,45 @@ const latestNews = safeNews.slice(0, 3);
 ) : null}
 
       {/* Trust Badges */}
-      <section className="py-10 md:py-16 bg-gradient-to-b from-white to-primary/5 overflow-hidden relative">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6">
-          {safeCommitments.map((item) => {
-            const IconComp = ICON_MAP[item?.iconName] || Heart;
-            return (
-              <div key={item?.id} className="flex items-center space-x-4">
-                <div className={`p-3 ${getColorClasses(item?.colorScheme)} rounded-2xl`}>
-                  <IconComp className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-slate-900 text-sm">
-                    {item?.title || ''}
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    {item?.description || ''}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
+<section className="py-6 md:py-8 bg-gradient-to-b from-white to-primary/5">
+  <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+    {safeCommitments.map((item) => {
+      const IconComp = ICON_MAP[item?.iconName] || Heart;
 
-          {safeCommitments.length === 0 && (
-            <p className="col-span-full text-center text-slate-400 text-xs italic">
-              Chưa có thông tin cam kết.
+      return (
+        <div key={item?.id} className="flex items-center gap-3">
+          <div
+            className={`p-2.5 ${getColorClasses(
+              item?.colorScheme
+            )} rounded-xl`}
+          >
+            <IconComp className="h-4 w-4 md:h-5 md:w-5" />
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-slate-900 text-xs md:text-sm leading-tight">
+              {item?.title || ""}
+            </h3>
+            <p className="text-[11px] md:text-xs text-slate-500 leading-tight">
+              {item?.description || ""}
             </p>
-          )}
+          </div>
         </div>
-      </section>
+      );
+    })}
+
+    {safeCommitments.length === 0 && (
+      <p className="col-span-full text-center text-slate-400 text-xs italic">
+        Chưa có thông tin cam kết.
+      </p>
+    )}
+  </div>
+</section>
 
       {/* About Section */}
-      <section className="py-16 bg-gradient-to-b from-white to-primary/5 overflow-hidden relative">
+      <section className="py-10 md:py-16 bg-gradient-to-b from-white to-primary/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-10 md:gap-16 items-center">
 
             <div className="relative order-2 lg:order-1 group">
               {/* NỀN XANH NGHIÊNG */}
@@ -221,7 +232,7 @@ shadow-md shadow-primary/40">
                   Câu chuyện thương hiệu
                 </span>
 
-                <h2 className="text-2xl md:text-5xl font-extrabold text-slate-900 leading-tight whitespace-pre-line tracking-tight">
+                <h2 className="text-2xl md:text-4xl font-extrabold text-slate-900 leading-tight whitespace-pre-line tracking-tight">
                   {safeAbout.title}
                 </h2>
 
@@ -251,7 +262,7 @@ shadow-md shadow-primary/40">
                 href={safeAbout.buttonLink || '/'}
                 className="inline-flex items-center space-x-3 
 bg-primary hover:bg-primary-dark 
-text-white px-10 py-5 rounded-2xl 
+text-white px-8 py-4 rounded-2xl 
 font-extrabold transition-all 
 shadow-lg shadow-primary/30 
 hover:shadow-primary/50 
@@ -268,16 +279,16 @@ group"
       </section>
 
       {/* Featured Products */}
-      <section className="py-12 bg-gradient-to-b from-primary/5 to-white">
+      <section className="py-10 md:py-16 bg-gradient-to-b from-primary/5 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <header className="flex flex-col md:flex-row justify-between items-end mb-14 gap-3">
+          <header className="flex flex-col md:flex-row justify-between items-end mb-8 md:mb-14 gap-3">
             <div className="text-center md:text-left">
               <div className="inline-block mb-3 px-4 py-1.5 
 bg-primary/10 text-primary 
 rounded-full text-xs font-bold uppercase tracking-widest">
   Sản phẩm nổi bật
 </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 mb-3">
+              <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight text-slate-900 mb-3">
                 Đặc Sản Bán Chạy
               </h2>
               <p className="text-slate-500">
@@ -323,7 +334,7 @@ transition-all group"
             Cẩm Nang Sống Khỏe
           </h2>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-4 md:gap-8">
             {latestNews.map(post => (
               <Link
                 key={post?.id}
