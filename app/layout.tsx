@@ -3,7 +3,8 @@ import "./globals.css";
 import ClientLayout from "./ClientLayout";
 import { Be_Vietnam_Pro } from "next/font/google";
 import type { Metadata } from "next";
-import { CartProvider } from "@/context/CartContext"; // 👈 thêm dòng này
+import { CartProvider } from "@/context/CartContext";
+import ThemeEffect from "@/components/ThemeEffect";
 
 const beVietnam = Be_Vietnam_Pro({
   subsets: ["latin", "vietnamese"],
@@ -79,8 +80,15 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body className={`${beVietnam.className} antialiased`}>
-        <CartProvider> {/* 👈 bọc ở đây */}
-          <ClientLayout>{children}</ClientLayout>
+        <CartProvider>
+
+          {/* 🔥 Theme effect toàn site */}
+          <ThemeEffect />
+
+          <ClientLayout>
+            {children}
+          </ClientLayout>
+
         </CartProvider>
       </body>
     </html>

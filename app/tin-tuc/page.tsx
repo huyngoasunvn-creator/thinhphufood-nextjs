@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic";
+export const revalidate = 120;
 
 import Link from "next/link";
 import { Metadata } from "next";
@@ -11,19 +11,20 @@ const PAGE_SIZE = 6;
 const baseUrl = "https://thinhphufood.vn";
 
 interface Props {
-  searchParams?: {
+  searchParams?: Promise<{
     page?: string;
     category?: string;
     q?: string;
-  };
+  }>;
 }
 
 /* ============================= */
 /* 🔥 DYNAMIC SEO METADATA      */
 /* ============================= */
 export async function generateMetadata(
-  { searchParams }: Props
+  props: Props
 ): Promise<Metadata> {
+  const searchParams = await props.searchParams;
 
   const page = Number(searchParams?.page || 1);
   const category = searchParams?.category || "";
@@ -77,8 +78,12 @@ export async function generateMetadata(
 /* ============================= */
 /* PAGE                         */
 /* ============================= */
-export default async function NewsPage({ searchParams }: Props) {
+export default async function NewsPage(
+  props: Props
+) {
   try {
+    const searchParams = await props.searchParams;
+
     const [allNewsRaw, bannersRaw] = await Promise.all([
       getNewsServer(),
       getBannersServer(),
@@ -124,11 +129,16 @@ export default async function NewsPage({ searchParams }: Props) {
     }
 
     /* Pagination */
-    const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+    const totalPages = Math.ceil(
+      filtered.length / PAGE_SIZE
+    );
     const start = (page - 1) * PAGE_SIZE;
-    const paginated = filtered.slice(start, start + PAGE_SIZE);
+    const paginated = filtered.slice(
+      start,
+      start + PAGE_SIZE
+    );
 
-    /* Category List - FIX TYPE */
+    /* Category List */
     const categories: string[] = [
       "Tất cả",
       ...Array.from(
@@ -136,7 +146,8 @@ export default async function NewsPage({ searchParams }: Props) {
           allNews
             .map((item) => item.category)
             .filter(
-              (cat): cat is string => typeof cat === "string"
+              (cat): cat is string =>
+                typeof cat === "string"
             )
         )
       ),
@@ -154,7 +165,7 @@ export default async function NewsPage({ searchParams }: Props) {
 
     return (
       <>
-        {/* SEO JSON-LD */}
+        {/* JSON-LD */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -162,14 +173,12 @@ export default async function NewsPage({ searchParams }: Props) {
           }}
         />
 
-        {/* HERO */}
         {newsBanners.length > 0 && (
           <HeroSlider banners={newsBanners} />
         )}
 
         <div className="w-full bg-white">
           <div className="max-w-6xl mx-auto px-6 py-12">
-
             {/* Header */}
             <div className="text-center mb-12">
               <h1 className="text-4xl font-bold mb-3">
@@ -183,7 +192,6 @@ export default async function NewsPage({ searchParams }: Props) {
 
             {/* FILTER */}
             <div className="flex flex-col md:flex-row gap-4 justify-between mb-10">
-
               <div className="flex flex-wrap gap-3">
                 {categories.map((cat, index) => {
                   const isActive =
@@ -203,12 +211,11 @@ export default async function NewsPage({ searchParams }: Props) {
                     <Link
                       key={index}
                       href={href}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition
-                        ${
-                          isActive
-                            ? "bg-green-600 text-white shadow-lg"
-                            : "bg-gray-100 hover:bg-green-100"
-                        }`}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                        isActive
+                          ? "bg-green-600 text-white shadow-lg"
+                          : "bg-gray-100 hover:bg-green-100"
+                      }`}
                     >
                       {cat}
                     </Link>
@@ -277,38 +284,42 @@ export default async function NewsPage({ searchParams }: Props) {
             {/* PAGINATION */}
             {totalPages > 1 && (
               <div className="flex justify-center mt-12 gap-2">
-                {Array.from({ length: totalPages }).map((_, i) => {
-                  const params = new URLSearchParams();
+                {Array.from({ length: totalPages }).map(
+                  (_, i) => {
+                    const params = new URLSearchParams();
 
-                  if (category)
-                    params.set("category", category);
-                  if (keyword)
-                    params.set("q", keyword);
-                  if (i + 1 > 1)
-                    params.set("page", String(i + 1));
+                    if (category)
+                      params.set("category", category);
+                    if (keyword)
+                      params.set("q", keyword);
+                    if (i + 1 > 1)
+                      params.set(
+                        "page",
+                        String(i + 1)
+                      );
 
-                  const href =
-                    params.toString().length > 0
-                      ? `/tin-tuc?${params.toString()}`
-                      : "/tin-tuc";
+                    const href =
+                      params.toString().length > 0
+                        ? `/tin-tuc?${params.toString()}`
+                        : "/tin-tuc";
 
-                  return (
-                    <Link
-                      key={i}
-                      href={href}
-                      className={`px-4 py-2 rounded-lg text-sm ${
-                        page === i + 1
-                          ? "bg-green-600 text-white"
-                          : "bg-gray-100 hover:bg-green-100"
-                      }`}
-                    >
-                      {i + 1}
-                    </Link>
-                  );
-                })}
+                    return (
+                      <Link
+                        key={i}
+                        href={href}
+                        className={`px-4 py-2 rounded-lg text-sm ${
+                          page === i + 1
+                            ? "bg-green-600 text-white"
+                            : "bg-gray-100 hover:bg-green-100"
+                        }`}
+                      >
+                        {i + 1}
+                      </Link>
+                    );
+                  }
+                )}
               </div>
             )}
-
           </div>
         </div>
       </>

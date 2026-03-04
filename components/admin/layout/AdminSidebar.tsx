@@ -54,6 +54,7 @@ export const ADMIN_MENU_ITEMS: MenuItem[] = [
   { icon: Mail, label: 'Tin nhắn khách hàng', path: '/admin/messages' },
   { icon: UserCircle, label: 'Nhúng Profile', path: '/admin/profile' },
   { icon: MonitorPlay, label: 'Popup', path: '/admin/popups' },
+  { icon: MonitorPlay, label: 'Theme hiệu ứng', path: '/admin/theme' },
   { icon: Settings, label: 'Cấu hình', path: '/admin/config' },
 ];
 

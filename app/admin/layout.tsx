@@ -1,72 +1,25 @@
-'use client';
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { adminAuth } from "@/lib/firebase-admin";
+import AdminClientLayout from "./layout/AdminClientLayout";
 
-import { useAuth } from "@/hooks/useAuth";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import AdminSidebar from "@/components/admin/layout/AdminSidebar";
-import AdminHeader from "@/components/admin/layout/AdminHeader";
-
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isAdmin, loading } = useAuth();
-  const router = useRouter();
+  const cookieStore = cookies();
+  const token = cookieStore.get("session")?.value;
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  useEffect(() => {
-    if (loading) return;
-
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
-
-    if (!isAdmin) {
-      router.replace("/");
-      return;
-    }
-  }, [user, isAdmin, loading, router]);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-gray-500">Đang kiểm tra quyền truy cập...</p>
-      </div>
-    );
+  if (!token) {
+    redirect("/login");
   }
 
-  if (!user || !isAdmin) {
-    return null;
+  try {
+    await adminAuth.verifySessionCookie(token, true);
+  } catch {
+    redirect("/login");
   }
 
-  return (
-    <div className="flex min-h-screen bg-slate-100">
-      
-      {/* Sidebar */}
-      <AdminSidebar
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-      />
-
-      {/* Overlay mobile */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-30 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Main */}
-      <main className="flex-1 min-h-screen relative">
-        <AdminHeader setSidebarOpen={setSidebarOpen} />
-
-        <div className="p-4 md:p-8 pb-20">
-          {children}
-        </div>
-      </main>
-    </div>
-  );
+  return <AdminClientLayout>{children}</AdminClientLayout>;
 }

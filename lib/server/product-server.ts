@@ -76,15 +76,17 @@ export async function getProducts(
 
     if (!snapshot?.docs) return [];
 
-    const products = snapshot.docs.map(mapProduct);
+    let products = snapshot.docs.map(mapProduct);
 
     if (onlyActive) {
-      return products.filter(
+      products = products.filter(
         (product) => product && product.isActive !== false
       );
     }
 
-    return products; // 🔥 admin sẽ vào đây
+    // 🔥 ÉP VỀ PLAIN OBJECT 100%
+    return JSON.parse(JSON.stringify(products));
+
   } catch (error) {
     console.error("getProducts error:", error);
     return [];
@@ -105,13 +107,16 @@ export async function getProductBySlug(
 
     if (!snapshot || snapshot.empty) return null;
 
-    return mapProduct(snapshot.docs[0]);
+    const product = mapProduct(snapshot.docs[0]);
+
+    // 🔥 ÉP VỀ PLAIN OBJECT
+    return JSON.parse(JSON.stringify(product));
+
   } catch (error) {
     console.error("getProductBySlug error:", error);
     return null;
   }
 }
-
 /* ================= CREATE ================= */
 
 export async function createProduct(
