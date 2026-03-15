@@ -48,14 +48,10 @@ const Login: React.FC = () => {
   body: JSON.stringify({ token: idToken }),
 });
 
-if (!res.ok) {
-  throw new Error("Login API failed");
-}
+if (!res.ok) throw new Error("Login API failed");
 
-const data = await res.json();
-
-// QUAN TRỌNG: reload để cookie được nhận
-window.location.href = data.role === "admin" ? "/admin" : "/";
+// redirect admin
+router.replace("/admin");
 
     } catch (error: any) {
       console.error("Auth Error:", error);
@@ -102,7 +98,7 @@ window.location.href = data.role === "admin" ? "/admin" : "/";
 
     const data = await res.json();
 
-    window.location.href = data.role === "admin" ? "/admin" : "/";
+    router.replace("/admin");
 
   } catch {
     setErrorMessage("Đăng nhập Google thất bại!");

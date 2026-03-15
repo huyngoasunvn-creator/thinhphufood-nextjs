@@ -2,16 +2,10 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname;
 
-  const session = request.cookies.get("session");
-
-  // nếu vào admin mà chưa login
-  if (request.nextUrl.pathname.startsWith("/admin")) {
-
-    if (!session) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
-
+  if (path.startsWith("/admin")) {
+    return NextResponse.next();
   }
 
   return NextResponse.next();

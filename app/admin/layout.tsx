@@ -8,6 +8,7 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+
   const cookieStore = cookies();
   const token = cookieStore.get("session")?.value;
 
@@ -16,8 +17,9 @@ export default async function AdminLayout({
   }
 
   try {
-    await adminAuth.verifySessionCookie(token, true);
-  } catch {
+    await adminAuth.verifySessionCookie(token, true); // thêm true
+  } catch (error) {
+    console.error("SESSION VERIFY ERROR:", error);
     redirect("/login");
   }
 

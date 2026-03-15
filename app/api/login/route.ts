@@ -5,17 +5,17 @@ export async function POST(req: Request) {
   try {
     const { token } = await req.json();
 
-    const decodedToken = await adminAuth.verifyIdToken(token);
+    const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 ngày
 
-    const response = NextResponse.json({
-      success: true,
-      uid: decodedToken.uid,
-      email: decodedToken.email,
+    const sessionCookie = await adminAuth.createSessionCookie(token, {
+      expiresIn,
     });
 
-    response.cookies.set("session", token, {
+    const response = NextResponse.json({ success: true });
+
+    response.cookies.set("session", sessionCookie, {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
     });
@@ -23,9 +23,7 @@ export async function POST(req: Request) {
     return response;
 
   } catch (error) {
-    return NextResponse.json(
-      { error: "Login failed" },
-      { status: 401 }
-    );
+    console.error(error);
+    return NextResponse.json({ error: "Login failed" }, { status: 401 });
   }
 }
