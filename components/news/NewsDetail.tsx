@@ -31,7 +31,11 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ news, slug }) => {
     const relatedIds = relatedPosts.map(r => r.id);
     return news
       .filter(n => n.id !== post.id && !relatedIds.includes(n.id))
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .sort(
+  (a, b) =>
+    new Date(b.date || '').getTime() -
+    new Date(a.date || '').getTime()
+)
       .slice(0, 3);
   }, [news, post, relatedPosts]);
 

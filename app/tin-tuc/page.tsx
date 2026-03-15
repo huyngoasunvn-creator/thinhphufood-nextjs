@@ -1,4 +1,4 @@
-export const revalidate = 120;
+export const revalidate = 3600;
 
 import Link from "next/link";
 import { Metadata } from "next";

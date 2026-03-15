@@ -38,10 +38,11 @@ async function getRelatedPosts(
   if (!category) return [];
 
   const snapshot = await adminDb
-    .collection("news")
-    .where("category", "==", category)
-    .limit(4)
-    .get();
+  .collection("news")
+  .where("category", "==", category)
+  .orderBy("date", "desc")
+  .limit(4)
+  .get();
 
   return snapshot.docs
     .map((doc) => ({

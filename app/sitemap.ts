@@ -16,7 +16,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const data = doc.data() as News;
 
   return {
-    url: `/tin-tuc/${data.slug}`,
+    url: `${baseUrl}/tin-tuc/${data.slug}`,
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
     priority: 0.7,

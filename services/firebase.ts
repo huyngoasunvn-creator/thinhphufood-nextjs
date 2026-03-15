@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, Auth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
@@ -12,11 +12,10 @@ const firebaseConfig = {
   appId: "1:452501099665:web:b06d58aafd7be311ee5b30",
 };
 
-// 🔥 Quan trọng: không initialize nhiều lần
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-// 🔥 Không khởi tạo Auth khi server
-export const auth =
+// ✅ khai báo type rõ ràng
+export const auth: Auth | null =
   typeof window !== "undefined" ? getAuth(app) : null;
 
 export const db = getFirestore(app);

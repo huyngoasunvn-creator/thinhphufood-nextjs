@@ -1,22 +1,22 @@
-import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
+
+  const session = request.cookies.get("session");
+
+  // nếu vào admin mà chưa login
   if (request.nextUrl.pathname.startsWith("/admin")) {
 
-    // 👉 chỉ check login nếu có (nếu bạn có login)
-    // const token = request.cookies.get("adminToken")
+    if (!session) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
 
-    // if (!token) {
-    //   return NextResponse.redirect(new URL("/", request.url))
-    // }
-
-    return NextResponse.next()
   }
 
-  return NextResponse.next()
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: ["/admin/:path*"],
-}
+};

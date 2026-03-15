@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Heart, ShoppingCart } from 'lucide-react';
 import { Product } from '@/types';
+import Image from "next/image";
 
 interface ProductCardProps {
   product: Product;
@@ -16,7 +17,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 }) => {
   if (!product || !product.id) return null;
 
-  const imageUrl = product.images?.[0] || "/placeholder.jpg";
+  const imageUrl = product.images?.[0] ?? "/placeholder.jpg";
   const productName = product.name || "Sản phẩm";
   const productSlug = product.slug || "";
 
@@ -27,7 +28,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   return (
-    <Link href={`/san-pham/${productSlug}`} className="block group">
+    <Link
+  href={`/san-pham/${productSlug}`}
+  prefetch={true}
+  className="block group"
+>
       <div className="bg-white rounded-2xl border border-slate-100 hover:border-green-400 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col">
 
         {/* IMAGE */}
@@ -46,11 +51,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <Heart className="h-3.5 w-3.5" />
           </button>
 
-          <img
-            src={imageUrl}
-            alt={productName}
-            className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
-          />
+          <Image
+  src={imageUrl}
+  alt={productName}
+  fill
+  sizes="(max-width:768px) 50vw, (max-width:1200px) 25vw, 300px"
+  className="object-cover group-hover:scale-105 transition-transform duration-500"
+/>
 
           {/* Hover nhẹ */}
           <div className="absolute inset-0 bg-green-600/0 group-hover:bg-green-600/10 transition duration-300 flex items-center justify-center">
@@ -88,4 +95,4 @@ const ProductCard: React.FC<ProductCardProps> = ({
   );
 };
 
-export default ProductCard;
+export default React.memo(ProductCard);

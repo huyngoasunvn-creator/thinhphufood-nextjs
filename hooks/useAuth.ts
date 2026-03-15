@@ -33,10 +33,16 @@ export const useAuth = () => {
   }, []);
 
   const loginWithGoogle = async () => {
-    if (!auth) return;
-    const provider = new GoogleAuthProvider();
-    return signInWithPopup(auth, provider);
-  };
+  if (!auth) return;
+
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({
+    prompt: "select_account",
+  });
+
+  const result = await signInWithPopup(auth, provider);
+  return result;
+};;
 
   const loginWithEmail = (email: string, pass: string) => {
     if (!auth) return;

@@ -5,6 +5,7 @@ import { Be_Vietnam_Pro } from "next/font/google";
 import type { Metadata } from "next";
 import { CartProvider } from "@/context/CartContext";
 import ThemeEffect from "@/components/ThemeEffect";
+import IntroWelcome from "@/components/IntroWelcome";
 
 const beVietnam = Be_Vietnam_Pro({
   subsets: ["latin", "vietnamese"],
@@ -80,6 +81,7 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body className={`${beVietnam.className} antialiased`}>
+        <IntroWelcome />
         <CartProvider>
 
           {/* 🔥 Theme effect toàn site */}

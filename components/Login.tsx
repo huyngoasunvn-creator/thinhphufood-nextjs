@@ -21,11 +21,7 @@ const Login: React.FC = () => {
   });
 
   // Nếu đã login thì về trang chủ
-  useEffect(() => {
-    if (user) {
-      router.replace("/");
-    }
-  }, [user, router]);
+  
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,19 +42,20 @@ const Login: React.FC = () => {
       const idToken = await currentUser.getIdToken();
 
       const res = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ idToken }),
-      });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  credentials: "include",
+  body: JSON.stringify({ token: idToken }),
+});
 
-      const data = await res.json();
+if (!res.ok) {
+  throw new Error("Login API failed");
+}
 
-      if (data.role === "admin") {
-        router.replace("/admin");
-      } else {
-        router.replace("/");
-      }
+const data = await res.json();
+
+// QUAN TRỌNG: reload để cookie được nhận
+window.location.href = data.role === "admin" ? "/admin" : "/";
 
     } catch (error: any) {
       console.error("Auth Error:", error);
@@ -82,35 +79,35 @@ const Login: React.FC = () => {
   };
 
   const handleGoogleLogin = async () => {
-    setErrorMessage(null);
+  setErrorMessage(null);
 
-    try {
-      await loginWithGoogle();
+  try {
+    await loginWithGoogle();
 
-      const currentUser = getAuth().currentUser;
-      if (!currentUser) throw new Error("Không tìm thấy user");
+    const currentUser = getAuth().currentUser;
+    if (!currentUser) throw new Error("Không tìm thấy user");
 
-      const idToken = await currentUser.getIdToken();
+    const idToken = await currentUser.getIdToken();
 
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ idToken }),
-      });
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ token: idToken }),
+    });
 
-      const data = await res.json();
-
-      if (data.role === "admin") {
-        router.replace("/admin");
-      } else {
-        router.replace("/");
-      }
-
-    } catch (error: any) {
-      setErrorMessage("Đăng nhập Google thất bại!");
+    if (!res.ok) {
+      throw new Error("Login API failed");
     }
-  };
+
+    const data = await res.json();
+
+    window.location.href = data.role === "admin" ? "/admin" : "/";
+
+  } catch {
+    setErrorMessage("Đăng nhập Google thất bại!");
+  }
+};
 
   const inputClass =
     "w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-green-500 focus:bg-white transition-all font-bold text-slate-900";

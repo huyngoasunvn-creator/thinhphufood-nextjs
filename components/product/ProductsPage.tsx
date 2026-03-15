@@ -60,16 +60,17 @@ export default function ProductsPage({
 
   /* ================= SYNC SEARCH TO URL ================= */
   useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
+  const params = new URLSearchParams(searchParams.toString());
 
-    if (debouncedSearch.trim()) {
-      params.set("q", debouncedSearch);
-    } else {
-      params.delete("q");
-    }
+  if (debouncedSearch.trim()) {
+    params.set("q", debouncedSearch);
+  } else {
+    params.delete("q");
+  }
 
-    router.replace(`/san-pham?${params.toString()}`, { scroll: false });
-  }, [debouncedSearch]);
+  router.replace(`/san-pham?${params.toString()}`, { scroll: false });
+
+}, [debouncedSearch]);
 
   /* ================= CATEGORY TREE ================= */
 
@@ -146,8 +147,8 @@ export default function ProductsPage({
 
     // FILTER CATEGORY
     if (activeCategory) {
-      const ids = getAllChildIds(activeCategory);
-      list = list.filter((p) => ids.includes(p.categoryId));
+      const ids = new Set(getAllChildIds(activeCategory));
+list = list.filter((p) => ids.has(p.categoryId));
     }
 
     // FILTER SEARCH
@@ -320,8 +321,11 @@ export default function ProductsPage({
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-4 gap-4">
               {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
+  <ProductCard
+    key={product.id}
+    product={product}
+  />
+))}
             </div>
           </>
         )}

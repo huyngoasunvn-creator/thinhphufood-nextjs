@@ -72,7 +72,10 @@ export async function getProducts(
   onlyActive: boolean = true
 ): Promise<Product[]> {
   try {
-    const snapshot = await adminDb.collection("products").get();
+    const snapshot = await adminDb
+  .collection("products")
+  .orderBy("createdAt", "desc")
+  .get();
 
     if (!snapshot?.docs) return [];
 
