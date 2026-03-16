@@ -1,25 +1,41 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function IntroWelcome() {
-  const [visible, setVisible] = useState(true);
+  const pathname = usePathname();
+
+  const [visible, setVisible] = useState(false);
   const [fade, setFade] = useState(false);
 
   useEffect(() => {
-    const fadeTimer = setTimeout(() => {
-      setFade(true);
-    }, 600); // bắt đầu fade
 
-    const hideTimer = setTimeout(() => {
-      setVisible(false);
-    }, 900); // ẩn hoàn toàn
+    // chỉ chạy intro cho các trang này
+    if (
+      pathname === "/san-pham" ||
+      pathname === "/tin-tuc" ||
+      pathname === "/"
+    ) {
 
-    return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(hideTimer);
-    };
-  }, []);
+      setVisible(true);
+      setFade(false);
+
+      const fadeTimer = setTimeout(() => {
+        setFade(true);
+      }, 400);
+
+      const hideTimer = setTimeout(() => {
+        setVisible(false);
+      }, 700);
+
+      return () => {
+        clearTimeout(fadeTimer);
+        clearTimeout(hideTimer);
+      };
+    }
+
+  }, [pathname]);
 
   if (!visible) return null;
 
@@ -30,8 +46,8 @@ export default function IntroWelcome() {
       }`}
     >
       <h1 className="px-6 text-center text-2xl sm:text-3xl md:text-4xl font-semibold text-green-700 leading-relaxed animate-intro">
-  ThinhPhuFood kính chào <br className="sm:hidden" /> Quý Khách!
-</h1>
+        ThinhPhuFood kính chào <br className="sm:hidden" /> Quý Khách!
+      </h1>
     </div>
   );
 }

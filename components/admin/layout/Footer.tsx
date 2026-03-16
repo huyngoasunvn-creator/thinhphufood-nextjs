@@ -80,11 +80,7 @@ const Footer: React.FC<FooterProps> = ({ config }) => {
 
         <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs space-y-4 md:space-y-0">
           <p>© 2024 {config.siteName}. Tất cả quyền được bảo lưu.</p>
-          <div className="flex items-center space-x-4">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" alt="Visa" className="h-4 grayscale hover:grayscale-0 transition-all" />
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" alt="Mastercard" className="h-4 grayscale hover:grayscale-0 transition-all" />
-            <img src="https://vnpay.vn/wp-content/uploads/2020/07/Logo-VNPAYQR-update.png" alt="VNPay" className="h-4 grayscale hover:grayscale-0 transition-all" />
-          </div>
+          
         </div>
       </div>
     </footer>
