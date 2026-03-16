@@ -6,6 +6,7 @@ import { SlidersHorizontal } from 'lucide-react';
 interface Category {
   id: string;
   name: string;
+  slug: string;
 }
 
 interface Props {
@@ -17,13 +18,13 @@ export default function MobileCategoryBar({ categories }: Props) {
   const searchParams = useSearchParams();
   const activeCategory = searchParams.get('category');
 
-  const handleFilter = (id?: string) => {
-    if (!id) {
-      router.push('/san-pham');
-    } else {
-      router.push(`/san-pham?category=${id}`);
-    }
-  };
+  const handleFilter = (slug?: string) => {
+  if (!slug) {
+    router.push('/san-pham');
+  } else {
+    router.push(`/danh-muc/${slug}`);
+  }
+};
 
   return (
     <div className="lg:hidden sticky top-16 z-40 bg-white border-b border-slate-100 shadow-sm">
@@ -53,7 +54,7 @@ export default function MobileCategoryBar({ categories }: Props) {
         {categories.map((cat) => (
           <button
             key={cat.id}
-            onClick={() => handleFilter(cat.id)}
+            onClick={() => handleFilter(cat.slug)}
             className={`px-4 h-9 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
               activeCategory === cat.id
                 ? 'bg-green-600 text-white shadow'

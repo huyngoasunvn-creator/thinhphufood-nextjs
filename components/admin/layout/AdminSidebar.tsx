@@ -40,6 +40,7 @@ interface Props {
 
 export const ADMIN_MENU_ITEMS: MenuItem[] = [
   { icon: LayoutDashboard, label: 'Tổng quan', path: '/admin' },
+  { icon: Tags, label: 'Menu Website', path: '/admin/menus' },
   { icon: Package, label: 'Sản phẩm', path: '/admin/products' },
   { icon: ShoppingCart, label: 'Đơn hàng', path: '/admin/orders' },
   { icon: Tags, label: 'Danh mục', path: '/admin/categories' },

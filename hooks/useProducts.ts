@@ -1,57 +1,65 @@
+'use client'
 
 import { useState, useEffect } from "react";
-import { collection, onSnapshot, query, orderBy } from "firebase/firestore"; // ✅ sửa ở đây
+import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 import { Product } from "@/types";
 import { db } from "../services/firebase";
-import {
-  PRODUCTS as INITIAL_PRODUCTS,
-  CATEGORIES as INITIAL_CATEGORIES,
-} from "../data/products";
 
 export const useProducts = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  interface Category {
-  id: string;
-  name: string;
-}
 
-const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  interface Category {
+    id: string;
+    name: string;
+  }
+
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
-    // 1. Lắng nghe sản phẩm Real-time với xử lý lỗi
+
     const q = query(collection(db, 'products'), orderBy('name', 'asc'));
-    const unsubscribe = onSnapshot(q, 
+
+    const unsubscribe = onSnapshot(
+      q,
       (snapshot) => {
+
         const prods: Product[] = [];
-        snapshot.forEach((doc) => prods.push({ id: doc.id, ...doc.data() } as Product));
-        
-        if (prods.length === 0) {
-          setProducts(INITIAL_PRODUCTS);
-        } else {
-          setProducts(prods);
-        }
+
+        snapshot.forEach((doc) =>
+          prods.push({ id: doc.id, ...doc.data() } as Product)
+        );
+
+        setProducts(prods);
+
       },
       (error) => {
-        console.warn("Firestore Products Error (Falling back to local data):", error.message);
-        setProducts(INITIAL_PRODUCTS);
+        console.warn("Firestore Products Error:", error.message);
+        setProducts([]);
       }
     );
 
-    // 2. Lắng nghe Categories với xử lý lỗi
-    const catUnsubscribe = onSnapshot(collection(db, 'metadata'), 
+    const catUnsubscribe = onSnapshot(
+      collection(db, 'metadata'),
       (snapshot) => {
+
         let found = false;
+
         snapshot.forEach((doc) => {
+
           if (doc.id === 'categories') {
-            setCategories(doc.data().list || INITIAL_CATEGORIES);
+            setCategories(doc.data().list || []);
             found = true;
           }
+
         });
-        if (!found) setCategories(INITIAL_CATEGORIES);
+
+        if (!found) setCategories([]);
+
       },
       (error) => {
-        console.warn("Firestore Categories Error (Falling back to local data):", error.message);
-        setCategories(INITIAL_CATEGORIES);
+        console.warn("Firestore Categories Error:", error.message);
+        setCategories([]);
       }
     );
 
@@ -59,6 +67,7 @@ const [categories, setCategories] = useState<Category[]>([]);
       unsubscribe();
       catUnsubscribe();
     };
+
   }, []);
 
   const saveProducts = async (updated: Product[]) => {
@@ -66,8 +75,9 @@ const [categories, setCategories] = useState<Category[]>([]);
   };
 
   const saveCategories = async (updated: Category[]) => {
-  setCategories(updated);
-};
+    setCategories(updated);
+  };
 
   return { products, categories, saveProducts, saveCategories };
+
 };

@@ -50,7 +50,7 @@ function mapProduct(
     comparePrice: raw?.comparePrice ?? 0,
     unit: raw?.unit ?? "",
     images: Array.isArray(raw?.images) ? raw.images : [],
-    categoryId: raw?.categoryId ?? "",
+    menuId: raw?.menuId ?? raw?.categoryId ?? "",
     tags: Array.isArray(raw?.tags) ? raw.tags : [],
     stock: raw?.stock ?? 0,
     rating: raw?.rating ?? 0,

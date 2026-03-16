@@ -2,7 +2,8 @@ export interface Product {
   id: string;
   name: string;
   slug: string;
-  categoryId: string;
+  
+  menuId: string;
 
   price: number;
   unit: string;

@@ -34,7 +34,7 @@ export default function CategoriesSidebar({ categories }: Props) {
 
             {/* LEVEL 1 */}
             <div className="flex justify-between items-center">
-              <Link href={`/san-pham?category=${cat1.id}`}>
+              <Link href={`/san-pham/${cat1.slug}`}>
                 {cat1.name}
               </Link>
 
@@ -58,7 +58,7 @@ export default function CategoriesSidebar({ categories }: Props) {
                   <div key={cat2.id} className="ml-4">
 
                     <div className="flex justify-between items-center">
-                      <Link href={`/san-pham?category=${cat2.id}`}>
+                      <Link href={`/san-pham/${cat2.slug}`}>
                         {cat2.name}
                       </Link>
 
@@ -79,7 +79,7 @@ export default function CategoriesSidebar({ categories }: Props) {
                     {openLevel2 === cat2.id &&
                       childrenLv3.map((cat3) => (
                         <div key={cat3.id} className="ml-4">
-                          <Link href={`/san-pham?category=${cat3.id}`}>
+                          <Link href={`/san-pham/${cat3.slug}`}>
                             {cat3.name}
                           </Link>
                         </div>

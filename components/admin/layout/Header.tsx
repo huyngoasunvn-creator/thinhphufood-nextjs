@@ -1,5 +1,6 @@
 'use client';
 
+import useMenus from "@/hooks/useMenus";
 import EventMenu from "@/components/header/EventMenu";
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -34,7 +35,37 @@ const Header: React.FC<HeaderProps> = ({
   const { user, logout, isAdmin, loading } = useAuth();
   const { cartCount } = useCart();
 
-  const navLinks = [
+  const menus = useMenus();
+
+const parents = menus
+  .filter((m: any) => m.parentId === null || m.parentId === "")
+  .sort((a: any, b: any) => a.order - b.order);
+
+const getChildren = (parentId: string) => {
+  return menus
+    .filter((m: any) => m.parentId === parentId)
+    .sort((a: any, b: any) => a.order - b.order);
+};
+
+const buildMenuLink = (slug?: string) => {
+  if (!slug) return "/";
+
+  // nếu đã có /
+  if (slug.startsWith("/")) {
+    return slug;
+  }
+
+  // mặc định thêm /
+  return `/${slug}`;
+};
+
+const navLinks =
+  parents.length > 0
+    ? parents.map((m: any) => ({
+        name: m.name,
+        path: m.slug,
+      }))
+    : [
     { name: 'Trang chủ', path: '/' },
     { name: 'Sản phẩm', path: '/san-pham' },
     { name: 'Tin tức', path: '/tin-tuc' },
@@ -43,7 +74,7 @@ const Header: React.FC<HeaderProps> = ({
     { name: 'Liên hệ', path: '/contact' },
   ];
 
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) => pathname.startsWith(`/${path}`);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,21 +108,55 @@ const Header: React.FC<HeaderProps> = ({
 
           {/* DESKTOP NAV */}
           <nav className="hidden lg:flex items-center space-x-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                href={link.path}
-                className={`text-sm font-bold transition-colors hover:text-green-600 ${
-                  isActive(link.path)
-                    ? 'text-green-600'
-                    : 'text-slate-600'
-                }`}
-              >
-                {link.name}
-              </Link>
-            ))}
-            <EventMenu />
-          </nav>
+
+{parents.map((parent:any)=>{
+
+const children = getChildren(parent.id)
+
+return (
+
+<div key={parent.id} className="relative group">
+
+<Link
+href={buildMenuLink(parent.slug)}
+className={`text-sm font-bold transition-colors hover:text-green-600 ${
+isActive(parent.slug)
+? 'text-green-600'
+: 'text-slate-600'
+}`}
+>
+{parent.name}
+</Link>
+
+{children.length > 0 && (
+
+<div className="absolute left-0 top-full mt-3 bg-white border border-slate-100 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+
+{children.map((child:any)=>(
+
+<Link
+key={child.id}
+href={buildMenuLink(child.slug)}
+className="block px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-green-50 hover:text-green-600 whitespace-nowrap"
+>
+{child.name}
+</Link>
+
+))}
+
+</div>
+
+)}
+
+</div>
+
+)
+
+})}
+
+<EventMenu />
+
+</nav>
 
           {/* RIGHT SIDE */}
           <div className="flex items-center space-x-2 sm:space-x-4">
@@ -217,7 +282,7 @@ const Header: React.FC<HeaderProps> = ({
             {navLinks.map((link) => (
               <Link
                 key={link.path}
-                href={link.path}
+                href={buildMenuLink(link.path)}
                 onClick={() => setIsMenuOpen(false)}
                 className={`text-sm font-bold ${
                   isActive(link.path)

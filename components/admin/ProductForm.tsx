@@ -36,7 +36,7 @@ export default function ProductForm({
   const [formData, setFormData] = useState<Partial<Product>>({
     name: "",
     slug: "",
-    categoryId: categories[0]?.id || "", // ✅ đúng
+    menuId: categories[0]?.id || "",
     price: 0,
     unit: "kg",
     images: [],
@@ -64,7 +64,7 @@ export default function ProductForm({
   if (!initialData && categories.length > 0) {
     setFormData((prev) => ({
       ...prev,
-      categoryId: prev.categoryId || categories[0].id,
+      menuId: prev.menuId || categories[0].id,
     }));
   }
 }, [categories, initialData]);
@@ -86,11 +86,12 @@ export default function ProductForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    if (!formData.categoryId) {
+    if (!formData.menuId) {
   alert("Vui lòng chọn danh mục");
   setLoading(false);
   return;
 }
+formData.menuId = formData.menuId;
 
     const method = initialData ? "PUT" : "POST";
     const url = initialData
@@ -189,18 +190,18 @@ export default function ProductForm({
                     Danh mục
                   </label>
                   <select
-                    className={inputClass}
-                    value={formData.categoryId || ""}
-                    onChange={(e) =>
-                      handleChange("categoryId", e.target.value)
-                    }
-                  >
-                    {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
+  className={inputClass}
+  value={formData.menuId || ""}
+  onChange={(e) => {
+    handleChange("menuId", e.target.value);
+  }}
+>
+  {categories.map((cat:any) => (
+    <option key={cat.id} value={cat.id}>
+      {cat.level ? "— ".repeat(cat.level) : ""}{cat.name}
+    </option>
+  ))}
+</select>
                 </div>
 
                 {/* Giá */}

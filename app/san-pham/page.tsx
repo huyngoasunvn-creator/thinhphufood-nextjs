@@ -2,7 +2,7 @@ export const revalidate = 86400;
 
 import ProductsPage from "@/components/product/ProductsPage";
 import HeroSlider from "@/components/home/HeroSlider";
-
+import { getMenus } from "@/lib/server/menu-server";
 import { getProducts } from "@/lib/server/product-server";
 import { getCategories } from "@/lib/server/category-server";
 import { getBannersServer } from "@/lib/server/banner-server";
@@ -19,11 +19,11 @@ export default async function Page({ searchParams }: PageProps) {
     /* ============================= */
     /* 1. FETCH DATA SERVER         */
     /* ============================= */
-    const [productsRaw, categoriesRaw, bannersRaw] = await Promise.all([
-      getProducts(),
-      getCategories(),
-      getBannersServer(),
-    ]);
+    const [productsRaw, menusRaw, bannersRaw] = await Promise.all([
+  getProducts(),
+  getMenus(),
+  getBannersServer(),
+]);
 
     /* ============================= */
     /* 2. SAFE PARSE (tránh lỗi serialize) */
@@ -32,9 +32,13 @@ export default async function Page({ searchParams }: PageProps) {
       ? JSON.parse(JSON.stringify(productsRaw))
       : [];
 
-    const categories = Array.isArray(categoriesRaw)
-      ? JSON.parse(JSON.stringify(categoriesRaw))
-      : [];
+    const menus = Array.isArray(menusRaw)
+  ? JSON.parse(JSON.stringify(menusRaw))
+  : [];
+
+const productMenu = menus.find((m:any)=>m.slug === "/san-pham");
+
+const categories = menus.filter((m:any)=>m.parentId);
 
     const banners = Array.isArray(bannersRaw)
       ? JSON.parse(JSON.stringify(bannersRaw))

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 interface Category {
   id: string;
   name: string;
+  slug: string;
 }
 
 interface Props {
@@ -16,13 +17,13 @@ export default function MobileCategoryBar({ categories }: Props) {
   const searchParams = useSearchParams();
   const activeCategory = searchParams.get('category');
 
-  const handleFilter = (id?: string) => {
-    if (!id) {
-      router.push('/san-pham');
-    } else {
-      router.push(`/san-pham?category=${id}`);
-    }
-  };
+  const handleFilter = (slug?: string) => {
+  if (!slug) {
+    router.push('/san-pham');
+  } else {
+    router.push(`/danh-muc/${slug}`);
+  }
+};
 
   return (
     <div className="lg:hidden bg-white border-b border-slate-100 sticky top-16 z-30">
@@ -43,7 +44,7 @@ export default function MobileCategoryBar({ categories }: Props) {
         {categories.map((cat) => (
           <button
             key={cat.id}
-            onClick={() => handleFilter(cat.id)}
+            onClick={() => handleFilter(cat.slug)}
             className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition ${
               activeCategory === cat.id
                 ? 'bg-green-600 text-white'

@@ -1,6 +1,7 @@
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import connectDB from "@/lib/connectDB"
 import EmbeddedPage from "@/models/EmbeddedPage"
+import { adminDb } from "@/lib/firebase-admin"
 
 interface PageProps {
   params: {
@@ -8,11 +9,26 @@ interface PageProps {
   }
 }
 
-export default async function EmbeddedPageView({ params }: PageProps) {
+export default async function Page({ params }: PageProps) {
+
+  const slug = params.slug
+
+  /* 1️⃣ CHECK CATEGORY (FIREBASE) */
+  const menuSnapshot = await adminDb
+    .collection("menus")
+    .where("slug", "==", slug)
+    .limit(1)
+    .get()
+
+  if (!menuSnapshot.empty) {
+  redirect(`/danh-muc/${slug}`)
+}
+
+  /* 2️⃣ CHECK EMBEDDED PAGE (MONGODB) */
   await connectDB()
 
   const page = await EmbeddedPage.findOne({
-    slug: params.slug,
+    slug,
     isActive: true
   })
 

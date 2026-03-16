@@ -77,7 +77,7 @@ export default async function Page({ params }: Props) {
 
   // 🔥 PRODUCT SCHEMA
   const schema: any = {
-  "@context": "https://schema.org/",
+  "@context": "https://schema.org",
   "@type": "Product",
   name: product.name,
   image: [image],
@@ -85,21 +85,27 @@ export default async function Page({ params }: Props) {
     product.shortDescription ??
     `Mua ${product.name} chất lượng cao tại Thịnh Phú Food.`,
   sku: product.id,
+
   brand: {
     "@type": "Brand",
     name: "Thịnh Phú Food",
   },
+
   offers: {
     "@type": "Offer",
     url: `https://thinhphufood.vn/san-pham/${product.slug}`,
     priceCurrency: "VND",
     price: product.price,
-    priceValidUntil: "2026-12-31",
     availability:
       product.stock > 0
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
     itemCondition: "https://schema.org/NewCondition",
+
+    seller: {
+      "@type": "Organization",
+      name: "Thịnh Phú Food",
+    },
   },
 };
 
@@ -113,7 +119,8 @@ if (product.rating && product.reviewCount) {
 
   return (
     <>
-      <script
+      <Script
+  id="product-schema"
   type="application/ld+json"
   dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
 />

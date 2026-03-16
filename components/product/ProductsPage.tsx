@@ -144,11 +144,15 @@ export default function ProductsPage({
 
   const filteredProducts = useMemo(() => {
     let list = [...products];
+    console.log("activeCategory", activeCategory);
+console.log("product menuIds", products.map(p => p.menuId));
 
     // FILTER CATEGORY
     if (activeCategory) {
       const ids = new Set(getAllChildIds(activeCategory));
-list = list.filter((p) => ids.has(p.categoryId));
+list = list.filter(
+  (p) => ids.has(p.menuId) || ids.has(p.menuId || "")
+);
     }
 
     // FILTER SEARCH

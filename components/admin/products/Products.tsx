@@ -29,7 +29,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
       const categoryName =
-        categories.find((c) => c.id === p.categoryId)?.name || '';
+        categories.find((c) => c.id === p.menuId)?.name || '';
 
       return (
         p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -164,7 +164,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({
                   {/* CATEGORY */}
                   <td className="px-8 py-5">
                     <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-bold uppercase">
-                      {categories.find((c) => c.id === p.categoryId)?.name || "Không có"}
+                      {categories.find((c) => c.id === p.menuId)?.name || "Không có"}
                     </span>
                   </td>
 
