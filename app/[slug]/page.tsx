@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation"
 import connectDB from "@/lib/connectDB"
 import EmbeddedPage from "@/models/EmbeddedPage"
 import { adminDb } from "@/lib/firebase-admin"
+import EventEmbed from "@/models/EventEmbed"
 
 interface PageProps {
   params: {
@@ -31,6 +32,24 @@ export default async function Page({ params }: PageProps) {
     slug,
     isActive: true
   })
+
+  /* 3️⃣ CHECK EVENT EMBED */
+
+const event = await EventEmbed.findOne({
+  slug,
+  isActive: true
+})
+
+if (event) {
+  return (
+    <div className="w-full h-screen">
+      <iframe
+        src={event.externalUrl}
+        className="w-full h-full border-0"
+      />
+    </div>
+  )
+}
 
   if (!page) return notFound()
 

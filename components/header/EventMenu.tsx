@@ -10,20 +10,44 @@ interface Event {
 }
 
 export default function EventMenu() {
+
   const [events, setEvents] = useState<Event[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch("/api/events")
-      .then(res => res.json())
-      .then(data => setEvents(data))
+
+    async function loadEvents() {
+      try {
+
+        const res = await fetch("/api/events")
+
+        if (!res.ok) return
+
+        const data = await res.json()
+
+        if (Array.isArray(data)) {
+          setEvents(data)
+        }
+
+      } catch (err) {
+        console.error("Load events failed", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadEvents()
+
   }, [])
+
+  if (loading || events.length === 0) return null
 
   return (
     <>
       {events.map(event => (
         <Link
           key={event._id}
-          href={`/event/${event.slug}`}
+          href={`/${event.slug}`}
           className="text-sm font-bold text-slate-600 hover:text-green-600"
         >
           {event.title}
