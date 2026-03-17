@@ -1,53 +1,60 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
 
 export default function IntroWelcome() {
-  const pathname = usePathname();
 
-  const [visible, setVisible] = useState(false);
-  const [fade, setFade] = useState(false);
+  const [hide,setHide] = useState(false);
 
-  useEffect(() => {
+  useEffect(()=>{
+    const timer = setTimeout(()=>{
+      setHide(true);
+    },1200);
 
-    // chỉ chạy intro cho các trang này
-    if (
-      pathname === "/san-pham" ||
-      pathname === "/tin-tuc" ||
-      pathname === "/"
-    ) {
+    return ()=> clearTimeout(timer);
+  },[]);
 
-      setVisible(true);
-      setFade(false);
-
-      const fadeTimer = setTimeout(() => {
-        setFade(true);
-      }, 400);
-
-      const hideTimer = setTimeout(() => {
-        setVisible(false);
-      }, 700);
-
-      return () => {
-        clearTimeout(fadeTimer);
-        clearTimeout(hideTimer);
-      };
-    }
-
-  }, [pathname]);
-
-  if (!visible) return null;
-
-  return (
+  return(
     <div
-      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-b from-white to-green-50 transition-opacity duration-500 ${
-        fade ? "opacity-0" : "opacity-100"
-      }`}
+      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center
+      bg-gradient-to-b from-white to-green-50
+      transition-opacity duration-700
+      ${hide ? "opacity-0" : "opacity-100"}`}
     >
-      <h1 className="px-6 text-center text-2xl sm:text-3xl md:text-4xl font-semibold text-green-700 leading-relaxed animate-intro">
-        ThinhPhuFood kính chào <br className="sm:hidden" /> Quý Khách!
-      </h1>
+
+      {/* LOGO */}
+      <img
+        src="/logo.png"
+        alt="Thịnh Phú Food"
+        className="w-16 sm:w-20 md:w-24 mb-4 animate-intro"
+      />
+
+      {/* TEXT */}
+      <h1
+  className="
+  px-6
+  text-center
+  max-w-md
+  text-xl
+  sm:text-3xl
+  md:text-4xl
+  font-semibold
+  text-green-700
+  leading-relaxed
+  animate-intro
+  "
+>
+
+  <span className="block">
+    ThinhPhuFood
+  </span>
+
+  <span className="block">
+    Kính Chào Quý Khách!
+  </span>
+
+</h1>
+
     </div>
   );
 }

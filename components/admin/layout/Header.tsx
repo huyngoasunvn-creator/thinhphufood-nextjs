@@ -79,7 +79,7 @@ const navLinks =
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchKeyword.trim()) {
-      router.push(`/san-pham?q=${encodeURIComponent(searchKeyword.trim())}`);
+      router.push(`/tim-kiem/${encodeURIComponent(searchKeyword.trim().replaceAll(" ", "-"))}`);
       setSearchKeyword('');
       setIsMenuOpen(false);
     }

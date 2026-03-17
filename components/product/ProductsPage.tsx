@@ -10,7 +10,10 @@ const normalizeText = (text: string) => {
   return text
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "d")
+    .trim();
 };
 
 interface Category {
@@ -38,13 +41,72 @@ export default function ProductsPage({
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
-
+  
   const [activeCategory, setActiveCategory] = useState<string | null>(
     initialCategory !== "all" ? initialCategory : null
   );
 
   const [search, setSearch] = useState(initialSearch);
   const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
+  const [suggestions, setSuggestions] = useState<Product[]>([]);
+const [showSuggest, setShowSuggest] = useState(false);
+
+  useEffect(() => {
+
+  if (!search.trim()) {
+    setSuggestions([]);
+    return;
+  }
+
+  const keyword = normalizeText(search);
+
+  const result = products
+    .filter((p) =>
+      normalizeText(p.name).includes(keyword)
+    )
+    .slice(0, 5);
+
+  setSuggestions(result);
+
+}, [search, products]);
+
+  useEffect(() => {
+
+  if (initialSearch) {
+
+    setSearch(initialSearch);
+    setDebouncedSearch(initialSearch);
+
+  }
+
+}, [initialSearch]);
+
+  useEffect(() => {
+
+  const q = searchParams.get("q");
+
+  if (q) {
+    setSearch(q);
+    setDebouncedSearch(q);
+    return;
+  }
+
+  // lấy slug từ URL /tim-kiem/...
+  const path = window.location.pathname;
+
+  if (path.startsWith("/tim-kiem/")) {
+
+    const keyword = decodeURIComponent(
+      path.replace("/tim-kiem/", "")
+    ).replaceAll("-", " ");
+
+    setSearch(keyword);
+    setDebouncedSearch(keyword);
+
+  }
+
+}, [searchParams]);
+
 
   const [openCategories, setOpenCategories] = useState<Set<string>>(new Set());
   const [mobileCategoryOpen, setMobileCategoryOpen] = useState(false);
@@ -59,7 +121,13 @@ export default function ProductsPage({
   }, [search]);
 
   /* ================= SYNC SEARCH TO URL ================= */
-  useEffect(() => {
+useEffect(() => {
+
+  // nếu đang ở trang /tim-kiem thì không sửa URL
+  if (window.location.pathname.startsWith("/tim-kiem")) {
+    return;
+  }
+
   const params = new URLSearchParams(searchParams.toString());
 
   if (debouncedSearch.trim()) {
@@ -157,16 +225,18 @@ list = list.filter(
 
     // FILTER SEARCH
     if (debouncedSearch.trim()) {
-      const keyword = normalizeText(debouncedSearch);
+      const keyword = normalizeText(debouncedSearch.replaceAll("-", " "));
 
       list = list.filter((p) => {
-        const name = normalizeText(p.name);
-        const description = normalizeText(p.description || "");
+        const name = normalizeText(p.name || "");
+const description = normalizeText(p.description || "");
+const category = normalizeText(p.category || "");
 
         return (
-          name.includes(keyword) ||
-          description.includes(keyword)
-        );
+  name.includes(keyword) ||
+  description.includes(keyword) ||
+  category.includes(keyword)
+);
       });
     }
 
@@ -305,13 +375,38 @@ list = list.filter(
       <main className="flex-1">
 
         {/* SEARCH */}
-        <div className="mb-4">
+        <div className="mb-4 relative">
           <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Tìm sản phẩm..."
-            className="w-full border rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
+  value={search}
+  onFocus={() => setShowSuggest(true)}
+  onChange={(e) => setSearch(e.target.value)}
+  placeholder="Tìm sản phẩm..."
+  className="w-full border rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+/>
+{showSuggest && suggestions.length > 0 && (
+
+  <div className="absolute bg-white border rounded-xl shadow w-full mt-1 z-50">
+
+    {suggestions.map((item) => (
+
+      <div
+        key={item.id}
+        className="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer"
+        onClick={() => router.push(`/san-pham/${item.slug}`)}
+      >
+
+        <div className="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer">
+  <span className="text-sm">{item.name}</span>
+</div>
+
+        
+      </div>
+
+    ))}
+
+  </div>
+
+)}
         </div>
 
         {/* PRODUCT GRID */}

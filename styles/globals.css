@@ -101,3 +101,104 @@ body {
 .animate-intro {
   animation: introZoom 1s ease-out forwards;
 }
+@keyframes logoIntro {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-logoIntro {
+  animation: logoIntro 0.9s ease-out;
+}
+
+@keyframes textIntro {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-textIntro {
+  animation: textIntro 0.9s ease-out;
+}
+.logoIntro{
+  animation: logoZoom 1.2s ease-out;
+}
+
+@keyframes logoZoom{
+  0%{
+    opacity:0;
+    transform:scale(0.6);
+  }
+  60%{
+    opacity:1;
+    transform:scale(1.05);
+  }
+  100%{
+    transform:scale(1);
+  }
+}
+
+.introOverlay{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(to bottom,#ffffff,#f0fdf4);
+  animation:introFade 1.8s ease forwards;
+}
+
+@keyframes introFade{
+  0%{opacity:1}
+  80%{opacity:1}
+  100%{opacity:0}
+}
+
+.introLogo{
+  animation:logoZoom 0.8s ease;
+}
+
+@keyframes logoZoom{
+  0%{
+    opacity:0;
+    transform:scale(.7);
+  }
+  100%{
+    opacity:1;
+    transform:scale(1);
+  }
+}
+
+.introText{
+  margin-top:16px;
+  font-size:28px;
+  font-weight:600;
+  color:#15803d;
+  animation:textSlide 1s ease;
+}
+
+@keyframes textSlide{
+  0%{
+    opacity:0;
+    transform:translateY(20px);
+  }
+  100%{
+    opacity:1;
+    transform:translateY(0);
+  }
+}

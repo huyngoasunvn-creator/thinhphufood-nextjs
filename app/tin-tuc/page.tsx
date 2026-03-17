@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 export const revalidate = 3600;
 
 import Link from "next/link";
@@ -11,11 +12,11 @@ const PAGE_SIZE = 6;
 const baseUrl = "https://thinhphufood.vn";
 
 interface Props {
-  searchParams?: Promise<{
+  searchParams?: {
     page?: string;
     category?: string;
     q?: string;
-  }>;
+  };
 }
 
 /* ============================= */
@@ -24,7 +25,7 @@ interface Props {
 export async function generateMetadata(
   props: Props
 ): Promise<Metadata> {
-  const searchParams = await props.searchParams;
+  const searchParams = props.searchParams;
 
   const page = Number(searchParams?.page || 1);
   const category = searchParams?.category || "";
@@ -82,7 +83,7 @@ export default async function NewsPage(
   props: Props
 ) {
   try {
-    const searchParams = await props.searchParams;
+    const searchParams = props.searchParams || {};
 
     const [allNewsRaw, bannersRaw] = await Promise.all([
       getNewsServer(),
