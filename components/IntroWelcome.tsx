@@ -5,14 +5,26 @@ import { useEffect, useState } from "react";
 export default function IntroWelcome() {
 
   const [hide,setHide] = useState(false);
+  const [show,setShow] = useState(true);
 
   useEffect(()=>{
+
     const timer = setTimeout(()=>{
       setHide(true);
-    },1200);
+    },800);
 
-    return ()=> clearTimeout(timer);
+    const remove = setTimeout(()=>{
+      setShow(false);
+    },1500);
+
+    return ()=>{
+      clearTimeout(timer);
+      clearTimeout(remove);
+    }
+
   },[]);
+
+  if(!show) return null;
 
   return(
     <div
@@ -22,38 +34,23 @@ export default function IntroWelcome() {
       ${hide ? "opacity-0" : "opacity-100"}`}
     >
 
-      {/* LOGO */}
       <img
         src="/logo.png"
         alt="Thịnh Phú Food"
         className="w-16 sm:w-20 md:w-24 mb-4 animate-intro"
       />
 
-      {/* TEXT */}
-      <h1
-  className="
-  px-6
-  text-center
-  max-w-md
-  text-xl
-  sm:text-3xl
-  md:text-4xl
-  font-semibold
-  text-green-700
-  leading-relaxed
-  animate-intro
-  "
->
+      <h1 className="text-green-700 text-center font-semibold animate-intro">
 
-  <span className="block">
-    ThinhPhuFood
-  </span>
+        <span className="block text-xl sm:text-3xl md:text-4xl">
+          ThinhPhuFood
+        </span>
 
-  <span className="block">
-    Kính Chào Quý Khách!
-  </span>
+        <span className="block text-lg sm:text-2xl md:text-3xl mt-1">
+          Kính Chào Quý Khách!
+        </span>
 
-</h1>
+      </h1>
 
     </div>
   );
