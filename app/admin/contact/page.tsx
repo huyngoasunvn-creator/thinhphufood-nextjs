@@ -1,16 +1,10 @@
 'use client';
 
-import { useAppState } from '@/hooks/useAppState'
-import AdminContactConfig from '@/components/admin/config/AdminContactConfig'
-export const dynamic = "force-dynamic";
+import AdminContactConfig from '@/components/admin/config/AdminContactConfig';
+import { useGlobalSettings } from '@/hooks/useGlobalSettings';
 
 export default function AdminContactPage() {
-  const { contact, saveContact } = useAppState()
+  const { contact, saveContact } = useGlobalSettings();
 
-  return (
-    <AdminContactConfig
-      config={contact}
-      onUpdate={saveContact}
-    />
-  )
+  return <AdminContactConfig config={contact} onUpdate={saveContact} />;
 }

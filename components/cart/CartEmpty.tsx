@@ -12,7 +12,7 @@ const CartEmpty: React.FC = () => (
     <h2 className="text-2xl font-bold text-slate-900 mb-2">Giỏ hàng đang trống</h2>
     <p className="text-slate-500 mb-8 max-w-xs">Có vẻ như bạn chưa thêm sản phẩm nào vào giỏ hàng của mình.</p>
     <Link
-      href="/products"
+      href="/san-pham"
       className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full font-bold transition-all shadow-lg shadow-green-200"
     >
       Tiếp tục mua sắm

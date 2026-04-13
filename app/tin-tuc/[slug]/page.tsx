@@ -1,117 +1,84 @@
-import { NewsPost } from "@/types";
-import { adminDb } from "@/lib/firebase-admin";
+import Link from "next/link";
+import Image from "next/image";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { decode } from "html-entities";
-import Link from "next/link";
-import { Metadata } from "next";
-import Image from "next/image";
+import { createPageMetadata, SITE_URL, stripHtml } from "@/lib/seo";
+import {
+  getNewsBySlug,
+  getRelatedNewsServer,
+} from "@/lib/server/news-server";
 
-const baseUrl = "https://thinhphufood.vn";
+export const revalidate = 3600;
 
-interface Props {
-  params: { slug: string };
-}
-
-/* ================= FETCH ================= */
-
-async function getNewsBySlug(slug: string): Promise<NewsPost | null> {
-  const snapshot = await adminDb
-    .collection("news")
-    .where("slug", "==", slug)
-    .limit(1)
-    .get();
-
-  if (snapshot.empty) return null;
-
-  const doc = snapshot.docs[0];
-
-  return {
-    id: doc.id,
-    ...(doc.data() as Omit<NewsPost, "id">),
+type PageProps = {
+  params: {
+    slug: string;
   };
-}
-
-async function getRelatedPosts(
-  category?: string,
-  currentSlug?: string
-): Promise<NewsPost[]> {
-  if (!category) return [];
-
-  const snapshot = await adminDb
-  .collection("news")
-  .where("category", "==", category)
-  .orderBy("date", "desc")
-  .limit(4)
-  .get();
-
-  return snapshot.docs
-    .map((doc) => ({
-      id: doc.id,
-      ...(doc.data() as Omit<NewsPost, "id">),
-    }))
-    .filter((item) => item.slug !== currentSlug)
-    .slice(0, 3);
-}
-
-/* ================= SEO ================= */
+};
 
 export async function generateMetadata({
   params,
-}: Props): Promise<Metadata> {
+}: PageProps): Promise<Metadata> {
   const post = await getNewsBySlug(params.slug);
 
   if (!post) {
-    return { title: "Không tìm thấy bài viết" };
+    return createPageMetadata({
+      title: "Không tìm thấy bài viết",
+      description: "Bài viết bạn đang tìm không tồn tại hoặc đã được ẩn.",
+      path: `/tin-tuc/${params.slug}`,
+      noIndex: true,
+    });
   }
 
-  const url = `${baseUrl}/tin-tuc/${post.slug}`;
+  const description = stripHtml(post.summary || decode(post.content || ""));
 
-  return {
+  return createPageMetadata({
     title: post.title,
-    description: post.summary,
-    alternates: { canonical: url },
-    openGraph: {
-      title: post.title,
-      description: post.summary,
-      url,
-      type: "article",
-      locale: "vi_VN",
-      images: [
-        {
-          url: post.image,
-          width: 1200,
-          height: 630,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: post.title,
-      description: post.summary,
-      images: [post.image],
-    },
-  };
+    description: description || "Bài viết tại Thịnh Phú Food.",
+    path: `/tin-tuc/${post.slug}`,
+    image: post.image || "/og-image.jpg",
+    type: "article",
+  });
 }
 
-/* ================= PAGE ================= */
-
-export default async function Page({ params }: Props) {
+export default async function Page({ params }: PageProps) {
   const post = await getNewsBySlug(params.slug);
-  if (!post) return notFound();
 
+  if (!post) {
+    return notFound();
+  }
+
+  const relatedPosts = await getRelatedNewsServer(post.category, post.slug);
   const decodedContent = decode(post.content || "");
-  const relatedPosts = await getRelatedPosts(
-    post.category,
-    post.slug
-  );
+  const articleUrl = `${SITE_URL}/tin-tuc/${post.slug}`;
 
-  const articleUrl = `${baseUrl}/tin-tuc/${post.slug}`;
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    image: post.image ? [post.image] : undefined,
+    datePublished: post.date,
+    dateModified: post.date,
+    author: {
+      "@type": "Person",
+      name: post.author || "Thịnh Phú Food",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Thịnh Phú Food",
+      logo: {
+        "@type": "ImageObject",
+        url: `${SITE_URL}/logo.png`,
+      },
+    },
+    mainEntityOfPage: articleUrl,
+    description: stripHtml(post.summary || decodedContent),
+  };
 
   return (
     <div className="w-full bg-white">
       <div className="max-w-4xl mx-auto px-6 py-12">
-
-        {/* Back */}
         <Link
           href="/tin-tuc"
           className="text-gray-500 hover:text-green-600 flex items-center gap-2 mb-8"
@@ -120,25 +87,20 @@ export default async function Page({ params }: Props) {
         </Link>
 
         <article>
-
-          {/* Category */}
           <div className="mb-4">
             <span className="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
               {post.category}
             </span>
           </div>
 
-          {/* Title */}
           <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-6">
             {post.title}
           </h1>
 
-          {/* Meta */}
           <div className="text-gray-500 text-sm mb-10 border-b pb-6">
             {post.date} • {post.author}
           </div>
 
-          {/* Cover Image */}
           {post.image && (
             <div className="relative w-full aspect-[16/9] mb-10 rounded-2xl overflow-hidden">
               <Image
@@ -151,30 +113,18 @@ export default async function Page({ params }: Props) {
             </div>
           )}
 
-          {/* Content */}
           <div
-            className="prose prose-lg max-w-none
-            prose-headings:font-bold
-            prose-p:leading-relaxed
-            prose-img:rounded-xl
-            prose-a:text-green-600
-            prose-strong:text-black
-            mb-20"
+            className="prose prose-lg max-w-none prose-headings:font-bold prose-p:leading-relaxed prose-img:rounded-xl prose-a:text-green-600 prose-strong:text-black mb-20"
             dangerouslySetInnerHTML={{
               __html: decodedContent,
             }}
           />
-
         </article>
-
-        {/* ================= RELATED POSTS ================= */}
 
         {relatedPosts.length > 0 && (
           <section className="border-t pt-12">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-bold">
-                Bài viết liên quan
-              </h2>
+              <h2 className="text-2xl font-bold">Bài viết liên quan</h2>
 
               <Link
                 href="/tin-tuc"
@@ -227,33 +177,10 @@ export default async function Page({ params }: Props) {
           </section>
         )}
 
-        {/* ================= JSON-LD ================= */}
-
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Article",
-              headline: post.title,
-              image: post.image,
-              datePublished: post.date,
-              dateModified: post.date,
-              author: {
-                "@type": "Person",
-                name: post.author,
-              },
-              publisher: {
-                "@type": "Organization",
-                name: "Thịnh Phú Food",
-                logo: {
-                  "@type": "ImageObject",
-                  url: `${baseUrl}/logo.png`,
-                },
-              },
-              mainEntityOfPage: articleUrl,
-              description: post.summary,
-            }),
+            __html: JSON.stringify(articleSchema),
           }}
         />
       </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 interface Category {
   id: string;
@@ -14,8 +14,12 @@ interface Props {
 
 export default function MobileCategoryBar({ categories }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
-  const activeCategory = searchParams.get('category');
+  const activeCategory =
+    pathname.startsWith('/danh-muc/')
+      ? pathname.replace('/danh-muc/', '')
+      : searchParams.get('category');
 
   const handleFilter = (slug?: string) => {
   if (!slug) {
@@ -46,7 +50,7 @@ export default function MobileCategoryBar({ categories }: Props) {
             key={cat.id}
             onClick={() => handleFilter(cat.slug)}
             className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition ${
-              activeCategory === cat.id
+              activeCategory === cat.slug || activeCategory === cat.id
                 ? 'bg-green-600 text-white'
                 : 'bg-slate-100 text-slate-600'
             }`}

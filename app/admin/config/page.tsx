@@ -2,15 +2,10 @@
 
 import React from 'react';
 import AboutConfig from '@/components/admin/config/AboutConfig';
-import { useAppState } from '@/hooks/useAppState';
+import { useGlobalSettings } from '@/hooks/useGlobalSettings';
 
 export default function AdminConfigPage() {
-  const { aboutConfig, saveAboutConfig } = useAppState();
+  const { aboutConfig, saveAboutConfig } = useGlobalSettings();
 
-  return (
-    <AboutConfig
-      config={aboutConfig}
-      onUpdate={saveAboutConfig}
-    />
-  );
+  return <AboutConfig config={aboutConfig} onUpdate={saveAboutConfig} />;
 }

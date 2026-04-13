@@ -1,12 +1,11 @@
-
 'use client';
 
 import React from 'react';
-import AboutUs from '../../components/AboutUs';
-import { useAppState } from '../../hooks/useAppState';
+import AboutUs from '@/components/AboutUs';
+import { useGlobalSettings } from '@/hooks/useGlobalSettings';
 
 export default function AboutUsPage() {
-  const { aboutPage } = useAppState();
+  const { aboutPage } = useGlobalSettings();
 
   return <AboutUs config={aboutPage} />;
 }

@@ -1,15 +1,10 @@
 'use client';
 
 import AdminOrders from '@/components/admin/Orders';
-import { useAppState } from '@/hooks/useAppState';
+import { useOrders } from '@/hooks/useOrders';
 
 export default function OrdersClient() {
-  const { orders, updateOrder } = useAppState();
+  const { orders, updateOrder } = useOrders();
 
-  return (
-    <AdminOrders
-      orders={orders}
-      onUpdateOrders={updateOrder}
-    />
-  );
+  return <AdminOrders orders={orders} onUpdateOrders={updateOrder} />;
 }

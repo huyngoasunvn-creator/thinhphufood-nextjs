@@ -1,37 +1,42 @@
-import { db } from "@/services/firebase";
-import {
-  collection,
-  getDocs,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-  query,
-  orderBy,
-} from "firebase/firestore";
+import { adminDb } from "@/lib/firebase-admin";
 
-const menuCollection = collection(db, "menus");
-
-export async function getMenus() {
-  const q = query(menuCollection, orderBy("order", "asc"));
-  const snapshot = await getDocs(q);
-
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  }));
+export interface MenuItem {
+  id: string;
+  name: string;
+  slug: string;
+  parentId: string | null;
+  isActive: boolean;
+  order: number;
+  updatedAt?: { toDate?: () => Date } | Date | string | null;
 }
 
-export async function createMenu(data: any) {
-  return await addDoc(menuCollection, data);
+export async function getMenus(): Promise<MenuItem[]> {
+  const snapshot = await adminDb
+    .collection("menus")
+    .orderBy("order", "asc")
+    .get();
+
+  return snapshot.docs
+    .map((doc) => ({
+      id: doc.id,
+      name: String(doc.data().name ?? ""),
+      slug: String(doc.data().slug ?? ""),
+      parentId: (doc.data().parentId as string | null | undefined) ?? null,
+      isActive: doc.data().isActive !== false,
+      order: Number(doc.data().order ?? 0),
+      updatedAt: doc.data().updatedAt ?? null,
+    }))
+    .filter((item) => item.isActive);
 }
 
-export async function updateMenu(id: string, data: any) {
-  const ref = doc(db, "menus", id);
-  return await updateDoc(ref, data);
+export async function createMenu(data: Record<string, unknown>) {
+  return adminDb.collection("menus").add(data);
+}
+
+export async function updateMenu(id: string, data: Record<string, unknown>) {
+  return adminDb.collection("menus").doc(id).update(data);
 }
 
 export async function deleteMenu(id: string) {
-  const ref = doc(db, "menus", id);
-  return await deleteDoc(ref);
+  return adminDb.collection("menus").doc(id).delete();
 }

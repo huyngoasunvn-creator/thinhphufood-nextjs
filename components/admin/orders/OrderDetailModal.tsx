@@ -75,7 +75,7 @@ const total = order.total ?? subtotal + shippingFee;
                     <div key={item.id} className="flex items-center space-x-4 bg-white p-3 rounded-2xl border border-slate-100 hover:shadow-sm transition-all">
                       <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
                         <img
-  src={item.images?.[0] || "/placeholder.jpg"}
+  src={item.images?.[0] || "/og-image.jpg"}
   className="w-full h-full object-cover"
   alt={item.name}
 />

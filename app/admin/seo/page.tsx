@@ -1,13 +1,11 @@
-
 'use client';
 
 import React from 'react';
 import SEOConfig from '@/components/admin/SEOConfig';
-import { useAppState } from '../../../hooks/useAppState';
-export const dynamic = "force-dynamic";
+import { useGlobalSettings } from '@/hooks/useGlobalSettings';
 
 export default function AdminSEOPage() {
-  const { siteConfig } = useAppState();
+  const { siteConfig } = useGlobalSettings();
 
   return <SEOConfig config={siteConfig} />;
 }

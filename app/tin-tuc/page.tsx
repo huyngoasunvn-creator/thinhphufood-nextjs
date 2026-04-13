@@ -1,247 +1,216 @@
-export const dynamic = "force-dynamic";
+import Link from "next/link";
+import type { Metadata } from "next";
+import HeroSlider from "@/components/home/HeroSlider";
+import { createPageMetadata, SITE_URL } from "@/lib/seo";
+import { getBannersServer } from "@/lib/server/banner-server";
+import { getNewsServer } from "@/lib/server/news-server";
+
 export const revalidate = 3600;
 
-import Link from "next/link";
-import { Metadata } from "next";
-import HeroSlider from "@/components/home/HeroSlider";
-
-import { getNewsServer } from "@/lib/server/news-server";
-import { getBannersServer } from "@/lib/server/banner-server";
-
 const PAGE_SIZE = 6;
-const baseUrl = "https://thinhphufood.vn";
 
-interface Props {
+type Props = {
   searchParams?: {
     page?: string;
     category?: string;
     q?: string;
   };
+};
+
+function normalizeText(text: string) {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "d")
+    .trim();
 }
 
-/* ============================= */
-/* 🔥 DYNAMIC SEO METADATA      */
-/* ============================= */
-export async function generateMetadata(
-  props: Props
-): Promise<Metadata> {
-  const searchParams = props.searchParams;
+function buildNewsPath(category?: string, keyword?: string, page?: number) {
+  const params = new URLSearchParams();
 
+  if (category) {
+    params.set("category", category);
+  }
+
+  if (keyword) {
+    params.set("q", keyword);
+  }
+
+  if (page && page > 1) {
+    params.set("page", String(page));
+  }
+
+  return params.toString() ? `/tin-tuc?${params.toString()}` : "/tin-tuc";
+}
+
+export async function generateMetadata({
+  searchParams,
+}: Props): Promise<Metadata> {
   const page = Number(searchParams?.page || 1);
   const category = searchParams?.category || "";
   const keyword = searchParams?.q || "";
 
-  let title = "Tin tức & Kiến thức | Thịnh Phú Food";
+  let title = "Tin tức và kiến thức";
   let description =
-    "Khám phá kiến thức nông sản, thực phẩm và tin tức mới nhất từ Thịnh Phú Food.";
+    "Cập nhật tin tức mới nhất, kinh nghiệm lựa chọn nông sản và kiến thức hữu ích từ Thịnh Phú Food.";
 
   if (category) {
-    title = `Tin tức ${category} | Thịnh Phú Food`;
-    description = `Các bài viết thuộc chuyên mục ${category} của Thịnh Phú Food.`;
+    title = `Tin tức ${category}`;
+    description = `Tổng hợp bài viết thuộc chuyên mục ${category} tại Thịnh Phú Food.`;
   }
 
   if (keyword) {
-    title = `Tìm kiếm "${keyword}" | Tin tức Thịnh Phú Food`;
-    description = `Kết quả tìm kiếm cho từ khóa "${keyword}".`;
+    title = `Tìm kiếm tin tức: ${keyword}`;
+    description = `Kết quả tìm kiếm bài viết cho từ khóa ${keyword} tại Thịnh Phú Food.`;
   }
 
   if (page > 1) {
-    title += ` - Trang ${page}`;
+    title = `${title} - trang ${page}`;
   }
 
-  const params = new URLSearchParams();
-  if (category) params.set("category", category);
-  if (keyword) params.set("q", keyword);
-  if (page > 1) params.set("page", String(page));
-
-  const canonicalUrl =
-    params.toString().length > 0
-      ? `${baseUrl}/tin-tuc?${params.toString()}`
-      : `${baseUrl}/tin-tuc`;
-
-  return {
+  return createPageMetadata({
     title,
     description,
-    alternates: {
-      canonical: canonicalUrl,
-    },
-    openGraph: {
-      title,
-      description,
-      url: canonicalUrl,
-      siteName: "Thịnh Phú Food",
-      locale: "vi_VN",
-      type: "website",
-    },
-  };
+    path: buildNewsPath(category, keyword, page),
+    noIndex: Boolean(keyword),
+  });
 }
 
-/* ============================= */
-/* PAGE                         */
-/* ============================= */
-export default async function NewsPage(
-  props: Props
-) {
-  try {
-    const searchParams = props.searchParams || {};
+export default async function NewsPage({ searchParams }: Props) {
+  const [allNews, banners] = await Promise.all([
+    getNewsServer(),
+    getBannersServer(),
+  ]);
 
-    const [allNewsRaw, bannersRaw] = await Promise.all([
-      getNewsServer(),
-      getBannersServer(),
-    ]);
+  const rawPage = Number(searchParams?.page || 1);
+  const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
+  const category = searchParams?.category || "";
+  const rawKeyword = searchParams?.q || "";
+  const keyword = normalizeText(rawKeyword);
 
-    const allNews: any[] = Array.isArray(allNewsRaw)
-      ? allNewsRaw
-      : [];
+  let filtered = Array.isArray(allNews) ? allNews : [];
 
-    const banners: any[] = Array.isArray(bannersRaw)
-      ? bannersRaw
-      : [];
+  if (category) {
+    filtered = filtered.filter((item) => item.category === category);
+  }
 
-    /* Banner Tin Tức */
-    const newsBanners = banners
-      .filter((b) => {
-        const placement = (b.placement || "").toLowerCase();
-        const isActive = b.isActive !== false;
-        return placement.includes("tin") && isActive;
-      })
-      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-
-    /* Params */
-    const page = Number(searchParams?.page || 1);
-    const category = searchParams?.category || "";
-    const keyword = searchParams?.q?.toLowerCase() || "";
-
-    /* Filter */
-    let filtered = allNews;
-
-    if (category) {
-      filtered = filtered.filter(
-        (item) => item.category === category
+  if (keyword) {
+    filtered = filtered.filter((item) => {
+      const haystack = normalizeText(
+        `${item.title || ""} ${item.summary || ""} ${item.category || ""}`,
       );
-    }
+      return haystack.includes(keyword);
+    });
+  }
 
-    if (keyword) {
-      filtered = filtered.filter(
-        (item) =>
-          item.title?.toLowerCase().includes(keyword) ||
-          item.summary?.toLowerCase().includes(keyword)
-      );
-    }
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const safePage =
+    totalPages > 0 ? Math.min(page, totalPages) : 1;
+  const start = (safePage - 1) * PAGE_SIZE;
+  const paginated = filtered.slice(start, start + PAGE_SIZE);
 
-    /* Pagination */
-    const totalPages = Math.ceil(
-      filtered.length / PAGE_SIZE
-    );
-    const start = (page - 1) * PAGE_SIZE;
-    const paginated = filtered.slice(
-      start,
-      start + PAGE_SIZE
-    );
-
-    /* Category List */
-    const categories: string[] = [
-      "Tất cả",
-      ...Array.from(
-        new Set(
-          allNews
-            .map((item) => item.category)
-            .filter(
-              (cat): cat is string =>
-                typeof cat === "string"
-            )
-        )
+  const categories = [
+    "Tất cả",
+    ...Array.from(
+      new Set(
+        allNews
+          .map((item) => item.category)
+          .filter((item): item is string => typeof item === "string" && item.length > 0),
       ),
-    ];
+    ),
+  ];
 
-    /* Structured Data */
-    const structuredData = {
-      "@context": "https://schema.org",
-      "@type": "Blog",
-      name: "Tin tức Thịnh Phú Food",
-      url: `${baseUrl}/tin-tuc`,
-      description:
-        "Tin tức và kiến thức về nông sản, thực phẩm sạch từ Thịnh Phú Food.",
-    };
+  const newsBanners: any[] = banners
+    .filter((banner: any) => {
+      const placement = (banner.placement || "").toLowerCase();
+      return placement.includes("tin") && banner.isActive !== false;
+    })
+    .sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0));
 
-    return (
-      <>
-        {/* JSON-LD */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(structuredData),
-          }}
-        />
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    name: "Tin tức Thịnh Phú Food",
+    url: `${SITE_URL}/tin-tuc`,
+    description:
+      "Tin tức và kiến thức về nông sản, thực phẩm sạch từ Thịnh Phú Food.",
+  };
 
-        {newsBanners.length > 0 && (
-          <HeroSlider banners={newsBanners} />
-        )}
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+      />
 
-        <div className="w-full bg-white">
-          <div className="max-w-6xl mx-auto px-6 py-12">
-            {/* Header */}
-            <div className="text-center mb-12">
-              <h1 className="text-4xl font-bold mb-3">
-                Tin Tức & Kiến Thức
-              </h1>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Cập nhật tin tức mới nhất về nông sản,
-                thực phẩm và hoạt động của Thịnh Phú Food.
+      {newsBanners.length > 0 && <HeroSlider banners={newsBanners} />}
+
+      <div className="w-full bg-white">
+        <div className="max-w-6xl mx-auto px-6 py-12">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold mb-3">Tin Tức & Kiến Thức</h1>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Cập nhật tin tức mới nhất về nông sản, thực phẩm và hoạt động của
+              Thịnh Phú Food.
+            </p>
+          </div>
+
+          <div className="flex flex-col md:flex-row gap-4 justify-between mb-10">
+            <div className="flex flex-wrap gap-3">
+              {categories.map((cat) => {
+                const isAll = cat === "Tất cả";
+                const isActive = (isAll && !category) || cat === category;
+                const href = isAll
+                  ? "/tin-tuc"
+                  : buildNewsPath(cat, undefined, undefined);
+
+                return (
+                  <Link
+                    key={cat}
+                    href={href}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                      isActive
+                        ? "bg-green-600 text-white shadow-lg"
+                        : "bg-gray-100 hover:bg-green-100"
+                    }`}
+                  >
+                    {cat}
+                  </Link>
+                );
+              })}
+            </div>
+
+            <form className="flex">
+              <input
+                type="text"
+                name="q"
+                placeholder="Tìm kiếm bài viết..."
+                defaultValue={rawKeyword}
+                className="border rounded-l-lg px-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+              <button
+                type="submit"
+                className="bg-green-600 text-white px-4 rounded-r-lg"
+              >
+                Tìm
+              </button>
+            </form>
+          </div>
+
+          {paginated.length === 0 ? (
+            <div className="rounded-2xl border border-gray-200 bg-gray-50 px-6 py-12 text-center">
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                Chưa có bài viết phù hợp
+              </h2>
+              <p className="text-gray-600">
+                Hãy thử đổi từ khóa tìm kiếm hoặc chọn chuyên mục khác.
               </p>
             </div>
-
-            {/* FILTER */}
-            <div className="flex flex-col md:flex-row gap-4 justify-between mb-10">
-              <div className="flex flex-wrap gap-3">
-                {categories.map((cat, index) => {
-                  const isActive =
-                    (cat === "Tất cả" && !category) ||
-                    cat === category;
-
-                  const params = new URLSearchParams();
-                  if (cat !== "Tất cả")
-                    params.set("category", cat);
-
-                  const href =
-                    params.toString().length > 0
-                      ? `/tin-tuc?${params.toString()}`
-                      : "/tin-tuc";
-
-                  return (
-                    <Link
-                      key={index}
-                      href={href}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                        isActive
-                          ? "bg-green-600 text-white shadow-lg"
-                          : "bg-gray-100 hover:bg-green-100"
-                      }`}
-                    >
-                      {cat}
-                    </Link>
-                  );
-                })}
-              </div>
-
-              <form className="flex">
-                <input
-                  type="text"
-                  name="q"
-                  placeholder="Tìm kiếm bài viết..."
-                  defaultValue={keyword}
-                  className="border rounded-l-lg px-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-green-500"
-                />
-                <button
-                  type="submit"
-                  className="bg-green-600 text-white px-4 rounded-r-lg"
-                >
-                  Tìm
-                </button>
-              </form>
-            </div>
-
-            {/* GRID */}
+          ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {paginated.map((item) => (
                 <article
@@ -281,57 +250,36 @@ export default async function NewsPage(
                 </article>
               ))}
             </div>
+          )}
 
-            {/* PAGINATION */}
-            {totalPages > 1 && (
-              <div className="flex justify-center mt-12 gap-2">
-                {Array.from({ length: totalPages }).map(
-                  (_, i) => {
-                    const params = new URLSearchParams();
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-12 gap-2">
+              {Array.from({ length: totalPages }).map((_, index) => {
+                const currentPage = index + 1;
+                const href = buildNewsPath(
+                  category || undefined,
+                  rawKeyword || undefined,
+                  currentPage,
+                );
 
-                    if (category)
-                      params.set("category", category);
-                    if (keyword)
-                      params.set("q", keyword);
-                    if (i + 1 > 1)
-                      params.set(
-                        "page",
-                        String(i + 1)
-                      );
-
-                    const href =
-                      params.toString().length > 0
-                        ? `/tin-tuc?${params.toString()}`
-                        : "/tin-tuc";
-
-                    return (
-                      <Link
-                        key={i}
-                        href={href}
-                        className={`px-4 py-2 rounded-lg text-sm ${
-                          page === i + 1
-                            ? "bg-green-600 text-white"
-                            : "bg-gray-100 hover:bg-green-100"
-                        }`}
-                      >
-                        {i + 1}
-                      </Link>
-                    );
-                  }
-                )}
-              </div>
-            )}
-          </div>
+                return (
+                  <Link
+                    key={currentPage}
+                    href={href}
+                    className={`px-4 py-2 rounded-lg text-sm ${
+                      safePage === currentPage
+                        ? "bg-green-600 text-white"
+                        : "bg-gray-100 hover:bg-green-100"
+                    }`}
+                  >
+                    {currentPage}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
-      </>
-    );
-  } catch (error) {
-    console.error("NEWS PAGE ERROR:", error);
-
-    return (
-      <div className="text-center py-20 text-red-500">
-        Lỗi tải dữ liệu trang Tin tức
       </div>
-    );
-  }
+    </>
+  );
 }

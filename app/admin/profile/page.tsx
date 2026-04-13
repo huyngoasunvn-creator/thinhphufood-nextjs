@@ -1,16 +1,10 @@
-'use client'
+'use client';
 
-import { useAppState } from '@/hooks/useAppState'
-import ProfileConfig from '@/components/admin/config/ProfileConfig'
-export const dynamic = "force-dynamic";
+import ProfileConfig from '@/components/admin/config/ProfileConfig';
+import { useGlobalSettings } from '@/hooks/useGlobalSettings';
 
 export default function AdminProfilePage() {
-  const { profile, saveProfile } = useAppState()
+  const { profile, saveProfile } = useGlobalSettings();
 
-  return (
-    <ProfileConfig
-      config={profile}
-      onUpdate={saveProfile}
-    />
-  )
+  return <ProfileConfig config={profile} onUpdate={saveProfile} />;
 }

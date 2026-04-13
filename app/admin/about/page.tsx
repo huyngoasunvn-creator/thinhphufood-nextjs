@@ -1,16 +1,12 @@
 'use client';
 
-import { useAppState } from '@/hooks/useAppState'
-import AboutConfig from '@/components/admin/config/AboutConfig'
-export const dynamic = "force-dynamic";
+import AboutConfig from '@/components/admin/config/AboutConfig';
+import { useGlobalSettings } from '@/hooks/useGlobalSettings';
+
+export const dynamic = 'force-dynamic';
 
 export default function AdminAboutPage() {
-  const { aboutConfig, saveAboutConfig } = useAppState()
+  const { aboutConfig, saveAboutConfig } = useGlobalSettings();
 
-  return (
-    <AboutConfig
-      config={aboutConfig}
-      onUpdate={saveAboutConfig}
-    />
-  )
+  return <AboutConfig config={aboutConfig} onUpdate={saveAboutConfig} />;
 }

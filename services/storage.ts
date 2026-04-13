@@ -1,76 +1,126 @@
+const DEFAULT_MAX_DIMENSION = 1600;
+const DEFAULT_QUALITY = 0.76;
+const DEFAULT_MAX_FILE_SIZE_MB = 8;
 
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // ✅ sửa ở đây
-import { storage } from "./firebase";
+type UploadFolder = "products" | "news" | "banners" | "content";
 
+function getTargetMimeType(file: File) {
+  if (file.type === "image/png" || file.type === "image/webp") {
+    return "image/webp";
+  }
 
-/**
- * Nén ảnh trước khi upload để tiết kiệm băng thông và tăng tốc độ
- */
-const compressImage = async (file: File): Promise<Blob | File> => {
-  // Chỉ nén nếu là định dạng ảnh phổ biến
-  if (!file.type.startsWith('image/')) return file;
-  
-  // Không nén ảnh GIF (để giữ animation)
-  if (file.type === 'image/gif') return file;
+  if (file.type === "image/jpeg" || file.type === "image/jpg") {
+    return "image/jpeg";
+  }
 
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
+  return "image/jpeg";
+}
+
+async function readImageDimensions(
+  file: File,
+): Promise<{ width: number; height: number }> {
+  const objectUrl = URL.createObjectURL(file);
+
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
       const img = new Image();
-      img.src = event.target?.result as string;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 1200; // Chiều rộng tối đa cho ảnh web
-        let width = img.width;
-        let height = img.height;
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("Không thể đọc kích thước ảnh."));
+      img.src = objectUrl;
+    });
 
-        if (width > MAX_WIDTH) {
-          height = (MAX_WIDTH / width) * height;
-          width = MAX_WIDTH;
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return resolve(file);
-
-        ctx.drawImage(img, 0, 0, width, height);
-        
-        // Chuyển sang định dạng JPEG với chất lượng 0.7 để tối ưu dung lượng
-        canvas.toBlob(
-          (blob) => {
-            if (blob) {
-              resolve(blob);
-            } else {
-              resolve(file);
-            }
-          },
-          'image/jpeg',
-          0.7
-        );
-      };
-      img.onerror = () => resolve(file);
+    return {
+      width: image.naturalWidth || image.width,
+      height: image.naturalHeight || image.height,
     };
-    reader.onerror = () => resolve(file);
-  });
-};
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
 
-/**
- * Upload hình ảnh và trả về URL
- * @param file File từ input
- * @param folder Thư mục lưu trữ (products, news, banners...)
- */
-export const uploadImage = async (file: File, folder: string): Promise<string> => {
-  // Thực hiện nén ảnh trước khi tải lên
-  const compressedFile = await compressImage(file);
-  
-  const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
-  const storageRef = ref(storage, `${folder}/${fileName}`);
-  
-  // Upload file đã nén
-  const snapshot = await uploadBytes(storageRef, compressedFile);
-  const downloadURL = await getDownloadURL(snapshot.ref);
-  
-  return downloadURL;
-};
+async function compressImage(file: File): Promise<File> {
+  if (!file.type.startsWith("image/")) return file;
+  if (file.type === "image/gif" || file.type === "image/svg+xml") return file;
+
+  const { width, height } = await readImageDimensions(file);
+  const scale = Math.min(1, DEFAULT_MAX_DIMENSION / Math.max(width, height));
+  const targetWidth = Math.max(1, Math.round(width * scale));
+  const targetHeight = Math.max(1, Math.round(height * scale));
+  const targetMimeType = getTargetMimeType(file);
+
+  const imageBitmap = await createImageBitmap(file);
+  const canvas = document.createElement("canvas");
+  canvas.width = targetWidth;
+  canvas.height = targetHeight;
+
+  const context = canvas.getContext("2d");
+  if (!context) {
+    imageBitmap.close();
+    return file;
+  }
+
+  context.drawImage(imageBitmap, 0, 0, targetWidth, targetHeight);
+  imageBitmap.close();
+
+  const compressedBlob = await new Promise<Blob | null>((resolve) => {
+    canvas.toBlob(resolve, targetMimeType, DEFAULT_QUALITY);
+  });
+
+  if (!compressedBlob) {
+    return file;
+  }
+
+  const finalBlob =
+    compressedBlob.size > 0 && compressedBlob.size < file.size
+      ? compressedBlob
+      : file;
+
+  const extension =
+    targetMimeType === "image/webp"
+      ? "webp"
+      : "jpg";
+
+  const safeName = file.name.replace(/\.[^.]+$/, "");
+
+  return new File([finalBlob], `${safeName}.${extension}`, {
+    type: finalBlob.type || file.type,
+    lastModified: Date.now(),
+  });
+}
+
+function validateFile(file: File) {
+  if (!file.type.startsWith("image/")) {
+    throw new Error("Chỉ hỗ trợ tải lên tệp hình ảnh.");
+  }
+
+  const maxBytes = DEFAULT_MAX_FILE_SIZE_MB * 1024 * 1024;
+  if (file.size > maxBytes) {
+    throw new Error(`Ảnh quá lớn. Vui lòng chọn ảnh nhỏ hơn ${DEFAULT_MAX_FILE_SIZE_MB}MB.`);
+  }
+}
+
+export async function uploadImage(
+  file: File,
+  folder: UploadFolder = "content",
+): Promise<string> {
+  validateFile(file);
+
+  const optimizedFile = await compressImage(file);
+
+  const formData = new FormData();
+  formData.append("file", optimizedFile);
+  formData.append("folder", folder);
+
+  const response = await fetch("/api/upload", {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok || !data?.url) {
+    throw new Error(data?.error || "Không thể tải ảnh lên Cloudinary.");
+  }
+
+  return data.url as string;
+}

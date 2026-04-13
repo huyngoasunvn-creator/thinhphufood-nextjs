@@ -1,13 +1,15 @@
 import HomePage from "@/components/home/HomePage";
+import { SITE_URL } from "@/lib/seo";
 import { getHomeData } from "@/lib/home-server";
-import { getNewsServer } from "@/lib/server/news-server";
-import {
-  Product,
-  Banner,
-  NewsPost,
-  Commitment,
+import type {
   AboutConfig,
+  Banner,
+  Commitment,
+  NewsPost,
+  Product,
 } from "@/types";
+
+export const revalidate = 3600;
 
 export default async function Page() {
   let data: {
@@ -27,21 +29,41 @@ export default async function Page() {
   try {
     const result = await getHomeData();
 
-    // 👇 LẤY NEWS ĐÃ FILTER isActive
-    const activeNews = await getNewsServer();
-
     if (result) {
       data = {
         products: result.products ?? [],
         banners: result.banners ?? [],
-        news: activeNews.slice(0, 3), // 👈 LẤY 3 BÀI MỚI NHẤT
+        news: (result.news ?? []).slice(0, 3),
         commitments: result.commitments ?? [],
         aboutConfig: result.aboutConfig ?? undefined,
       };
     }
   } catch (error) {
-    console.error("Lỗi getHomeData:", error);
+    console.error("getHomeData error:", error);
   }
 
-  return <HomePage {...data} />;
+  const homeSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Trang chủ Thịnh Phú Food",
+    url: SITE_URL,
+    description:
+      "Gạo ST25 chính hãng, nông sản sạch và tin tức mới nhất từ Thịnh Phú Food.",
+    isPartOf: {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}#website`,
+    },
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(homeSchema),
+        }}
+      />
+      <HomePage {...data} />
+    </>
+  );
 }

@@ -1,27 +1,64 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { LogIn, Mail, Lock, User as UserIcon, ArrowLeft, Loader2, UserPlus, AlertTriangle } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
-import SEOManager from '../components/common/SEO';
-import { getAuth } from "firebase/auth";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../hooks/useAuth";
+import SEOManager from "../components/common/SEO";
 
 const Login: React.FC = () => {
-  const { loginWithGoogle, loginWithEmail, registerWithEmail, user } = useAuth();
+  const {
+    loginWithGoogle,
+    loginWithEmail,
+    registerWithEmail,
+    user,
+    isAdmin,
+    loading: authLoading,
+    syncAdminSession,
+  } = useAuth();
   const router = useRouter();
 
   const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [bootstrapping, setBootstrapping] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    name: ''
+    email: "",
+    password: "",
+    name: "",
   });
 
-  // Nếu đã login thì về trang chủ
-  
+  useEffect(() => {
+    if (authLoading) {
+      return;
+    }
+
+    if (!user || !isAdmin) {
+      setBootstrapping(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    const bootstrapAdminSession = async () => {
+      try {
+        await syncAdminSession(user);
+        if (!cancelled) {
+          router.replace("/admin");
+        }
+      } catch (error) {
+        console.error("Admin session bootstrap failed:", error);
+        if (!cancelled) {
+          setBootstrapping(false);
+        }
+      }
+    };
+
+    bootstrapAdminSession();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, isAdmin, router, syncAdminSession, user]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,78 +72,68 @@ const Login: React.FC = () => {
         await loginWithEmail(formData.email, formData.password);
       }
 
-      const currentUser = getAuth().currentUser;
-
-      if (!currentUser) throw new Error("Không tìm thấy user");
-
-      const idToken = await currentUser.getIdToken();
-
-      const res = await fetch("/api/login", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  credentials: "include",
-  body: JSON.stringify({ token: idToken }),
-});
-
-if (!res.ok) throw new Error("Login API failed");
-
-// redirect admin
-router.replace("/admin");
-
+      await syncAdminSession();
+      router.replace("/admin");
     } catch (error: any) {
       console.error("Auth Error:", error);
 
       let message = "Đã có lỗi xảy ra.";
 
-      if (error.code === 'auth/user-not-found')
+      if (error.code === "auth/user-not-found") {
         message = "Tài khoản không tồn tại.";
+      }
 
-      if (error.code === 'auth/wrong-password')
+      if (error.code === "auth/wrong-password") {
         message = "Mật khẩu không chính xác.";
+      }
 
-      if (error.code === 'auth/email-already-in-use')
+      if (error.code === "auth/email-already-in-use") {
         message = "Email này đã được đăng ký.";
+      }
+
+      if (error.message === "Không thể đồng bộ phiên đăng nhập") {
+        message = "Đăng nhập thành công nhưng không tạo được phiên quản trị.";
+      }
 
       setErrorMessage(message);
-
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
-  setErrorMessage(null);
+    setLoading(true);
+    setErrorMessage(null);
 
-  try {
-    await loginWithGoogle();
-
-    const currentUser = getAuth().currentUser;
-    if (!currentUser) throw new Error("Không tìm thấy user");
-
-    const idToken = await currentUser.getIdToken();
-
-    const res = await fetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ token: idToken }),
-    });
-
-    if (!res.ok) {
-      throw new Error("Login API failed");
+    try {
+      await loginWithGoogle();
+      await syncAdminSession();
+      router.replace("/admin");
+    } catch (error) {
+      console.error("Google login error:", error);
+      setErrorMessage("Đăng nhập Google thất bại!");
+    } finally {
+      setLoading(false);
     }
-
-    const data = await res.json();
-
-    router.replace("/admin");
-
-  } catch {
-    setErrorMessage("Đăng nhập Google thất bại!");
-  }
-};
+  };
 
   const inputClass =
     "w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-green-500 focus:bg-white transition-all font-bold text-slate-900";
+
+  if (authLoading || bootstrapping) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-[3rem] shadow-2xl shadow-green-900/10 p-10 border border-slate-100 text-center">
+          <h1 className="text-3xl font-black text-slate-900 mb-3">
+            Đang kiểm tra đăng nhập
+          </h1>
+          <p className="text-slate-500">
+            Hệ thống đang đồng bộ phiên quản trị cho tài khoản của bạn.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
@@ -115,7 +142,7 @@ router.replace("/admin");
       <div className="max-w-md w-full bg-white rounded-[3rem] shadow-2xl shadow-green-900/10 p-10 border border-slate-100">
         <div className="text-center mb-6">
           <h1 className="text-3xl font-black text-slate-900">
-            {isRegister ? 'Tạo tài khoản' : 'Chào mừng bạn!'}
+            {isRegister ? "Tạo tài khoản" : "Chào mừng bạn!"}
           </h1>
         </div>
 
@@ -164,7 +191,7 @@ router.replace("/admin");
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-green-600 text-white py-4 rounded-2xl font-bold"
+            className="w-full bg-green-600 text-white py-4 rounded-2xl font-bold disabled:opacity-70"
           >
             {loading ? "Đang xử lý..." : isRegister ? "Đăng ký" : "Đăng nhập"}
           </button>
@@ -172,7 +199,8 @@ router.replace("/admin");
 
         <button
           onClick={handleGoogleLogin}
-          className="w-full mt-4 border rounded-2xl py-4"
+          disabled={loading}
+          className="w-full mt-4 border rounded-2xl py-4 disabled:opacity-70"
         >
           Đăng nhập với Google
         </button>
@@ -182,7 +210,9 @@ router.replace("/admin");
             onClick={() => setIsRegister(!isRegister)}
             className="text-green-600 text-sm"
           >
-            {isRegister ? "Đã có tài khoản? Đăng nhập" : "Chưa có tài khoản? Đăng ký"}
+            {isRegister
+              ? "Đã có tài khoản? Đăng nhập"
+              : "Chưa có tài khoản? Đăng ký"}
           </button>
         </div>
       </div>

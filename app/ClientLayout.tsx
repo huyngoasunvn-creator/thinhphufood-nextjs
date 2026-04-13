@@ -1,41 +1,36 @@
 'use client';
 
-import React from 'react';
-import Header from '@/components/admin/layout/Header';
+import React, { Suspense } from 'react';
 import Footer from '@/components/admin/layout/Footer';
+import Header from '@/components/admin/layout/Header';
 import MobileBottomNav from '@/components/admin/layout/MobileBottomNav';
+import Popup from '@/components/common/Popup';
 import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
-import Popup from '@/components/common/Popup';
-import { useAppState } from '@/hooks/useAppState';
+import { useGlobalSettings } from '@/hooks/useGlobalSettings';
 
 export default function ClientLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-
-  const state = useAppState(); // chỉ dùng popup & config
+  const { popupConfig, siteConfig } = useGlobalSettings();
 
   return (
     <CartProvider>
       <AuthProvider>
         <div className="flex flex-col min-h-screen">
-          
-          <Header />
+          <Suspense fallback={<div className="h-16 sm:h-20 border-b border-green-100 bg-white" />}>
+            <Header />
+          </Suspense>
 
-          <main className="flex-grow pb-20 md:pb-0">
-            {children}
-          </main>
+          <main className="flex-grow pb-20 md:pb-0">{children}</main>
 
-          <Footer config={state?.siteConfig} />
+          <Footer config={siteConfig} />
 
           <MobileBottomNav />
 
-          {state?.popupConfig && (
-            <Popup config={state.popupConfig} />
-          )}
-
+          {popupConfig && <Popup config={popupConfig} />}
         </div>
       </AuthProvider>
     </CartProvider>

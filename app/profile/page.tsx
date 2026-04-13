@@ -1,12 +1,11 @@
-
 'use client';
 
 import React from 'react';
 import Profile from '@/components/Profile';
-import { useAppState } from '../../hooks/useAppState';
+import { useGlobalSettings } from '@/hooks/useGlobalSettings';
 
 export default function ProfilePage() {
-  const { profile } = useAppState();
+  const { profile } = useGlobalSettings();
 
   return <Profile config={profile} />;
 }

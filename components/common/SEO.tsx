@@ -1,11 +1,13 @@
-'use client'
-
+'use client';
 
 import React, { useEffect } from 'react';
-// Use next/navigation instead of react-router-dom
 import { usePathname } from 'next/navigation';
 import { Product, NewsPost } from '@/types';
-import { generateWebsiteSchema, generateProductSchema, generateArticleSchema } from '../../helpers/seo';
+import {
+  generateWebsiteSchema,
+  generateProductSchema,
+  generateArticleSchema,
+} from '../../helpers/seo';
 
 interface SEOProps {
   title?: string;
@@ -15,23 +17,28 @@ interface SEOProps {
   data?: Product | NewsPost;
 }
 
-const SEOManager: React.FC<SEOProps> = ({ 
+const SEOManager: React.FC<SEOProps> = ({
   title,
-  description = "Chuyên cung cấp gạo ST25, gạo lứt, và các loại nông sản sạch đạt tiêu chuẩn xuất khẩu.",
-  image = "https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=1200",
-  type = "website",
-  data
+  description = 'Chuyên cung cấp gạo ST25, gạo lứt và các loại nông sản sạch đạt tiêu chuẩn xuất khẩu.',
+  image = 'https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=1200',
+  type = 'website',
+  data,
 }) => {
   const pathname = usePathname();
-  const siteName = "ThinhPhuFood";
-  const displayTitle = title ? `${title} | ${siteName}` : `ThinhPhuFood - Tinh Hoa Gạo Việt`;
-  // In Next.js client side, window.location.href is available
+  const siteName = 'Thịnh Phú Food';
+  const displayTitle = title
+    ? `${title} | ${siteName}`
+    : `${siteName} - Tinh Hoa Gạo Việt`;
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
 
   useEffect(() => {
     document.title = displayTitle;
-    
-    const updateMeta = (name: string, content: string, isProperty: boolean = false) => {
+
+    const updateMeta = (
+      name: string,
+      content: string,
+      isProperty: boolean = false
+    ) => {
       const attr = isProperty ? 'property' : 'name';
       let element = document.querySelector(`meta[${attr}="${name}"]`);
       if (!element) {
@@ -70,8 +77,7 @@ const SEOManager: React.FC<SEOProps> = ({
 
     script.text = JSON.stringify(schema);
     document.head.appendChild(script);
-
-  }, [pathname, displayTitle, description, image, type, data]);
+  }, [pathname, displayTitle, description, image, type, data, currentUrl]);
 
   return null;
 };

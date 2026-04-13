@@ -1,8 +1,19 @@
 import { adminDb } from "../firebase-admin";
-import { AboutConfig, SiteConfig } from "@/types";
+import {
+  AboutConfig,
+  AboutPageConfig,
+  ContactConfig,
+  PopupConfig,
+  ProfileConfig,
+  SiteConfig,
+} from "@/types";
 
 interface GlobalSettings {
   aboutConfig?: AboutConfig;
+  aboutPage?: AboutPageConfig;
+  contact?: ContactConfig;
+  popupConfig?: PopupConfig;
+  profile?: ProfileConfig;
   siteConfig?: SiteConfig;
 }
 

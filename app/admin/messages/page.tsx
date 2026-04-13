@@ -1,19 +1,17 @@
-
 'use client';
 
 import React from 'react';
 import AdminMessages from '@/components/admin/ContactMessages';
-import { useAppState } from '../../../hooks/useAppState';
-export const dynamic = "force-dynamic";
+import { useContactMessages } from '@/hooks/useContactMessages';
 
 export default function AdminMessagesPage() {
-  const { contactMessages, deleteMessage, markAsRead } = useAppState();
+  const { contactMessages, deleteMessage, markAsRead } = useContactMessages();
 
   return (
-    <AdminMessages 
-      messages={contactMessages} 
-      onDelete={deleteMessage} 
-      onMarkAsRead={markAsRead} 
+    <AdminMessages
+      messages={contactMessages}
+      onDelete={deleteMessage}
+      onMarkAsRead={markAsRead}
     />
   );
 }

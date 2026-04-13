@@ -1,16 +1,12 @@
 'use client';
 
-import { useAppState } from '@/hooks/useAppState'
-import AboutPageConfig from '@/components/admin/config/AboutPageConfig'
-export const dynamic = "force-dynamic";
+import AboutPageConfig from '@/components/admin/config/AboutPageConfig';
+import { useGlobalSettings } from '@/hooks/useGlobalSettings';
+
+export const dynamic = 'force-dynamic';
 
 export default function AdminAboutPageEmbed() {
-  const { aboutPage, saveAboutPage } = useAppState()
+  const { aboutPage, saveAboutPage } = useGlobalSettings();
 
-  return (
-    <AboutPageConfig 
-      config={aboutPage}
-      onUpdate={saveAboutPage}
-    />
-  )
+  return <AboutPageConfig config={aboutPage} onUpdate={saveAboutPage} />;
 }

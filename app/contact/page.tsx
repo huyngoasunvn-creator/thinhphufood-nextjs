@@ -1,14 +1,13 @@
-
 'use client';
 
 import React from 'react';
 import Contact from '@/components/Contact';
-import { useAppState } from '../../hooks/useAppState';
+import { useContactMessages } from '@/hooks/useContactMessages';
+import { useGlobalSettings } from '@/hooks/useGlobalSettings';
 
 export default function ContactPage() {
-  const { contact, addMessage } = useAppState();
+  const { contact } = useGlobalSettings();
+  const { addMessage } = useContactMessages();
 
-  return (
-    <Contact config={contact} onSendMessage={addMessage} />
-  );
+  return <Contact config={contact} onSendMessage={addMessage} />;
 }
