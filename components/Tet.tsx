@@ -1,123 +1,140 @@
-"use client"
+"use client";
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef } from "react";
+
+type TetItem = {
+  x: number;
+  y: number;
+  baseX: number;
+  type: "lixi" | "mai";
+  size: number;
+  speedY: number;
+  angle: number;
+  angleSpeed: number;
+  sway: number;
+  rotation: number;
+  rotationSpeed: number;
+  opacity: number;
+};
+
+const getItemCount = (width: number) => {
+  if (width < 640) return 4;
+  if (width < 1024) return 6;
+  return 8;
+};
+
+const createItems = (width: number, height: number): TetItem[] =>
+  Array.from({ length: getItemCount(width) }, () => {
+    const isLixi = Math.random() > 0.92;
+
+    return {
+      x: Math.random() * width,
+      y: Math.random() * height,
+      baseX: Math.random() * width,
+      type: isLixi ? "lixi" : "mai",
+      size: isLixi ? Math.random() * 5 + 11 : Math.random() * 4 + 7,
+      speedY: Math.random() * 0.28 + 0.22,
+      angle: Math.random() * Math.PI * 2,
+      angleSpeed: Math.random() * 0.004 + 0.004,
+      sway: isLixi ? Math.random() * 6 + 4 : Math.random() * 8 + 6,
+      rotation: Math.random() * 360,
+      rotationSpeed: isLixi ? Math.random() * 0.08 + 0.04 : Math.random() * 0.12 + 0.05,
+      opacity: isLixi ? Math.random() * 0.08 + 0.16 : Math.random() * 0.1 + 0.1,
+    };
+  });
 
 export default function Tet() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const context = canvas.getContext("2d")
-if (!context) return
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-const ctx = context as CanvasRenderingContext2D
+    const context = canvas.getContext("2d");
+    if (!context) return;
 
-    let width = window.innerWidth
-    let height = window.innerHeight
-    canvas.width = width
-    canvas.height = height
+    const ctx = context as CanvasRenderingContext2D;
 
-    const maiImg = new Image()
-    maiImg.src = "/mai.png"
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    let items = createItems(width, height);
+    let animationFrameId = 0;
 
-    const lixiImg = new Image()
-    lixiImg.src = "/lixi.png"
+    const maiImg = new Image();
+    maiImg.src = "/mai.png";
 
-    const items = Array.from({ length: 36 }).map(() => {
-  const isLixi = Math.random() > 0.6 // tăng tỷ lệ lì xì (40%)
+    const lixiImg = new Image();
+    lixiImg.src = "/lixi.png";
 
-  return {
-    x: Math.random() * width,
-    y: Math.random() * height,
-    baseX: Math.random() * width,
-    type: isLixi ? "lixi" : "mai",
+    const resizeCanvas = () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+      items = createItems(width, height);
+    };
 
-    // 🌼 Hoa giữ nhỏ
-    size: isLixi
-      ? Math.random() * 12 + 16   // 🧧 lì xì nhỏ lại
-      : Math.random() * 8 + 10,   // 🌼 hoa
-
-    speedY: Math.random() * 1 + 0.8,
-    angle: Math.random() * Math.PI * 2,
-    rotation: Math.random() * 360,
-
-    // lì xì đậm màu hơn chút
-    opacity: isLixi
-      ? Math.random() * 0.3 + 0.8
-      : Math.random() * 0.4 + 0.6,
-  }
-})
-
-    function draw() {
-      ctx.clearRect(0, 0, width, height)
+    const draw = () => {
+      ctx.clearRect(0, 0, width, height);
 
       items.forEach((item) => {
-        ctx.save()
+        ctx.save();
 
-        // hiệu ứng lắc ngang dạng sóng
-        item.x = item.baseX + Math.sin(item.angle) * 20
-        item.angle += 0.02
+        item.x = item.baseX + Math.sin(item.angle) * item.sway;
+        item.angle += item.angleSpeed;
 
-        ctx.globalAlpha = item.opacity
-        ctx.translate(item.x, item.y)
-        ctx.rotate((item.rotation * Math.PI) / 180)
+        ctx.globalAlpha = item.opacity;
+        ctx.translate(item.x, item.y);
+        ctx.rotate((item.rotation * Math.PI) / 180);
+        ctx.shadowBlur = item.type === "lixi" ? 2 : 1;
+        ctx.shadowColor =
+          item.type === "lixi"
+            ? "rgba(248, 113, 113, 0.18)"
+            : "rgba(250, 204, 21, 0.14)";
 
-        ctx.shadowBlur = 6
-        ctx.shadowColor = "rgba(255, 200, 0, 0.4)"
+        const image = item.type === "mai" ? maiImg : lixiImg;
+        ctx.drawImage(image, -item.size / 2, -item.size / 2, item.size, item.size);
+        ctx.restore();
 
-        const img = item.type === "mai" ? maiImg : lixiImg
+        item.y += item.speedY;
+        item.rotation += item.rotationSpeed;
 
-        ctx.drawImage(
-          img,
-          -item.size / 2,
-          -item.size / 2,
-          item.size,
-          item.size
-        )
-
-        ctx.restore()
-
-        // update
-        item.y += item.speedY
-        item.rotation += item.type === "mai" ? 0.6 : 0.3
-
-        if (item.y > height) {
-          item.y = -40
-          item.baseX = Math.random() * width
+        if (item.y > height + 30) {
+          item.y = -30;
+          item.baseX = Math.random() * width;
         }
-      })
+      });
 
-      requestAnimationFrame(draw)
-    }
+      animationFrameId = window.requestAnimationFrame(draw);
+    };
 
-    let loaded = 0
-    const checkLoaded = () => {
-      loaded++
-      if (loaded === 2) draw()
-    }
+    let loaded = 0;
+    const startIfReady = () => {
+      loaded += 1;
+      if (loaded === 2) {
+        resizeCanvas();
+        draw();
+      }
+    };
 
-    maiImg.onload = checkLoaded
-    lixiImg.onload = checkLoaded
+    maiImg.onload = startIfReady;
+    lixiImg.onload = startIfReady;
 
-    const handleResize = () => {
-      width = window.innerWidth
-      height = window.innerHeight
-      canvas.width = width
-      canvas.height = height
-    }
-
-    window.addEventListener("resize", handleResize)
+    window.addEventListener("resize", resizeCanvas);
 
     return () => {
-      window.removeEventListener("resize", handleResize)
-    }
-  }, [])
+      window.cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("resize", resizeCanvas);
+      maiImg.onload = null;
+      lixiImg.onload = null;
+    };
+  }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-[5]"
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 z-[5] h-full w-full max-w-full opacity-35"
     />
-  )
+  );
 }

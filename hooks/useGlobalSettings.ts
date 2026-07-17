@@ -7,6 +7,7 @@ import type {
   AboutConfig,
   AboutPageConfig,
   ContactConfig,
+  HomePageConfig,
   PopupConfig,
   ProfileConfig,
   SiteConfig,
@@ -15,6 +16,7 @@ import {
   INITIAL_ABOUT_CONFIG,
   INITIAL_ABOUT_PAGE,
   INITIAL_CONTACT,
+  INITIAL_HOME_PAGE_CONFIG,
   INITIAL_POPUP,
   INITIAL_PROFILE,
   INITIAL_SITE_CONFIG,
@@ -27,6 +29,8 @@ export function useGlobalSettings() {
   const [profile, setProfile] = useState<ProfileConfig>(INITIAL_PROFILE);
   const [aboutConfig, setAboutConfig] =
     useState<AboutConfig>(INITIAL_ABOUT_CONFIG);
+  const [homePageConfig, setHomePageConfig] =
+    useState<HomePageConfig>(INITIAL_HOME_PAGE_CONFIG);
   const [popupConfig, setPopupConfig] = useState<PopupConfig>(INITIAL_POPUP);
   const [siteConfig, setSiteConfig] = useState<SiteConfig>(INITIAL_SITE_CONFIG);
 
@@ -40,6 +44,7 @@ export function useGlobalSettings() {
       if (data.aboutPage) setAboutPage(data.aboutPage);
       if (data.profile) setProfile(data.profile);
       if (data.aboutConfig) setAboutConfig(data.aboutConfig);
+      if (data.homePageConfig) setHomePageConfig(data.homePageConfig);
       if (data.popupConfig) setPopupConfig(data.popupConfig);
       if (data.siteConfig) setSiteConfig(data.siteConfig);
     });
@@ -54,6 +59,7 @@ export function useGlobalSettings() {
     aboutPage,
     profile,
     aboutConfig,
+    homePageConfig,
     popupConfig,
     siteConfig,
     saveContact: (config: ContactConfig) => updateGlobalSettings("contact", config),
@@ -63,6 +69,8 @@ export function useGlobalSettings() {
       updateGlobalSettings("profile", config),
     saveAboutConfig: (config: AboutConfig) =>
       updateGlobalSettings("aboutConfig", config),
+    saveHomePageConfig: (config: HomePageConfig) =>
+      updateGlobalSettings("homePageConfig", config),
     savePopups: (config: PopupConfig) =>
       updateGlobalSettings("popupConfig", config),
     updateSiteConfig: (config: SiteConfig) =>

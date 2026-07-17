@@ -1,9 +1,9 @@
 import { notFound, redirect } from "next/navigation";
 import connectDB from "@/lib/connectDB";
-import { adminDb } from "@/lib/firebase-admin";
 import EventEmbed from "@/models/EventEmbed";
 import EmbeddedPage from "@/models/EmbeddedPage";
 import { getMenus } from "@/lib/server/menu-server";
+import { buildMenuMap, findSectionRoot } from "@/lib/menu-sections";
 
 interface PageProps {
   params: {
@@ -17,33 +17,23 @@ export default async function Page({ params }: PageProps) {
   const currentMenu = menus.find((menu) => menu.slug === slug);
 
   if (currentMenu) {
-    const parentMenu = currentMenu.parentId
-      ? menus.find((menu) => menu.id === currentMenu.parentId)
-      : null;
+    const menuMap = buildMenuMap(menus);
+    const sectionRoot = findSectionRoot(currentMenu, menuMap);
 
     if (currentMenu.slug === "san-pham") {
       redirect("/san-pham");
     }
 
-    if (parentMenu?.slug === "san-pham") {
-      redirect(`/san-pham?category=${currentMenu.id}`);
+    if (currentMenu.slug === "nong-san") {
+      redirect("/nong-san");
     }
 
-    redirect(`/danh-muc/${slug}`);
-  }
+    if (sectionRoot && sectionRoot.id !== currentMenu.id) {
+      if (sectionRoot.slug === "san-pham") {
+        redirect(`/danh-muc/${currentMenu.slug}`);
+      }
 
-  const menuSnapshot = await adminDb
-    .collection("menus")
-    .where("slug", "==", slug)
-    .limit(1)
-    .get();
-
-  if (!menuSnapshot.empty) {
-    const menu = menuSnapshot.docs[0];
-    const parentId = menu.data().parentId as string | null | undefined;
-
-    if (parentId) {
-      redirect(`/san-pham?category=${menu.id}`);
+      redirect(`/${sectionRoot.slug}?category=${currentMenu.id}`);
     }
 
     redirect(`/danh-muc/${slug}`);

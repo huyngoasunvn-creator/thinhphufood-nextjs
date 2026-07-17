@@ -1,8 +1,13 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { notFound, redirect } from "next/navigation";
 import HeroSlider from "@/components/home/HeroSlider";
 import ProductsPage from "@/components/product/ProductsPage";
-import { getProductCategoryMenus } from "@/lib/product-category-menus";
+import {
+  getSectionCategoryMenus,
+  getSectionProducts,
+  findMenuBySlug,
+} from "@/lib/menu-sections";
 import { createPageMetadata, SITE_URL } from "@/lib/seo";
 import { getBannersServer } from "@/lib/server/banner-server";
 import { getMenus } from "@/lib/server/menu-server";
@@ -24,17 +29,27 @@ function readFirst(value?: string | string[]) {
 export async function generateMetadata({
   searchParams,
 }: PageProps): Promise<Metadata> {
+  const menus = await getMenus();
+  const productRoot = findMenuBySlug(menus, "san-pham");
+
+  if (!productRoot) {
+    return createPageMetadata({
+      title: "Không tìm thấy trang sản phẩm",
+      description: "Trang sản phẩm hiện chưa được cấu hình.",
+      path: "/san-pham",
+      noIndex: true,
+    });
+  }
+
   const categoryId = readFirst(searchParams?.category);
   const keyword = readFirst(searchParams?.q)?.trim();
 
   let title = "Sản phẩm gạo ST25 và nông sản sạch";
   let description =
     "Khám phá danh sách gạo ST25, gạo sạch và nông sản chất lượng cao tại Thịnh Phú Food.";
-  let path = "/san-pham";
   let noIndex = false;
 
   if (categoryId) {
-    const menus = await getMenus();
     const currentCategory = menus.find((item) => item.id === categoryId);
 
     if (currentCategory?.slug) {
@@ -42,7 +57,6 @@ export async function generateMetadata({
       description = `Tổng hợp sản phẩm thuộc danh mục ${
         currentCategory.name ?? "Thịnh Phú Food"
       } tại Thịnh Phú Food.`;
-      path = `/danh-muc/${currentCategory.slug}`;
     }
 
     noIndex = true;
@@ -51,14 +65,13 @@ export async function generateMetadata({
   if (keyword) {
     title = `Tìm kiếm sản phẩm: ${keyword}`;
     description = `Kết quả tìm kiếm sản phẩm cho từ khóa ${keyword} tại Thịnh Phú Food.`;
-    path = "/san-pham";
     noIndex = true;
   }
 
   return createPageMetadata({
     title,
     description,
-    path,
+    path: "/san-pham",
     noIndex,
   });
 }
@@ -67,12 +80,30 @@ export default async function Page({ searchParams }: PageProps) {
   const categoryId = readFirst(searchParams?.category) ?? "all";
   const keyword = readFirst(searchParams?.q) ?? "";
 
-  const [products, menus, banners] = await Promise.all([
+  const [allProducts, menus, banners] = await Promise.all([
     getProducts(),
     getMenus(),
     getBannersServer(),
   ]);
-  const productCategories = getProductCategoryMenus(menus, products);
+
+  const productRoot = findMenuBySlug(menus, "san-pham");
+  if (!productRoot) {
+    return notFound();
+  }
+
+  if (categoryId !== "all") {
+    const legacyCategory = menus.find((item) => item.id === categoryId);
+
+    if (legacyCategory?.slug) {
+      const query = keyword.trim()
+        ? `?q=${encodeURIComponent(keyword.trim())}`
+        : "";
+      redirect(`/danh-muc/${legacyCategory.slug}${query}`);
+    }
+  }
+
+  const products = getSectionProducts(menus, allProducts, "san-pham");
+  const productCategories = getSectionCategoryMenus(menus, allProducts, "san-pham");
 
   const shopBanners: any[] = banners
     .filter((banner: any) => banner.placement === "Cửa hàng" && banner.isActive)
@@ -102,6 +133,10 @@ export default async function Page({ searchParams }: PageProps) {
           categories={productCategories}
           initialCategory={categoryId}
           initialSearch={keyword}
+          basePath="/san-pham"
+          allCategoriesPath="/san-pham"
+          categoryPathPrefix="/danh-muc"
+          categoryTitle="Danh mục sản phẩm"
         />
       </Suspense>
     </>

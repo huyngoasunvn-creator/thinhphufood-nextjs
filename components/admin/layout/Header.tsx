@@ -2,6 +2,10 @@
 
 import useMenus from "@/hooks/useMenus";
 import EventMenu from "@/components/header/EventMenu";
+import {
+  buildMenuMap,
+  findSectionRoot,
+} from "@/lib/menu-sections";
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -49,15 +53,13 @@ const Header: React.FC<HeaderProps> = ({
 
   const menus = useMenus() as MenuItem[];
   const menuMap = useMemo(
-    () => new Map(menus.map((menu) => [menu.id, menu])),
+    () => buildMenuMap(menus as any),
     [menus],
   );
 
   const parents = menus
     .filter((menu) => menu.parentId === null || menu.parentId === "")
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-
-  const productRoot = parents.find((menu) => menu.slug === "san-pham") ?? null;
 
   useEffect(() => {
     const categoryId = searchParams.get("category");
@@ -77,18 +79,13 @@ const Header: React.FC<HeaderProps> = ({
     setCurrentCategoryId(null);
   }, [menus, pathname, searchParams]);
 
-  const isProductCategoryMenu = (menu: MenuItem) => {
-    let current: MenuItem | undefined = menu;
+  const getSectionRoot = (menu?: MenuItem | null) => {
+    return findSectionRoot(menu as any, menuMap as any);
+  };
 
-    while (current) {
-      if (current.slug === "san-pham") {
-        return menu.id !== current.id;
-      }
-
-      current = current.parentId ? menuMap.get(current.parentId) : undefined;
-    }
-
-    return false;
+  const isSectionCategoryMenu = (menu: MenuItem) => {
+    const root = getSectionRoot(menu);
+    return Boolean(root && root.id !== menu.id);
   };
 
   const getChildren = (parentId: string) => {
@@ -100,12 +97,18 @@ const Header: React.FC<HeaderProps> = ({
   const buildMenuHref = (menu?: MenuItem | null) => {
     if (!menu?.slug) return "/";
 
-    if (isProductCategoryMenu(menu)) {
-      return `/san-pham?category=${menu.id}`;
-    }
+    const sectionRoot = getSectionRoot(menu);
 
-    if (menu.slug.startsWith("/")) {
-      return menu.slug;
+    if (sectionRoot) {
+      if (sectionRoot.id === menu.id) {
+        return `/${sectionRoot.slug}`;
+      }
+
+      if (sectionRoot.slug === "san-pham") {
+        return `/danh-muc/${menu.slug}`;
+      }
+
+      return `/${sectionRoot.slug}?category=${menu.id}`;
     }
 
     return `/${menu.slug}`;
@@ -128,12 +131,26 @@ const Header: React.FC<HeaderProps> = ({
         ];
 
   const isActive = (href: string, menu?: MenuItem | null) => {
-    if (menu && isProductCategoryMenu(menu)) {
-      return currentCategoryId === menu.id;
-    }
+    if (menu) {
+      const sectionRoot = getSectionRoot(menu);
 
-    if (menu?.slug === "san-pham") {
-      return pathname === "/san-pham" || pathname.startsWith("/danh-muc/");
+      if (sectionRoot && sectionRoot.id !== menu.id) {
+        return currentCategoryId === menu.id;
+      }
+
+      if (sectionRoot && sectionRoot.id === menu.id) {
+        if (pathname === `/${sectionRoot.slug}`) {
+          return true;
+        }
+
+        if (!currentCategoryId) {
+          return false;
+        }
+
+        const currentMenu = menuMap.get(currentCategoryId);
+        const currentRoot = currentMenu ? getSectionRoot(currentMenu) : null;
+        return currentRoot?.id === menu.id;
+      }
     }
 
     if (href === "/") {
@@ -388,8 +405,8 @@ const Header: React.FC<HeaderProps> = ({
               </Link>
             ))}
 
-            {productRoot &&
-              getChildren(productRoot.id).map((child) => (
+            {parents.map((parent) =>
+              getChildren(parent.id).map((child) => (
                 <Link
                   key={child.id}
                   href={buildMenuHref(child)}
@@ -402,7 +419,8 @@ const Header: React.FC<HeaderProps> = ({
                 >
                   {child.name}
                 </Link>
-              ))}
+              )),
+            )}
 
             {isAdmin && (
               <button

@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase-admin";
 
 export async function DELETE(
-  req: Request,
+  _req: Request,
   { params }: { params: { id: string } }
 ) {
   try {
     await adminDb.collection("banners").doc(params.id).delete();
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("DELETE banner error:", error);
@@ -21,7 +22,23 @@ export async function PUT(
   try {
     const body = await req.json();
 
-    await adminDb.collection("banners").doc(params.id).update(body);
+    const payload = {
+  title: body.title ?? "",
+  subtitle: body.subtitle ?? "",
+  mediaType: body.mediaType ?? "image",
+  imageUrl: body.imageUrl ?? "",
+  logoUrl: body.logoUrl ?? "",
+  link: body.link ?? "",
+  buttonText: body.buttonText ?? "",
+  placement: body.placement ?? "Trang chủ",
+  textColor: body.textColor ?? "#ffffff",
+  overlayOpacity: body.overlayOpacity ?? 0.4,
+  order: body.order ?? 0,
+  contentAlign: body.contentAlign ?? "left",
+  isActive: body.isActive ?? true,
+};
+
+await adminDb.collection("banners").doc(params.id).update(payload);
 
     return NextResponse.json({ success: true });
   } catch (error) {

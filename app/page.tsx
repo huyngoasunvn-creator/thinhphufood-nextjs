@@ -5,9 +5,19 @@ import type {
   AboutConfig,
   Banner,
   Commitment,
+  HomePageConfig,
   NewsPost,
   Product,
 } from "@/types";
+
+type HomeMenu = {
+  id: string;
+  name: string;
+  slug: string;
+  parentId: string | null;
+  isActive: boolean;
+  order: number;
+};
 
 export const revalidate = 3600;
 
@@ -18,12 +28,16 @@ export default async function Page() {
     news: NewsPost[];
     commitments: Commitment[];
     aboutConfig?: AboutConfig;
+    homePageConfig?: HomePageConfig;
+    menus: HomeMenu[];
   } = {
     products: [],
     banners: [],
     news: [],
     commitments: [],
     aboutConfig: undefined,
+    homePageConfig: undefined,
+    menus: [],
   };
 
   try {
@@ -36,6 +50,8 @@ export default async function Page() {
         news: (result.news ?? []).slice(0, 3),
         commitments: result.commitments ?? [],
         aboutConfig: result.aboutConfig ?? undefined,
+        homePageConfig: result.homePageConfig ?? undefined,
+        menus: result.menus ?? [],
       };
     }
   } catch (error) {

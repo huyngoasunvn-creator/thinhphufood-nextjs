@@ -112,6 +112,7 @@ const AdminSidebar: React.FC<Props> = ({
             <Link
               key={item.path}
               href={item.path}
+              prefetch={false}
               onClick={() => setSidebarOpen(false)} // ✅ auto close mobile
               className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 ${
                 isActive

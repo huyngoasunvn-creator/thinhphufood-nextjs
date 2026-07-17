@@ -1,4 +1,5 @@
 import { MetadataRoute } from "next";
+import { buildMenuMap, findSectionRoot } from "@/lib/menu-sections";
 import { SITE_URL } from "@/lib/seo";
 import { getMenus } from "@/lib/server/menu-server";
 import { getNewsServer } from "@/lib/server/news-server";
@@ -46,6 +47,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: `${SITE_URL}/nong-san`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.85,
+    },
+    {
       url: `${SITE_URL}/tin-tuc`,
       lastModified: new Date(),
       changeFrequency: "daily",
@@ -56,6 +63,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.6,
+    },
+    {
+      url: `${SITE_URL}/profile`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.7,
     },
     {
       url: `${SITE_URL}/contact`,
@@ -85,14 +98,48 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  const menuMap = buildMenuMap(menus as any);
+
   const categoryUrls: MetadataRoute.Sitemap = menus
     .filter((item) => item.slug)
-    .map((item) => ({
-      url: `${SITE_URL}/danh-muc/${item.slug}`,
-      lastModified: toDate(item.updatedAt),
-      changeFrequency: "weekly" as const,
-      priority: item.parentId ? 0.65 : 0.75,
-    }));
+    .flatMap((item) => {
+      if (item.slug === "san-pham" || item.slug === "nong-san") {
+        return [];
+      }
+
+      const sectionRoot = findSectionRoot(item as any, menuMap as any);
+
+      if (sectionRoot?.slug === "san-pham") {
+        return [
+          {
+            url: `${SITE_URL}/danh-muc/${item.slug}`,
+            lastModified: toDate(item.updatedAt),
+            changeFrequency: "weekly" as const,
+            priority: 0.65,
+          },
+        ];
+      }
+
+      if (sectionRoot?.slug === "nong-san") {
+        return [
+          {
+            url: `${SITE_URL}/nong-san?category=${item.id}`,
+            lastModified: toDate(item.updatedAt),
+            changeFrequency: "weekly" as const,
+            priority: 0.65,
+          },
+        ];
+      }
+
+      return [
+        {
+          url: `${SITE_URL}/danh-muc/${item.slug}`,
+          lastModified: toDate(item.updatedAt),
+          changeFrequency: "weekly" as const,
+          priority: item.parentId ? 0.65 : 0.75,
+        },
+      ];
+    });
 
   return [...staticUrls, ...categoryUrls, ...productUrls, ...newsUrls];
 }

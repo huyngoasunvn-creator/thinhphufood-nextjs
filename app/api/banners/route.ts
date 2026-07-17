@@ -9,9 +9,13 @@ interface Banner {
   id: string;
   title: string;
   subtitle?: string;
+  mediaType?: "image" | "video";
   imageUrl: string;
   link?: string;
+  buttonText?: string;
   placement?: string;
+  textColor?: string;
+  overlayOpacity?: number;
   order?: number;
   isActive?: boolean;
   createdAt?: number;
@@ -48,15 +52,20 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log("BODY:", body);
 
     const docRef = await adminDb.collection("banners").add({
   title: body.title,
-  subtitle: body.subtitle,
+  subtitle: body.subtitle || "",
+  mediaType: body.mediaType || "image",
   imageUrl: body.imageUrl,
-  link: body.link,
+  logoUrl: body.logoUrl || "",
+  link: body.link || "",
+  buttonText: body.buttonText || "",
   placement: body.placement ?? "Trang chủ",
+  textColor: body.textColor || "#ffffff",
+  overlayOpacity: body.overlayOpacity ?? 0.4,
   order: body.order ?? 0,
+  contentAlign: body.contentAlign || "left",
   isActive: body.isActive ?? true,
   createdAt: Date.now(),
 });

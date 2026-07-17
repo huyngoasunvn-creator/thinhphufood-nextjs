@@ -10,7 +10,6 @@ export interface CartItem {
   category?: string;
 }
 
-
 export interface Order {
   id: string;
   customerName: string;
@@ -19,7 +18,7 @@ export interface Order {
   items: CartItem[];
   shippingFee: number;
   total: number;
-  status: 'pending' | 'shipping' | 'completed' | 'cancelled';
+  status: "pending" | "shipping" | "completed" | "cancelled";
   createdAt: string;
   note?: string;
   paymentMethod: string;
@@ -46,21 +45,25 @@ export interface ContactMessage {
   subject: string;
   message: string;
   createdAt: string;
-  status: 'new' | 'read' | 'replied';
+  status: "new" | "read" | "replied";
 }
 
 export interface Banner {
   id: string;
   title: string;
   subtitle?: string;
+  mediaType?: "image" | "video";
   imageUrl: string;
+  logoUrl?: string;
   link?: string;
   buttonText?: string;
   isActive: boolean;
-  placement: 'Trang chủ' | 'Tin tức' | 'Cửa hàng';
+  placement: "Trang chủ" | "Tin tức" | "Cửa hàng" | "Nông sản" | string;
   textColor: string;
   overlayOpacity: number;
   order?: number;
+  contentAlign?: "left" | "center" | "right";
+  createdAt?: number;
 }
 
 export interface Commitment {
@@ -68,7 +71,7 @@ export interface Commitment {
   iconName: string;
   title: string;
   description: string;
-  colorScheme: 'green' | 'blue' | 'orange' | 'purple' | 'red' | 'slate';
+  colorScheme: "green" | "blue" | "orange" | "purple" | "red" | "slate";
 }
 
 export interface AboutConfig {
@@ -85,16 +88,75 @@ export interface AboutConfig {
   buttonLink: string;
 }
 
+export interface HomeProofItem {
+  value: string;
+  title: string;
+  description: string;
+}
+
+export interface HomeFeaturedHighlight {
+  label: string;
+  value: string;
+  description: string;
+}
+
+export interface HomeProofBenefit {
+  title: string;
+  description: string;
+}
+
+export interface HomeSectionContent {
+  isEnabled: boolean;
+  badge: string;
+  title: string;
+  description: string;
+  buttonText?: string;
+  buttonLink?: string;
+}
+
+export interface HomeFeaturedSection extends HomeSectionContent {
+  highlights: HomeFeaturedHighlight[];
+}
+
+export interface HomeProofSection {
+  isEnabled: boolean;
+  badge: string;
+  title: string;
+  description: string;
+  items: HomeProofItem[];
+  benefits: HomeProofBenefit[];
+}
+
+export interface HomePageConfig {
+  featuredSection: HomeFeaturedSection;
+  proofSection: HomeProofSection;
+  trustSection: HomeSectionContent;
+  bestsellerSection: HomeSectionContent;
+  newsSection: HomeSectionContent;
+
+  topFeaturesSection: {
+    isEnabled: boolean;
+  };
+}
+
 export interface ProfileConfig {
   title: string;
   externalUrl: string;
   isActive: boolean;
+  renderMode?: 'native' | 'embed';
+  factoryImageUrl?: string;
+  headline?: string;
+  description?: string;
 }
 
 export interface AboutPageConfig {
   title: string;
   externalUrl: string;
   isActive: boolean;
+  renderMode?: 'native' | 'embed';
+  factoryImageUrl?: string;
+  headline?: string;
+  description?: string;
 }
 
 export interface ContactConfig {
@@ -130,8 +192,8 @@ export interface SiteConfig {
   certValue: string;
   shippingLabel: string;
   shippingValue: string;
-  
 }
+
 export interface Category {
   id: string;
   name: string;
@@ -139,3 +201,5 @@ export interface Category {
   parentId: string | null;
   isActive: boolean;
 }
+
+export type { Product };

@@ -6,12 +6,16 @@ import { getSettingsServer } from "@/lib/server/settings-server";
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettingsServer();
   const profile = settings?.profile ?? INITIAL_PROFILE;
+  const pageTitle = ["Tài khoản", "Profile"].includes(profile.title)
+    ? "Giới thiệu Thịnh Phú Food"
+    : profile.title || "Giới thiệu Thịnh Phú Food";
 
   return createPageMetadata({
-    title: profile.title || "Tai khoan",
-    description: "Trang thong tin tai khoan nguoi dung.",
+    title: pageTitle,
+    description:
+      profile.description ||
+      "Tìm hiểu về Thịnh Phú Food, cơ cấu tổ chức, quy trình sản xuất và năng lực cung cấp gạo cho gia đình, đại lý và doanh nghiệp.",
     path: "/profile",
-    noIndex: true,
   });
 }
 

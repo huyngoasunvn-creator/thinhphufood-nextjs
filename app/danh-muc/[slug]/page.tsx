@@ -93,6 +93,10 @@ export default async function CategoryPage({ params }: PageProps) {
           products={products}
           categories={productCategories}
           initialCategory={category.id}
+          basePath={`/danh-muc/${category.slug}`}
+          allCategoriesPath="/san-pham"
+          categoryPathPrefix="/danh-muc"
+          categoryTitle="Danh mục sản phẩm"
         />
       </Suspense>
     </>

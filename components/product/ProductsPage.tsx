@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import ProductCard from "./ProductCard";
 import type { Product } from "@/types";
 
@@ -11,13 +11,13 @@ const normalizeText = (text: string) => {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/đ/g, "d")
-    .replace(/Đ/g, "d")
     .trim();
 };
 
 interface Category {
   id: string;
   name: string;
+  slug?: string;
   parentId?: string | null;
 }
 
@@ -26,6 +26,11 @@ interface Props {
   categories: Category[];
   initialCategory?: string;
   initialSearch?: string;
+  basePath?: string;
+  allCategoriesPath?: string;
+  categoryPathPrefix?: string;
+  categoryTitle?: string;
+  emptyMessage?: string;
 }
 
 interface CategoryNode extends Category {
@@ -37,8 +42,14 @@ export default function ProductsPage({
   categories = [],
   initialCategory = "all",
   initialSearch = "",
+  basePath = "/san-pham",
+  allCategoriesPath = basePath,
+  categoryPathPrefix,
+  categoryTitle = "Danh mục",
+  emptyMessage = "Không có sản phẩm phù hợp.",
 }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [activeCategory, setActiveCategory] = useState<string | null>(
     initialCategory !== "all" ? initialCategory : null,
@@ -89,18 +100,20 @@ export default function ProductsPage({
       return;
     }
 
-    const path = window.location.pathname;
-
-    if (path.startsWith("/tim-kiem/")) {
-      const keyword = decodeURIComponent(path.replace("/tim-kiem/", "")).replaceAll(
+    if (pathname.startsWith("/tim-kiem/")) {
+      const keyword = decodeURIComponent(pathname.replace("/tim-kiem/", "")).replaceAll(
         "-",
         " ",
       );
 
       setSearch(keyword);
       setDebouncedSearch(keyword);
+      return;
     }
-  }, [searchParams]);
+
+    setSearch(initialSearch);
+    setDebouncedSearch(initialSearch);
+  }, [initialSearch, pathname, searchParams]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -111,7 +124,7 @@ export default function ProductsPage({
   }, [search]);
 
   useEffect(() => {
-    if (window.location.pathname.startsWith("/tim-kiem")) {
+    if (pathname.startsWith("/tim-kiem")) {
       return;
     }
 
@@ -124,11 +137,10 @@ export default function ProductsPage({
     }
 
     const queryString = params.toString();
-    router.replace(
-      queryString ? `/san-pham?${params.toString()}` : "/san-pham",
-      { scroll: false },
-    );
-  }, [debouncedSearch, router, searchParams]);
+    router.replace(queryString ? `${basePath}?${queryString}` : basePath, {
+      scroll: false,
+    });
+  }, [basePath, debouncedSearch, pathname, router, searchParams]);
 
   const categoryTree: CategoryNode[] = useMemo(() => {
     const map = new Map<string, CategoryNode>();
@@ -220,13 +232,11 @@ export default function ProductsPage({
       });
     }
 
-    list.sort((first, second) => {
+    return list.sort((first, second) => {
       if (first.isBestseller && !second.isBestseller) return -1;
       if (!first.isBestseller && second.isBestseller) return 1;
       return 0;
     });
-
-    return list;
   }, [products, activeCategory, debouncedSearch, categoryTree]);
 
   const handleCategoryChange = (id: string | null) => {
@@ -234,15 +244,23 @@ export default function ProductsPage({
     setMobileCategoryOpen(false);
 
     const params = new URLSearchParams(searchParams.toString());
+    params.delete("category");
+    let targetPath = allCategoriesPath;
 
-    if (!id) {
-      params.delete("category");
-    } else {
+    if (id && categoryPathPrefix) {
+      const category = categories.find((item) => item.id === id);
+
+      if (category?.slug) {
+        targetPath = `${categoryPathPrefix}/${category.slug}`;
+      } else {
+        params.set("category", id);
+      }
+    } else if (id) {
       params.set("category", id);
     }
 
     const queryString = params.toString();
-    router.push(queryString ? `/san-pham?${queryString}` : "/san-pham", {
+    router.push(queryString ? `${targetPath}?${queryString}` : targetPath, {
       scroll: false,
     });
   };
@@ -264,13 +282,13 @@ export default function ProductsPage({
   const renderCategories = (nodes: CategoryNode[], level = 0) => {
     return nodes.map((node) => {
       const isOpen = openCategories.has(node.id);
-      const isActive = activeCategory === node.id;
+      const isCurrent = activeCategory === node.id;
 
       return (
         <div key={node.id} className="mb-1">
           <div
             className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm cursor-pointer transition ${
-              isActive ? "bg-green-600 text-white" : "hover:bg-green-50"
+              isCurrent ? "bg-green-600 text-white" : "hover:bg-green-50"
             }`}
             style={{ paddingLeft: `${12 + level * 14}px` }}
           >
@@ -283,6 +301,7 @@ export default function ProductsPage({
 
             {node.children.length > 0 && (
               <button
+                type="button"
                 onClick={() => toggleOpen(node.id)}
                 className="text-xs ml-2"
               >
@@ -303,15 +322,17 @@ export default function ProductsPage({
     <div className="max-w-7xl mx-auto px-4 py-6 lg:py-10 flex flex-col lg:flex-row gap-6 lg:gap-8">
       <div className="lg:hidden">
         <button
+          type="button"
           onClick={() => setMobileCategoryOpen(!mobileCategoryOpen)}
           className="w-full bg-green-600 text-white py-2 rounded-xl font-semibold"
         >
-          Danh mục sản phẩm
+          {categoryTitle}
         </button>
 
         {mobileCategoryOpen && (
           <div className="mt-3 bg-white border rounded-xl p-3 shadow-md max-h-96 overflow-y-auto">
             <button
+              type="button"
               onClick={() => handleCategoryChange(null)}
               className={`mb-3 w-full text-left px-3 py-2 rounded-lg text-sm ${
                 !activeCategory ? "bg-green-600 text-white" : "bg-slate-50"
@@ -327,10 +348,11 @@ export default function ProductsPage({
 
       <aside className="hidden lg:block w-64">
         <h3 className="text-xs uppercase font-bold text-slate-400 mb-4">
-          Danh mục
+          {categoryTitle}
         </h3>
 
         <button
+          type="button"
           onClick={() => handleCategoryChange(null)}
           className={`mb-4 w-full text-left px-4 py-2 rounded-xl font-semibold ${
             !activeCategory ? "bg-green-600 text-white" : "bg-white border"
@@ -372,7 +394,7 @@ export default function ProductsPage({
         </div>
 
         {filteredProducts.length === 0 ? (
-          <p className="text-slate-500">Không có sản phẩm phù hợp.</p>
+          <p className="text-slate-500">{emptyMessage}</p>
         ) : (
           <>
             <p className="text-sm font-medium text-green-700 mb-3">

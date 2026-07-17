@@ -3,6 +3,7 @@ import {
   AboutConfig,
   AboutPageConfig,
   ContactConfig,
+  HomePageConfig,
   PopupConfig,
   ProfileConfig,
   SiteConfig,
@@ -10,6 +11,7 @@ import {
 
 interface GlobalSettings {
   aboutConfig?: AboutConfig;
+  homePageConfig?: HomePageConfig;
   aboutPage?: AboutPageConfig;
   contact?: ContactConfig;
   popupConfig?: PopupConfig;

@@ -6,6 +6,7 @@ const NON_PRODUCT_MENU_SLUGS = new Set([
   "/",
   "trang-chu",
   "san-pham",
+  "nong-san",
   "tin-tuc",
   "gioi-thieu",
   "ve-chung-toi",

@@ -4,8 +4,10 @@
 @tailwind utilities;
 
 @layer base {
+  html,
   body {
     @apply bg-background text-slate-900;
+    overflow-x: clip;
   }
 }
   body {

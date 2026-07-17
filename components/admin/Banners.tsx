@@ -100,11 +100,21 @@ export default function Banners() {
             >
               {/* Image */}
               <div className="relative">
-                <img
-                  src={banner.imageUrl}
-                  alt={banner.title}
-                  className="w-full h-60 object-cover"
-                />
+  {(banner.mediaType || "image") === "video" ? (
+    <video
+      src={banner.imageUrl}
+      className="w-full h-60 object-cover"
+      muted
+      playsInline
+      controls
+    />
+  ) : (
+    <img
+      src={banner.imageUrl}
+      alt={banner.title}
+      className="w-full h-60 object-cover"
+    />
+  )}
 
                 {/* Overlay Actions */}
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-4">

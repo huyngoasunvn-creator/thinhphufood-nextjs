@@ -10,23 +10,49 @@ export interface MenuItem {
   updatedAt?: { toDate?: () => Date } | Date | string | null;
 }
 
+function normalizeSlug(value: unknown) {
+  return String(value ?? "")
+    .trim()
+    .replace(/^\/+/, "")
+    .replace(/\/+$/, "");
+}
+
 export async function getMenus(): Promise<MenuItem[]> {
   const snapshot = await adminDb
     .collection("menus")
     .orderBy("order", "asc")
     .get();
 
-  return snapshot.docs
-    .map((doc) => ({
+  const allMenus = snapshot.docs.map((doc) => ({
       id: doc.id,
       name: String(doc.data().name ?? ""),
-      slug: String(doc.data().slug ?? ""),
+      slug: normalizeSlug(doc.data().slug),
       parentId: (doc.data().parentId as string | null | undefined) ?? null,
       isActive: doc.data().isActive !== false,
       order: Number(doc.data().order ?? 0),
       updatedAt: doc.data().updatedAt ?? null,
-    }))
-    .filter((item) => item.isActive);
+    }));
+
+  const activeMenus = allMenus.filter((item) => item.isActive);
+  const activeMap = new Map(activeMenus.map((item) => [item.id, item]));
+
+  const hasActiveAncestors = (menu: MenuItem) => {
+    let currentParentId = menu.parentId;
+
+    while (currentParentId) {
+      const parent = activeMap.get(currentParentId);
+
+      if (!parent) {
+        return false;
+      }
+
+      currentParentId = parent.parentId;
+    }
+
+    return true;
+  };
+
+  return activeMenus.filter(hasActiveAncestors);
 }
 
 export async function createMenu(data: Record<string, unknown>) {

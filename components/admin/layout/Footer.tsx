@@ -10,6 +10,8 @@ interface FooterProps {
 }
 
 const Footer: React.FC<FooterProps> = ({ config }) => {
+  const currentYear = new Date().getFullYear();
+
   return (
     <footer className="bg-slate-900 text-slate-300 pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -79,7 +81,7 @@ const Footer: React.FC<FooterProps> = ({ config }) => {
         </div>
 
         <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs space-y-4 md:space-y-0">
-          <p>© 2024 {config.siteName}. Tất cả quyền được bảo lưu.</p>
+          <p>© {currentYear} {config.siteName}. Tất cả quyền được bảo lưu.</p>
           
         </div>
       </div>

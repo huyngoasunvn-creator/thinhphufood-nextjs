@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   X,
   Save,
@@ -8,9 +8,10 @@ import {
   Upload,
   Loader2,
   Link as LinkIcon,
-} from 'lucide-react';
-import { Banner } from '../../types';
-import { uploadImage } from '../../services/storage';
+  Video,
+} from "lucide-react";
+import { Banner } from "../../types";
+import { uploadImage } from "../../services/storage";
 
 interface BannerFormProps {
   initialData?: Banner | null;
@@ -24,58 +25,70 @@ const BannerForm: React.FC<BannerFormProps> = ({
   onClose,
 }) => {
   const [formData, setFormData] = useState<Partial<Banner>>(
-    initialData || {
-      title: '',
-      subtitle: '',
-      imageUrl: '',
-      link: '',
-      buttonText: 'Xem thêm',
-      isActive: true,
-      placement: 'Trang chủ',
-      textColor: '#ffffff',
-      overlayOpacity: 0.4,
-      order: 0,
-    }
-  );
+  initialData || {
+    title: "",
+    subtitle: "",
+    imageUrl: "",
+    mediaType: "image",
+    logoUrl: "",
+    link: "",
+    buttonText: "",
+    isActive: true,
+    placement: "Trang chủ",
+    textColor: "#ffffff",
+    overlayOpacity: 0.4,
+    order: 0,
+    contentAlign: "left",
+  }
+);
+
   const [uploading, setUploading] = useState(false);
 
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
     onSave({
-      ...formData,
-      id: initialData?.id || Date.now().toString(),
-    } as Banner);
+  ...formData,
+  id: initialData?.id || Date.now().toString(),
+  mediaType: formData.mediaType || "image",
+  contentAlign: formData.contentAlign || "left",
+  logoUrl: formData.logoUrl || "",
+} as Banner);
   };
 
   const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     try {
       setUploading(true);
-      const url = await uploadImage(file, 'banners');
+
+      const url = await uploadImage(file, "banners");
+
       setFormData((prev) => ({
         ...prev,
         imageUrl: url,
+        mediaType: file.type.startsWith("video/") ? "video" : "image",
       }));
     } catch (error) {
-      console.error('Banner upload error:', error);
+      console.error("Banner upload error:", error);
       alert(
         error instanceof Error
           ? error.message
-          : 'Không thể tải banner lên Cloudinary.',
+          : "Không thể tải banner lên Cloudinary."
       );
     } finally {
       setUploading(false);
-      event.target.value = '';
+      event.target.value = "";
     }
   };
 
   const inputClass =
-    'w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-green-500 transition-all font-medium text-slate-900';
+    "w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-green-500 transition-all font-medium text-slate-900";
+
+  const mediaType = formData.mediaType || "image";
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -88,7 +101,7 @@ const BannerForm: React.FC<BannerFormProps> = ({
         <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100 bg-white z-10">
           <h3 className="text-xl font-extrabold text-slate-900 flex items-center">
             <Layout className="h-6 w-6 mr-3 text-green-600" />
-            {initialData ? 'Chỉnh sửa Banner' : 'Thêm Banner mới'}
+            {initialData ? "Chỉnh sửa Banner" : "Thêm Banner mới"}
           </h3>
           <button
             type="button"
@@ -196,22 +209,61 @@ const BannerForm: React.FC<BannerFormProps> = ({
             </div>
 
             <div>
+  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">
+    Vị trí hiển thị
+  </label>
+  <select
+    className={inputClass}
+    value={formData.placement}
+    onChange={(e) =>
+      setFormData({
+        ...formData,
+        placement: e.target.value as Banner["placement"],
+      })
+    }
+  >
+    <option value="Trang chủ">Trang chủ (Hero)</option>
+    <option value="Tin tức">Trang Tin tức (Header)</option>
+    <option value="Cửa hàng">Trang Cửa hàng (Header)</option>
+    <option value="Nông sản">Trang Nông sản (Header)</option>
+  </select>
+</div>
+<div>
+  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">
+    Căn nội dung
+  </label>
+  <select
+    className={inputClass}
+    value={formData.contentAlign || "left"}
+    onChange={(e) =>
+      setFormData({
+        ...formData,
+        contentAlign: e.target.value as "left" | "center" | "right",
+      })
+    }
+  >
+    <option value="left">Căn trái</option>
+    <option value="center">Căn giữa</option>
+    <option value="right">Căn phải</option>
+  </select>
+</div>
+
+            <div>
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">
-                Vị trí hiển thị
+                Loại media
               </label>
               <select
                 className={inputClass}
-                value={formData.placement}
+                value={mediaType}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    placement: e.target.value as any,
+                    mediaType: e.target.value as "image" | "video",
                   })
                 }
               >
-                <option value="Trang chủ">Trang chủ (Hero)</option>
-                <option value="Tin tức">Trang Tin tức (Header)</option>
-                <option value="Cửa hàng">Trang Cửa hàng (Header)</option>
+                <option value="image">Ảnh</option>
+                <option value="video">Video</option>
               </select>
             </div>
           </div>
@@ -219,7 +271,7 @@ const BannerForm: React.FC<BannerFormProps> = ({
           <div className="space-y-6">
             <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-4">
-                Hình ảnh Banner
+                Media Banner
               </label>
 
               <div className="aspect-[21/9] bg-white rounded-xl border-2 border-dashed border-slate-200 overflow-hidden relative flex items-center justify-center">
@@ -231,11 +283,21 @@ const BannerForm: React.FC<BannerFormProps> = ({
                     </span>
                   </div>
                 ) : formData.imageUrl ? (
-                  <img
-                    src={formData.imageUrl}
-                    className="w-full h-full object-cover"
-                    alt=""
-                  />
+                  mediaType === "video" ? (
+                    <video
+                      src={formData.imageUrl}
+                      className="w-full h-full object-cover"
+                      controls
+                    />
+                  ) : (
+                    <img
+                      src={formData.imageUrl}
+                      className="w-full h-full object-cover"
+                      alt=""
+                    />
+                  )
+                ) : mediaType === "video" ? (
+                  <Video className="h-10 w-10 text-slate-300" />
                 ) : (
                   <ImageIcon className="h-10 w-10 text-slate-300" />
                 )}
@@ -249,20 +311,19 @@ const BannerForm: React.FC<BannerFormProps> = ({
                     <Upload className="h-4 w-4 text-green-600" />
                   )}
                   <span className="text-xs font-bold text-slate-700">
-                    Tải ảnh từ máy lên Cloudinary
+                    Tải ảnh hoặc video lên Cloudinary
                   </span>
                   <input
                     type="file"
                     className="hidden"
-                    accept="image/*"
+                    accept="image/*,video/*"
                     onChange={handleFileChange}
                     disabled={uploading}
                   />
                 </label>
 
                 <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Ảnh tải từ máy sẽ được nén trước khi upload để tiết kiệm dung
-                  lượng lưu trữ trên Cloudinary.
+                  Có thể tải cả ảnh hoặc video. Khi upload, hệ thống sẽ tự nhận diện loại media.
                 </p>
 
                 <div className="relative">
@@ -270,7 +331,8 @@ const BannerForm: React.FC<BannerFormProps> = ({
                   <input
                     required
                     type="text"
-                    placeholder="Hoặc dán URL hình ảnh..."
+                    placeholder="Dán URL ảnh hoặc video..."
+                    
                     className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-200 rounded-xl outline-none"
                     value={formData.imageUrl}
                     onChange={(e) =>
@@ -281,6 +343,20 @@ const BannerForm: React.FC<BannerFormProps> = ({
                     }
                   />
                 </div>
+                <div className="relative">
+  <input
+    type="text"
+    placeholder="URL logo banner (nếu có)"
+    className="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-xl outline-none"
+    value={formData.logoUrl || ""}
+    onChange={(e) =>
+      setFormData({
+        ...formData,
+        logoUrl: e.target.value,
+      })
+    }
+  />
+</div>
               </div>
             </div>
 
@@ -355,7 +431,7 @@ const BannerForm: React.FC<BannerFormProps> = ({
               </div>
               <Eye
                 className={`h-5 w-5 ${
-                  formData.isActive ? 'text-green-600' : 'text-slate-300'
+                  formData.isActive ? "text-green-600" : "text-slate-300"
                 }`}
               />
             </div>
